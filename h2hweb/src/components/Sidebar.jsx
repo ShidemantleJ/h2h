@@ -1,9 +1,11 @@
 import {Play, User, Users, Home} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from '../user/UserContext';
 
 const Sidebar = (props) => {
   const navigate = useNavigate();
-  const user = props.user;
+  const {user} = useContext(UserContext);
   // console.log(user);
     return (
       <>

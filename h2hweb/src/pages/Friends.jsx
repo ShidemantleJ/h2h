@@ -1,8 +1,8 @@
-// Split into left: new friends, right: current friends
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import UserCard from "../components/UserCard";
 import axios from "axios";
 import supabase from "../supabase";
+import { UserContext } from "../user/UserContext";
 
 const fetchPublicUserInfo = async (searchTerm, setUserResult) => {
     axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/userSearch`, {
@@ -57,14 +57,14 @@ const Friends = (props) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [userResult, setUserResult] = useState([]);
     const [friendInfo, setFriendInfo] = useState({incomingReqs: [], outgoingReqs: [], friends: []});
-    
+    const {user} = useContext(UserContext);
     useEffect(() => {
-        if (!props.user) return;
+        if (!user) return;
 
         fetchPublicUserInfo(searchTerm, setUserResult);
-        subscribeToFriendChanges(props.user, setFriendInfo);
-        getFriendRequests(props.user, setFriendInfo);
-    }, [searchTerm, props.user]);
+        subscribeToFriendChanges(user, setFriendInfo);
+        getFriendRequests(user, setFriendInfo);
+    }, [searchTerm, user]);
     
     /*
     return (

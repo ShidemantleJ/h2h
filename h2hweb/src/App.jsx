@@ -7,6 +7,8 @@ import Sidebar from './components/Sidebar';
 import Friends from './pages/Friends';
 import Play from './pages/Play';
 import supabase from './supabase';
+import {UserContext} from './user/UserContext';
+import { User } from 'lucide-react';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -52,6 +54,7 @@ function App() {
   }, []);
 
   return (
+    <UserContext.Provider value={{user, setUser}}>
     <Router>
       <div className="flex">
       <Sidebar user={user}/>
@@ -64,6 +67,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </UserContext.Provider>
   )
 }
 
