@@ -8,13 +8,15 @@ function isLoggedIn(req, res, next) {
 async function findOrCreateUser(user) {
   // console.log(user);
   const { data, error } = await supabase
-    .from("Users")
+    .from("users")
     .select()
     .eq("wcaid", user.wca.id);
 
-  if (data.length === 0) {
+  console.error(error);
+
+  if (data?.length === 0) {
     // console.log("No user found");
-    const { error } = await supabase.from("Users").insert({
+    const { error } = await supabase.from("users").insert({
       name: user.displayName,
       wcaid: user.wca.id,
       profile_pic_url: user.photos[0].value,

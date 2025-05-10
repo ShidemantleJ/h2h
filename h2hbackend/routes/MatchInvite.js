@@ -5,16 +5,14 @@ const { isLoggedIn } = require("../login/user");
 
 // TODO: finish create match function
 async function createMatch(match) {
-    const {data, error} = await supabase
-    .from("Matches")
-    .insert({
-        player_1_id: match.player_1_id,
-        player_2_id: match.player_2_id,
-        best_of_set_format: match.boSetFormat,
-        best_of_solve_format: match.boSolveFormat,
-        event: match.event,
-        time_limit: match.timeLimit,
-    })
+  const { data, error } = await supabase.from("matches").insert({
+    player_1_id: match.player_1_id,
+    player_2_id: match.player_2_id,
+    best_of_set_format: match.boSetFormat,
+    best_of_solve_format: match.boSolveFormat,
+    event: match.event,
+    time_limit: match.timeLimit,
+  });
 }
 
 // friend.js /sendreq endpoint referenced to write this
@@ -23,7 +21,7 @@ router.post("/send", isLoggedIn, async (req, res) => {
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
 
   const { data, error } = await supabase
-    .from("MatchInvites")
+    .from("matchinvites")
     .insert({
       player_1_id: senderId,
       player_2_id: recipientId,
@@ -45,7 +43,7 @@ router.post("/send", isLoggedIn, async (req, res) => {
 router.post("/accept", isLoggedIn, async (req, res) => {
   const { inviteId } = req.body;
   const { inviteData, fetchError } = await supabase
-    .from("MatchInvites")
+    .from("matchinvites")
     .select("*")
     .eq("id", Number.parseInt(inviteId, 10))
     .single();
@@ -56,7 +54,7 @@ router.post("/accept", isLoggedIn, async (req, res) => {
       .send("Could not find this invite, could have been canceled or deleted");
 
   const { deleteError } = await supabase
-    .from("MatchInvites")
+    .from("matchinvites")
     .delete()
     .eq("id", Number.parseInt(inviteId));
 

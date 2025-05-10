@@ -19,32 +19,6 @@ function App() {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/loggedInInfo`, { withCredentials: true });
         setUser(res.data);
-  
-        const onlineUsersChannel = supabase.channel('onlineUsers');
-  
-        onlineUsersChannel
-          .on('presence', { event: 'sync' }, () => {
-            // console.log('Synced presence state: ', onlineUsersChannel.presenceState());
-            const userIds = [];
-            for (const currId in onlineUsersChannel.presenceState()) {
-              userIds.push(res.data.dbInfo.id);
-            }
-            const userIdsSet = new Set(userIds);
-            setOnlineUsers(Array.from(userIdsSet));
-          })
-          .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-              await onlineUsersChannel.track({
-                online_at: new Date().toISOString(),
-                user: res.data,
-              });
-            }
-          });
-  
-        return () => {
-          onlineUsersChannel.unsubscribe();
-        };
-  
       } catch (error) {
         console.log(error);
       }
@@ -57,13 +31,13 @@ function App() {
     <UserContext.Provider value={{user, setUser}}>
     <Router>
       <div className="flex">
-      <Sidebar user={user}/>
+      <Sidebar/>
         {/* Main Page Content */}
         <Routes>
           <Route path="/" element={<Home onlineUsers={onlineUsers}/>}/>
           <Route path="/users/:userId" element={<UserView/>}/>
-          <Route path="/friends" element={<Friends user={user}/>}/>
-          <Route path="/play" element={<Play user={user}/>}/>
+          <Route path="/friends" element={<Friends/>}/>
+          <Route path="/play" element={<Play/>}/>
         </Routes>
       </div>
     </Router>

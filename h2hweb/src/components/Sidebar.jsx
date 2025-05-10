@@ -6,7 +6,7 @@ import { UserContext } from '../user/UserContext';
 const Sidebar = (props) => {
   const navigate = useNavigate();
   const {user} = useContext(UserContext);
-  // console.log(user);
+  console.log(user);
     return (
       <>
     {/* Sidebar Parent Div */}

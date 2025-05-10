@@ -9,7 +9,7 @@ router.get("/loggedInInfo", isLoggedIn, (req, res) => {
 
 router.get("/userPublic", async (req, res) => {
   const { data, error } = await supabase
-    .from("Users")
+    .from("users")
     .select("name, wcaid, created_at, profile_pic_url")
     .eq("id", req.query.id)
     .maybeSingle();
@@ -22,11 +22,13 @@ router.get("/userPublic", async (req, res) => {
 router.get("/userSearch", async (req, res) => {
   try {
     // console.log(req.query.term);
+    if (req.query.term === "") return;
     const { data, error } = await supabase
-      .from("Users")
+      .from("users")
       .select("*")
-      .textSearch("wcaid", req.query.term);
-    // console.log(data);
+      .or(`wcaid.ilike.%${req.query.term}%, name.ilike.%${req.query.term}%`)
+      .limit(5);
+    console.log(data, req.query.term);
     // console.log(error);
     res.send(data);
   } catch (e) {
