@@ -3,7 +3,6 @@ import UserCard from "../components/UserCard";
 import axios from "axios";
 import supabase from "../supabase";
 import { UserContext } from "../user/UserContext";
-import { NewspaperIcon } from "lucide-react";
 
 const fetchPublicUserInfo = async (searchTerm, setUserResult, userId) => {
     axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/userSearch`, {
@@ -18,85 +17,18 @@ const fetchPublicUserInfo = async (searchTerm, setUserResult, userId) => {
     })
 }
 
-const getFriendInfo = async (user, setFriendInfo) => {
-    const {data: friendsData1, error: friendsError1} = await supabase
-    .from("friends")
-    .select("user1_id")
-    .eq("user2_id", user.dbInfo.id);
-
-    const {data: friendsData2, error: friendsError2} = await supabase
-    .from("friends")
-    .select("user2_id")
-    .eq("user1_id", user.dbInfo.id);
-
-    const friendsData = [...friendsData1.map((u) => u.user1_id), ...friendsData2.map((u) => u.user2_id)] || [];
-    // console.log(friendsData);
-    // console.error(friendsError1, friendsError2);
-
-    const {data: incReqsData, error: incReqsError} = await supabase
-    .from("friendreqs")
-    .select("sender_user_id")
-    .eq("recipient_user_id", user.dbInfo.id)
-    .eq("status", "pending");
-    // console.log(incReqsData.map((u) => u.sender_user_id));
-    // console.error(incReqsError);
-
-    const {data: outReqsData, error: outReqsError} = await supabase
-    .from("friendreqs")
-    .select("recipient_user_id")
-    .eq("sender_user_id", user.dbInfo.id)
-    .eq("status", "pending");
-    // console.log(outReqsData.map((u) => u.recipient_user_id));
-    // console.error(outReqsError);
-
-    setFriendInfo({
-        incomingReqs: incReqsData.map((u) => u.sender_user_id) || [],
-        outgoingReqs: outReqsData.map((u) => u.recipient_user_id) || [],
-        friends: friendsData || []
-    });
-}
-
-const subscribeToFriendChanges = async (user, setFriendInfo) => {
-    const channelA = supabase
-    .channel('schema-db-changes')
-    .on('postgres_changes',
-        {
-            event: "*",
-            schema: "public",
-            table: "friends",
-        },
-        (payload) => {
-            getFriendInfo(user, setFriendInfo);
-        }
-    )
-    .on('postgres_changes',
-        {
-            event: "*",
-            schema: "public",
-            table: "friendreqs",
-        },
-        (payload) => {
-            getFriendInfo(user, setFriendInfo);
-        }
-    )
-    .subscribe();
-}
-
 const Friends = (props) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [userResult, setUserResult] = useState([]);
-    const [friendInfo, setFriendInfo] = useState({incomingReqs: [], outgoingReqs: [], friends: []});
     const [openDropdown, setOpenDropdown] = useState(false);
     const {user} = useContext(UserContext);
     const dropdownRef = useRef(null);
-    console.log(friendInfo);
+    console.log(user?.friendInfo);
 
     useEffect(() => {   
         if (!user) return;
 
         searchTerm === "" ? setUserResult([]) : fetchPublicUserInfo(searchTerm, setUserResult, user.dbInfo.id);
-        subscribeToFriendChanges(user, setFriendInfo);
-        getFriendInfo(user, setFriendInfo);
 
         const handleOutsideDropdownClick = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target))
@@ -107,7 +39,7 @@ const Friends = (props) => {
         return () => {
             document.removeEventListener("mousedown", handleOutsideDropdownClick);
         }
-    }, [searchTerm, user]);
+    }, [searchTerm]);
     // console.log(friendInfo);
     return (
         <div className="bg-zinc-900 text-white min-h-screen p-8 font-sans w-full">
@@ -124,8 +56,8 @@ const Friends = (props) => {
                         />
                         {openDropdown && userResult.length > 0 && (
                             <div className="absolute top-full w-full z-50 bg-zinc-700 border border-zinc-700 rounded-b-xl max-h-60 overflow-y-auto shadow-xl p-2 space-y-2">
-                                {userResult.map((user, i) => (
-                                    <UserCard friendInfo={friendInfo} variant="FriendReq" key={i} userId={user.id} />
+                                {userResult.map((searchUser, i) => (
+                                    <UserCard friendInfo={user.friendInfo} variant="FriendReq" key={i} userId={searchUser.id} />
                                 ))}
                             </div>
                         )}
@@ -136,19 +68,19 @@ const Friends = (props) => {
                     <div className="bg-zinc-800 rounded-2xl p-6">
                         <h2 className="text-2xl font-semibold mb-4">Incoming Friend Requests</h2>
                         <div className="space-y-4">
-                            {friendInfo.incomingReqs.map((userId, i) => (
+                            {user?.friendInfo?.incomingReqs.map((userId, i) => (
                                 <UserCard variant="IncomingReq" key={i} userId={userId} />
                             ))}
-                            {friendInfo.incomingReqs.length === 0 && <p className="text-zinc-400">No incoming requests.</p>}
+                            {user?.friendInfo?.incomingReqs.length === 0 && <p className="text-zinc-400">No incoming requests.</p>}
                         </div>
                     </div>
                     <div className="bg-zinc-800 rounded-2xl p-6">
                         <h2 className="text-2xl font-semibold mb-4">Outgoing Friend Requests</h2>
                         <div className="flex flex-wrap gap-4">
-                            {friendInfo.outgoingReqs.map((userId, i) => (
+                            {user?.friendInfo?.outgoingReqs.map((userId, i) => (
                                 <UserCard variant="OutgoingReq" key={i} userId={userId} />
                             ))}
-                            {friendInfo.outgoingReqs.length === 0 && <p className="text-zinc-400">No outgoing requests.</p>}
+                            {user?.friendInfo?.outgoingReqs.length === 0 && <p className="text-zinc-400">No outgoing requests.</p>}
                         </div>
                     </div>
                 </div>
@@ -157,10 +89,10 @@ const Friends = (props) => {
             {/* Friends List */}
             <div className="mt-12 bg-zinc-800 rounded-2xl p-6">
                 <h2 className="text-3xl font-semibold mb-4">Your Friends</h2>
-                {friendInfo.friends.map((userId, i) => (
-                    <UserCard variant="FriendReq" key={i} userId={userId} friendInfo={friendInfo}/>
+                {user?.friendInfo?.friends.map((userId, i) => (
+                    <UserCard variant="FriendReq" key={i} userId={userId} friendInfo={user.friendInfo}/>
                 ))}
-                {friendInfo.friends.length === 0 && <p className="col-span-full text-zinc-400">You have no friends yet.</p>}
+                {user?.friendInfo?.friends.length === 0 && <p className="col-span-full text-zinc-400">You have no friends yet.</p>}
             </div>
         </div>
     )

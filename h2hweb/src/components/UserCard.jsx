@@ -82,8 +82,8 @@ const UserCard = (props) => {
         }
         fetchUser();
     }, [userId])
-    // console.log(user);
-    if (!user) return;
+    console.log(user, friendInfo, userId);
+    if (!user || !friendInfo) return null;
     if (variant === "IncomingReq") return (
         <div className={`w-50 bg-zinc-700 py-5 rounded-4xl flex flex-col items-center space-y-3 ${className}`}>
             <img src={user.profile_pic_url} className="w-20" />

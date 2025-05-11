@@ -9,6 +9,7 @@ import Play from './pages/Play';
 import supabase from './supabase';
 import {UserContext} from './user/UserContext';
 import { User } from 'lucide-react';
+import {subscribeToFriendChanges, getFriendInfo} from './user/friendinfo';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -18,7 +19,11 @@ function App() {
     const fetchAndSubscribe = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/loggedInInfo`, { withCredentials: true });
-        setUser(res.data);
+        setUser(prevUser => ({
+          ...prevUser,
+          sessionInfo: res.data.sessionInfo,
+          dbInfo: res.data.dbInfo
+        }));
       } catch (error) {
         console.log(error);
       }
@@ -26,6 +31,14 @@ function App() {
   
     fetchAndSubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user?.dbInfo?.id) {
+      getFriendInfo(user, setUser);
+      subscribeToFriendChanges(user, setUser);
+    }
+  }, [user?.dbInfo?.id]);
+  console.log(user);
 
   return (
     <UserContext.Provider value={{user, setUser}}>
