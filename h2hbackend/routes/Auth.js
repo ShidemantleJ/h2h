@@ -19,7 +19,10 @@ router.get("/failure", (req, res) => {
 
 router.get("/logout", isLoggedIn, (req, res) => {
   req.logout(function (err) {
-    if (err) res.error(err);
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Logout failed");
+    }
     req.session.destroy();
     res.redirect(process.env.ORIGIN);
   });

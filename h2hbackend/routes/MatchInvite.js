@@ -19,12 +19,13 @@ async function createMatch(match) {
 router.post("/send", isLoggedIn, async (req, res) => {
   let { recipientId, boSetFormat, boSolveFormat, event, timeLimit } = req.body;
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  const senderGetsFirstTurn = Math.floor(Math.random() * 2);
 
   const { data, error } = await supabase
     .from("matchinvites")
     .insert({
-      player_1_id: senderId,
-      player_2_id: recipientId,
+      player_1_id: senderGetsFirstTurn ? senderId : recipientId,
+      player_2_id: senderGetsFirstTurn ? recipientId : senderId,
       best_of_set_format: boSetFormat,
       best_of_solve_format: boSolveFormat,
       event: event,

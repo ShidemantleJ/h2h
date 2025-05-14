@@ -6,7 +6,7 @@ import { UserContext } from '../user/UserContext';
 const Sidebar = (props) => {
   const navigate = useNavigate();
   const {user} = useContext(UserContext);
-  console.log(user);
+  // console.log(user);
     return (
       <>
     {/* Sidebar Parent Div */}
@@ -33,10 +33,10 @@ const Sidebar = (props) => {
           <User className='font-sans text-zinc-300 inline-block'/>
           <a className="ml-2 font-sans text-zinc-300 inline-block">{user.dbInfo.name}</a>
         </li>}
-        {!user ? <li className="cursor-pointer mt-3 block rounded-[6px] bg-emerald-700 hover:bg-emerald-800 transition-all p-2 text-center text-white font-sans font-bold" onClick={() => window.location.href="http://localhost:5000/auth/wca"}>
+        {!user ? <li className="cursor-pointer mt-3 block rounded-[6px] bg-emerald-700 hover:bg-emerald-800 transition-all p-2 text-center text-white font-sans font-bold" onClick={() => window.location.href=`${import.meta.env.VITE_BACKEND_URL}/auth/wca`}>
           <p>Login with WCA ID</p>
         </li> :
-        <li className="cursor-pointer mt-3 block rounded-[6px] bg-emerald-700 hover:bg-emerald-800 transition-all p-2 text-center text-white font-sans font-bold" onClick={() => window.location.href="http://localhost:5000/auth/logout"}>
+        <li className="cursor-pointer mt-3 block rounded-[6px] bg-emerald-700 hover:bg-emerald-800 transition-all p-2 text-center text-white font-sans font-bold" onClick={() => window.location.href=`${import.meta.env.VITE_BACKEND_URL}/auth/logout`}>
         <p>Logout</p>
       </li>}
       </ul>

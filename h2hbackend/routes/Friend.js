@@ -4,7 +4,7 @@ const { supabase } = require("../supabase");
 const { isLoggedIn } = require("../login/user");
 
 async function removeFriend(userId, friendId) {
-  if (!userId || !friendId) {
+  if (!userId || !friendId || isNaN(userId) || isNaN(friendId)) {
     console.error("userid or friendid are undefined");
   }
   const { error } = await supabase

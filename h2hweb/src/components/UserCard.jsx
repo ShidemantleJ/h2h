@@ -72,7 +72,7 @@ const UserCard = (props) => {
     const [user, setUser] = useState(null);
     const variant = props.variant || "Normal";
     const className = props.className || "";
-    const friendInfo = props.friendInfo;
+    const friendInfo = props?.friendInfo;
     // console.log(props.userId);
     const userId = Number.parseInt(props.userId, 10);
     useEffect(() => {
@@ -82,8 +82,8 @@ const UserCard = (props) => {
         }
         fetchUser();
     }, [userId])
-    console.log(user, friendInfo, userId);
-    if (!user || !friendInfo) return null;
+
+    if (!user) return null;
     if (variant === "IncomingReq") return (
         <div className={`w-50 bg-zinc-700 py-5 rounded-4xl flex flex-col items-center space-y-3 ${className}`}>
             <img src={user.profile_pic_url} className="w-20" />

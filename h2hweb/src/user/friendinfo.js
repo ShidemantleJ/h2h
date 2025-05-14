@@ -1,6 +1,8 @@
 import supabase from "../supabase";
 
 const getFriendInfo = async (user, setUser) => {
+  // console.log("Getting friend info");
+
   const { data: friendsData1, error: friendsError1 } = await supabase
     .from("friends")
     .select("user1_id")
@@ -35,6 +37,10 @@ const getFriendInfo = async (user, setUser) => {
   // console.log(outReqsData.map((u) => u.recipient_user_id));
   // console.error(outReqsError);
 
+  if (friendsError1 || friendsError2 || incReqsError || outReqsError) {
+    console.error(friendsError1, friendsError2, incReqsError, outReqsError);
+    return;
+  }
   const friendInfo = {
     incomingReqs: incReqsData.map((u) => u.sender_user_id) || [],
     outgoingReqs: outReqsData.map((u) => u.recipient_user_id) || [],
@@ -46,7 +52,7 @@ const getFriendInfo = async (user, setUser) => {
   });
 };
 
-const subscribeToFriendChanges = async (user, setUser) => {
+const subscribeToFriendChanges = (user, setUser) => {
   const channelA = supabase
     .channel("schema-db-changes")
     .on(
@@ -73,7 +79,7 @@ const subscribeToFriendChanges = async (user, setUser) => {
     )
     .subscribe();
 
-    return channelA.unsubscribe();
+  return () => channelA.unsubscribe();
 };
 
 export { subscribeToFriendChanges, getFriendInfo };
