@@ -125,6 +125,15 @@ const UserCard = (props) => {
             </div>
         )
     }
+    if (variant === "MatchDisplay") return (
+        <div className={`bg-zinc-800 p-2 inline-flex rounded-2xl hover:bg-zinc-700 transition-all duration-200 ${className}`}>
+            <img className="w-10 h-10 my-auto" src={user.profile_pic_url} />
+            <div className="ml-5 items-center my-auto">
+                <h1 className="font-bold">{user.name}</h1>
+                <a href={`http://worldcubeassociation.org/persons/${user.wcaid}`}>{user.wcaid}</a>
+            </div>
+        </div>
+    )
     return (
         <div className={`bg-zinc-800 p-5 flex rounded-2xl ${className}`}>
             <img className="block" src={user.profile_pic_url} />
