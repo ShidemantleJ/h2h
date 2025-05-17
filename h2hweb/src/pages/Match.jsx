@@ -16,37 +16,34 @@
 
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-import Timer from '../components/Timer';
+import Timer from '../components/Match/Timer';
 import UserCard from '../components/UserCard';
-import {getNameFromId} from '../utils/dbutils'
 import supabase from "../supabase";
-import { ArrowLeftCircle, ArrowRightCircle } from 'lucide-react';
-
-function getTimes(p1timearr, p2timearr, setNum) {
-    let tableElements = [];
-    for (let i = 0; i < p1timearr[setNum].length || i < p2timearr[setNum].length; i++) {
-        const p1time = p1timearr[setNum][i];
-        const p2time = p2timearr[setNum][i];
-        tableElements.push(
-            <tr key={i} className=''>
-                <td className='px-6 py-4 text-center'>{i + 1}</td>
-                <td className='px-6 py-4'>{p1time || '-'}</td>
-                <td className='px-6 py-4'>{p2time || '-'}</td>
-            </tr>
-        )
-    }
-    return tableElements;
-}
+import SolveTable from '../components/Match/SolveTable';
+import TopBar from '../components/Match/TopBar';
+import Scramble from '../components/Match/Scramble';
 
 function Match(props) {
     let {matchId} = useParams();
     matchId = Number.parseInt(matchId, 10);
     const [match, setMatch] = useState({});
-    const [p1name, setp1name] = useState('');
-    const [p2name, setp2name] = useState('');
-    const [setToDisplay, setSetToDisplay] = useState(0);
 
     useEffect(() => {
+        const changes = supabase
+        .channel(`match-updates-${matchId}`)
+        .on(
+            'postgres_changes',
+            {
+                schema: "public",
+                event: "*",
+                table: "matches",
+                filter: `id=eq.${matchId}`
+            },
+            (payload) => {
+                setMatch(payload.new);
+            }
+        ).subscribe()
+
         async function getMatch(matchId) {
             const {data, error} = await supabase
             .from("matches")
@@ -58,57 +55,29 @@ function Match(props) {
             else setMatch(data);
         }
         getMatch(matchId);
-    }, [matchId])
 
-    useEffect(() => {
-        async function getNames() {
-            if (!match || !match.player_1_id || !match.player_2_id) return;
-            const player1name = await getNameFromId(match.player_1_id)
-            const player2name = await getNameFromId(match.player_2_id)
-            setp1name(player1name);
-            setp2name(player2name);
-        }
-        getNames();
-    }, [match, match.player_1_id, match.player_2_id])
+        return () => changes.unsubscribe();
+    }, [matchId])
 
     if (!match || !match.player_1_times || !match.player_2_times) return <h1>Loading</h1>
     console.log(match);
     return (
         <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-2 auto-rows-min text-white gap-5 p-5">
-            {/* Profile picture and username of opponents */}
-            <div className="bg-zinc-800 rounded-2xl col-span-2 grid grid-cols-3 p-3">
-                <UserCard key={match.player_1_id} className="mr-auto" variant="MatchDisplay" userId={match.player_1_id}/>
-                <p className='my-auto mx-auto font-bold text-xl'>vs</p>
-                <UserCard key={match.player_2_id} className="ml-auto" variant="MatchDisplay" userId={match.player_2_id}/>
+            {/* Profile picture and username of opponents and timer */}
+            <div className="bg-zinc-800 rounded-2xl col-span-2">
+                <TopBar match={match}/>
             </div>
             {/* Current Scramble */}
             <div className="bg-zinc-800 rounded-2xl p-5">
-                <h2 className='text-2xl font-semibold mb-2'>Current Scramble</h2>
-                <p className='text-xl'>R U R' U' R U R' U' R U R' U' R U R' U' R U R' U'</p>
+                <Scramble event={match.event} scrambleArray={match.scrambles}/>
             </div>
             {/* Submit Times */}
             <div className="bg-zinc-800 rounded-2xl p-5">
                 <Timer/>
             </div>
             {/* Table of solves */}
-            <div className="bg-zinc-800 rounded-2xl col-span-2 p-5 w-fit">
-                <h1 className='text-2xl font-semibold mb-2 text-center'>Set #{setToDisplay+1}</h1>
-                <div className='inline-flex items-center'>
-                    <ArrowLeftCircle className="cursor-pointer" onClick={() => setSetToDisplay(prev => Math.max(0, prev - 1))}/>
-                    <table className=''>
-                        <thead>
-                            <tr className='text-zinc-400'>
-                                <th className='px-6 py-4'>Solve #</th>
-                                <th className='px-6 py-4'>{p1name}'s times</th>
-                                <th className='px-6 py-4'>{p2name}'s times</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {getTimes(match.player_1_times, match.player_2_times, setToDisplay)}
-                        </tbody>
-                    </table>
-                    <ArrowRightCircle className="cursor-pointer" onClick={() => setSetToDisplay(prev => Math.min(match.player_1_times.length - 1, prev + 1))}/>
-                </div>
+            <div className="col-span-2">
+                <SolveTable match={match}/>
             </div>
         </div>
     );

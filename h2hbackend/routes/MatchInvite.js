@@ -11,13 +11,13 @@ async function createMatch(match) {
     best_of_set_format: match.boSetFormat,
     best_of_solve_format: match.boSolveFormat,
     event: match.event,
-    time_limit: match.timeLimit,
+    countdown_secs: match.countdown_secs,
   });
 }
 
 // friend.js /sendreq endpoint referenced to write this
 router.post("/send", isLoggedIn, async (req, res) => {
-  let { recipientId, boSetFormat, boSolveFormat, event, timeLimit } = req.body;
+  let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } = req.body;
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
   const senderGetsFirstTurn = Math.floor(Math.random() * 2);
 
@@ -29,7 +29,7 @@ router.post("/send", isLoggedIn, async (req, res) => {
       best_of_set_format: boSetFormat,
       best_of_solve_format: boSolveFormat,
       event: event,
-      time_limit: timeLimit,
+      countdown_secs: countdown_secs,
     })
     .select("*");
 

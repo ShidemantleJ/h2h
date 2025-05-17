@@ -54,7 +54,7 @@ const getFriendInfo = async (user, setUser) => {
 
 const subscribeToFriendChanges = (user, setUser) => {
   const channelA = supabase
-    .channel("schema-db-changes")
+    .channel("friend-req-changes")
     .on(
       "postgres_changes",
       {

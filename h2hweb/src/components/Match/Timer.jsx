@@ -6,16 +6,22 @@ function Timer() {
     const [timerVal, setTimerVal] = useState(0);
     const [timerBold, setTimerBold] = useState(false);
     const [timeInputVal, setTimeInputVal] = useState(0);
+    const [dnfInputted, setDnfInputted] = useState(false);
 
     const intervalIdRef = useRef(null);
     const runningRef = useRef(false);
     const justStoppedRef = useRef(false);
+    const timerValRef = useRef(0);
 
     const startTimer = () => {
         if (!intervalIdRef.current) {
             setTimerVal(0);
             const id = setInterval(() => {
-                setTimerVal((prevVal) => parseFloat((prevVal + 0.01).toFixed(2)));
+                setTimerVal((prevVal) => {
+                    const newVal = parseFloat((prevVal + 0.01).toFixed(2));
+                    timerValRef.current = newVal;
+                    return newVal;
+                });
             }, 10);
             intervalIdRef.current = id;
             runningRef.current = true;
@@ -27,15 +33,14 @@ function Timer() {
             clearInterval(intervalIdRef.current);
             intervalIdRef.current = null;
             runningRef.current = false;
+            setTimeInputVal(timerValRef.current.toFixed(2));
         }
     };
 
     const handleSpaceKeyUp = (event) => {
         if (event.key === ' ') {
             event.preventDefault();
-            console.log("running, justStopped: ", runningRef.current, justStoppedRef.current);
             if (justStoppedRef.current) {
-                console.log("just stopped, changing...");
                 justStoppedRef.current = false;
             }
             else if (!runningRef.current && !justStoppedRef.current) {
@@ -51,7 +56,6 @@ function Timer() {
             if (runningRef.current) {
                 stopTimer();
                 justStoppedRef.current = true;
-                console.log("Setting justStopped to true");
             } else {
                 setTimerBold(true);
             }
@@ -81,10 +85,13 @@ function Timer() {
                 <Info className="ml-3 timer-info"/>
             </div>
             <p className={`${timerBold ? "text-green-800 font-bold" : ""} text-2xl font-semibold`}>{timerVal.toFixed(2)}</p>
-            <input type="number" min="0.00" step="0.01" className='p-2 rounded-xl bg-zinc-950' placeholder='Enter your time' value={timeInputVal} onChange={(e) => setTimeInputVal(e.target.value)}/>
-            <button className="bg-emerald-700 rounded-md ml-5 font-semibold p-2 cursor-pointer">Submit</button>
-            <button className="bg-amber-700 rounded-md ml-5 font-semibold p-2 cursor-pointer">+2</button>
-            <button className="bg-red-800 rounded-md ml-5 font-semibold p-2 cursor-pointer">DNF</button>
+            <div className="relative inline-block">
+                <input type="number" min="0.00" step="0.01" className={`${dnfInputted ? 'text-zinc-950' : 'text-white'} mr-5 p-2 rounded-xl bg-zinc-950`} placeholder='Enter your time' value={dnfInputted ? -1 : timeInputVal} onChange={(e) => setTimeInputVal(e.target.value)} onFocus={() => {setDnfInputted(false), setTimeInputVal(0)}}/>
+                <p className={`${dnfInputted ? 'block' : 'hidden'} absolute top-0 left-0 w-full h-full pointer-events-none p-2`}>DNF</p>
+            </div>
+            <button className="bg-emerald-700 rounded-md font-semibold p-2 cursor-pointer">Submit</button>
+            <button className="bg-amber-700 rounded-md ml-5 font-semibold p-2 cursor-pointer" onClick={() => setTimeInputVal(prev => parseFloat(prev) + 2)?.toFixed(2)}>+2</button>
+            <button className="bg-red-800 rounded-md ml-5 font-semibold p-2 cursor-pointer" onClick={() => setDnfInputted(true)}>DNF</button>
         </div>
     );
 }
