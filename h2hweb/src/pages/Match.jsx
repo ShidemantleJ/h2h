@@ -8,10 +8,6 @@
         Text chat (add later)
     Next row: 1 rectangle with full width:
         Table of each solve with arrows on each side to switch between viewing different sets
-
-    To do next:
-    - add arrows to change set being viewed
-
 */
 
 import React, {useState, useEffect} from 'react';
@@ -59,7 +55,7 @@ function Match(props) {
         return () => changes.unsubscribe();
     }, [matchId])
 
-    if (!match || !match.player_1_times || !match.player_2_times) return <h1>Loading</h1>
+    if (!match) return <div className='bg-zinc-900 w-full min-h-screen'></div>
     console.log(match);
     return (
         <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-2 auto-rows-min text-white gap-5 p-5">
@@ -73,7 +69,7 @@ function Match(props) {
             </div>
             {/* Submit Times */}
             <div className="bg-zinc-800 rounded-2xl p-5">
-                <Timer/>
+                <Timer matchId={matchId}/>
             </div>
             {/* Table of solves */}
             <div className="col-span-2">

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import UserCard from '../UserCard';
 import CountdownTimer from './CountdownTimer';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 function TopBar(props) {
     const match = props.match;

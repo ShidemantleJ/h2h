@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 
 function calculateTimeLeft(timestamp, countdownSecs) {
     const timestampNow = new Date().getTime();
@@ -8,7 +8,10 @@ function calculateTimeLeft(timestamp, countdownSecs) {
     const secsToDisplay = Math.max(secsRemaining % 60, 0);
     const minsToDisplay = Math.max(Math.floor(secsRemaining / 60), 0);
 
-    return `${String(minsToDisplay).padStart(1,'0')}:${String(secsToDisplay).padStart(2,'0')}`;
+    return {
+        text: `${String(minsToDisplay).padStart(1,'0')}:${String(secsToDisplay).padStart(2,'0')}`,
+        seconds: secsRemaining,
+    };
 }
 
 function CountdownTimer(props) {
@@ -18,18 +21,20 @@ function CountdownTimer(props) {
     const player = props.player;
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(startTimestamp, countdownSecs));
+    const timeLeftRef = useRef(calculateTimeLeft(startTimestamp, countdownSecs));
 
     useEffect(() => {
         const intervalId = setInterval(() => {
             setTimeLeft(calculateTimeLeft(startTimestamp, countdownSecs));
+            timeLeftRef.current = calculateTimeLeft(startTimestamp, countdownSecs);
         }, 1000);
 
         return () => clearInterval(intervalId);
     }, [startTimestamp])
 
     return (
-        <div className='mx-7 text-2xl text-black bg-white inset-shadow-amber-500 p-2 rounded-xl'>
-            <p>{player === playerTurn ? timeLeft : '0:00'}</p>
+        <div className={`mx-7 text-2xl text-black bg-zinc-200 p-2 rounded-xl`}>
+            <p className={`${player === playerTurn && timeLeftRef.current.seconds < countdownSecs / 3 ? 'text-red-600' : 'text-black'}`}>{player === playerTurn ? timeLeftRef.current.text : '0:00'}</p>
         </div>
     );
 }

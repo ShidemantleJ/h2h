@@ -1,8 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Info } from 'lucide-react';
 import {Tooltip} from 'react-tooltip';
+import axios from 'axios';
 
-function Timer() {
+const submitTime = async (time, matchId) => {
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/match/addTime`, {matchId: matchId, newTime: time}, {withCredentials: true});
+}
+
+function Timer(props) {
+    const matchId = props.matchId;
+
     const [timerVal, setTimerVal] = useState(0);
     const [timerBold, setTimerBold] = useState(false);
     const [timeInputVal, setTimeInputVal] = useState(0);
@@ -89,7 +96,7 @@ function Timer() {
                 <input type="number" min="0.00" step="0.01" className={`${dnfInputted ? 'text-zinc-950' : 'text-white'} mr-5 p-2 rounded-xl bg-zinc-950`} placeholder='Enter your time' value={dnfInputted ? -1 : timeInputVal} onChange={(e) => setTimeInputVal(e.target.value)} onFocus={() => {setDnfInputted(false), setTimeInputVal(0)}}/>
                 <p className={`${dnfInputted ? 'block' : 'hidden'} absolute top-0 left-0 w-full h-full pointer-events-none p-2`}>DNF</p>
             </div>
-            <button className="bg-emerald-700 rounded-md font-semibold p-2 cursor-pointer">Submit</button>
+            <button className="bg-emerald-700 rounded-md font-semibold p-2 cursor-pointer" onClick={() => submitTime(timeInputVal, matchId)}>Submit</button>
             <button className="bg-amber-700 rounded-md ml-5 font-semibold p-2 cursor-pointer" onClick={() => setTimeInputVal(prev => parseFloat(prev) + 2)?.toFixed(2)}>+2</button>
             <button className="bg-red-800 rounded-md ml-5 font-semibold p-2 cursor-pointer" onClick={() => setDnfInputted(true)}>DNF</button>
         </div>

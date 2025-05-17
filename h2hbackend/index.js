@@ -9,13 +9,6 @@ const app = express();
 const cors = require("cors");
 const { supabase } = require("./supabase");
 
-const { data, error } = supabase
-  .from("matches")
-  .select("*")
-  .eq("id", 1)
-  .single()
-  .then((p) => console.log(p.data.player_1_times));
-
 const pgPool = new Pool({
   connectionString: process.env.PG_CONNECTION_STRING,
   ssl: {

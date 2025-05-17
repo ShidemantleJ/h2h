@@ -3,7 +3,7 @@ import { ArrowLeftCircle, ArrowRightCircle } from 'lucide-react';
 import { getNameFromId } from '../../utils/dbutils';
 
 function p1WonSolve(p1time, p2time) {
-    if (!p1time || !p2time) return -1;
+    if (p1time === null || p2time == null) return -1;
     else if (p1time === -1) return 0;
     else if (p2time === -1) return 1;
     else if (p1time < p2time) return 1;
@@ -13,14 +13,14 @@ function p1WonSolve(p1time, p2time) {
 function getTimes(p1timearr, p2timearr, setNum, boSolveFormat) {
     let tableElements = [];
     for (let i = 0; i < boSolveFormat; i++) {
-        const p1time = p1timearr[setNum][i]?.toFixed(2);
-        const p2time = p2timearr[setNum][i]?.toFixed(2);
+        const p1time = parseFloat(p1timearr?.[setNum]?.[i])?.toFixed(2);
+        const p2time = parseFloat(p2timearr?.[setNum]?.[i])?.toFixed(2);
         const p1won = p1WonSolve(p1time, p2time);
         tableElements.push(
             <tr key={i} className='hover:bg-zinc-700 rounded-2xl border-b-1 border-zinc-600'>
                 <td className='px-6 py-4 text-center'>{i + 1}</td>
-                <td className={`px-6 py-4 ${p1won === 0 && 'font-bold'}`}>{p1time || '-'}</td>
-                <td className={`px-6 py-4 ${p1won === 1 && 'font-bold'}`}>{p2time || '-'}</td>
+                <td className={`px-6 py-4 ${p1won === 0 && 'font-bold'}`}>{isNaN(p1time) ? '-' : p1time}</td>
+                <td className={`px-6 py-4 ${p1won === 1 && 'font-bold'}`}>{isNaN(p2time) ? '-' : p2time}</td>
             </tr>
         )
     }
@@ -59,10 +59,10 @@ function SolveTable(props) {
                         </tr>
                     </thead>
                     <tbody>
-                        {getTimes(match.player_1_times, match.player_2_times, setToDisplay, match.best_of_solve_format)}
+                        {getTimes(match?.player_1_times || [[]], match?.player_2_times || [[]], setToDisplay, match.best_of_solve_format)}
                     </tbody>
                 </table>
-                <ArrowRightCircle className="cursor-pointer ml-5" onClick={() => setSetToDisplay(prev => Math.min(match.player_1_times.length - 1, prev + 1))}/>
+                <ArrowRightCircle className="cursor-pointer ml-5" onClick={() => setSetToDisplay(prev => Math.max(Math.min(match?.player_1_times?.length - 1, prev + 1), Math.min(match?.player_2_times?.length - 1, prev + 1)))}/>
             </div>
         </div>
     );
