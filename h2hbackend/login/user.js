@@ -1,4 +1,4 @@
-const { supabase } = require("../supabase");
+import {supabase} from '../supabase.js';
 
 // If request has user, send to next point. If not, return 401 (unauthorized)
 function isLoggedIn(req, res, next) {
@@ -27,4 +27,4 @@ async function findOrCreateUser(user) {
   return data;
 }
 
-module.exports = { findOrCreateUser, isLoggedIn };
+export { findOrCreateUser, isLoggedIn };

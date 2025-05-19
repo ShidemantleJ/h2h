@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const passport = require("passport");
-const { isLoggedIn } = require("../login/user");
+import { supabase } from "../supabase.js";
+import { isLoggedIn, findOrCreateUser } from "../login/user.js";
+import passport from "passport";
 
 router.get("/wca", passport.authenticate("wca"));
 
@@ -28,4 +29,4 @@ router.get("/logout", isLoggedIn, (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

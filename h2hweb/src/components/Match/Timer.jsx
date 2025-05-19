@@ -4,7 +4,17 @@ import {Tooltip} from 'react-tooltip';
 import axios from 'axios';
 
 const submitTime = async (time, matchId) => {
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/match/addTime`, {matchId: matchId, newTime: time}, {withCredentials: true});
+    try {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/match/addTime`, {matchId: matchId, newTime: time}, {withCredentials: true});
+        return res;
+    } catch (err) {
+        if (err.response) {
+            alert(err.response.data);
+        } else {
+            alert("something went wrong: ", err.message);
+        }
+        return null;
+    }
 }
 
 function Timer(props) {

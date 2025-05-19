@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const { supabase } = require("../supabase");
-const { isLoggedIn } = require("../login/user");
+import { supabase } from "../supabase.js";
+import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
 async function removeFriend(userId, friendId) {
   if (!userId || !friendId || isNaN(userId) || isNaN(friendId)) {
@@ -97,4 +97,4 @@ router.post("/removeFriend", isLoggedIn, async (req, res) => {
     : res.status(200).send("Friend removed");
 });
 
-module.exports = router;
+export default router;

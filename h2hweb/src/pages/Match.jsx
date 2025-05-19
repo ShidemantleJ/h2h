@@ -10,7 +10,7 @@
         Table of each solve with arrows on each side to switch between viewing different sets
 */
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
 import Timer from '../components/Match/Timer';
 import UserCard from '../components/UserCard';
@@ -18,11 +18,15 @@ import supabase from "../supabase";
 import SolveTable from '../components/Match/SolveTable';
 import TopBar from '../components/Match/TopBar';
 import Scramble from '../components/Match/Scramble';
+import { UserContext } from '../user/UserContext';
 
 function Match(props) {
     let {matchId} = useParams();
     matchId = Number.parseInt(matchId, 10);
     const [match, setMatch] = useState({});
+    const [currSet, setCurrSet] = useState(0);
+    const [currSolve, setCurrSolve] = useState(0);
+    const {user} = useContext(UserContext);
 
     useEffect(() => {
         const changes = supabase
@@ -52,10 +56,20 @@ function Match(props) {
         }
         getMatch(matchId);
 
-        return () => changes.unsubscribe();
+        return () => supabase.removeChannel(`match-updates-${matchId}`);
     }, [matchId])
 
+    useEffect(() => {
+        if (!user || !match) return;
+        const playerTimesArr = user?.dbInfo?.id === match?.player_1_id ? match?.player_1_times : match?.player_2_times;
+        if (!playerTimesArr) return;
+        console.log(playerTimesArr);
+        setCurrSet(playerTimesArr.length);
+        setCurrSolve(playerTimesArr[playerTimesArr.length - 1].length + 1);
+    }, [match, user])
+
     if (!match) return <div className='bg-zinc-900 w-full min-h-screen'></div>
+
     console.log(match);
     return (
         <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-2 auto-rows-min text-white gap-5 p-5">
@@ -65,7 +79,7 @@ function Match(props) {
             </div>
             {/* Current Scramble */}
             <div className="bg-zinc-800 rounded-2xl p-5">
-                <Scramble event={match.event} scrambleArray={match.scrambles}/>
+                <Scramble event={match.event} scrambleArray={match.scrambles} currSet={currSet} currSolve={currSolve}/>
             </div>
             {/* Submit Times */}
             <div className="bg-zinc-800 rounded-2xl p-5">

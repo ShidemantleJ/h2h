@@ -52,9 +52,12 @@ const getFriendInfo = async (user, setUser) => {
   });
 };
 
+// TODO: change channel name to something user-specific and optimize to only query for rows specific
+//       to the current user.
+
 const subscribeToFriendChanges = (user, setUser) => {
   const channelA = supabase
-    .channel("friend-req-changes")
+    .channel(`friend-req-changes-${user.dbInfo.id}`)
     .on(
       "postgres_changes",
       {
@@ -79,7 +82,7 @@ const subscribeToFriendChanges = (user, setUser) => {
     )
     .subscribe();
 
-  return () => channelA.unsubscribe();
+  return () => supabase.removeChannel(channelA);
 };
 
 export { subscribeToFriendChanges, getFriendInfo };

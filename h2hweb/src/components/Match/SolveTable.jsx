@@ -42,7 +42,7 @@ function SolveTable(props) {
             setp2name(player2name);
         }
         getNames();
-    }, [match, match.player_1_id, match.player_2_id])
+    }, [match])
 
     if (!match || !match.player_1_id || !match.player_2_id) return <h1>Loading</h1>
     return (

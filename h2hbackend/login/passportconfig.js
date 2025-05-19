@@ -1,7 +1,6 @@
-const passport = require("passport");
-const { findOrCreateUser } = require("./user");
-
-const WCAStrategy = require("passport-wca").Strategy;
+import passport from "passport";
+import { findOrCreateUser } from "./user.js";
+import WCAStrategy from "passport-wca";
 
 passport.use(
   new WCAStrategy(

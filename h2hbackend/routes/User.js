@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const { supabase } = require("../supabase");
-const { isLoggedIn, findOrCreateUser } = require("../login/user");
+import { supabase } from "../supabase.js";
+import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
 router.get("/loggedInInfo", isLoggedIn, (req, res) => {
   res.json(req.user);
@@ -36,4 +36,4 @@ router.get("/userSearch", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

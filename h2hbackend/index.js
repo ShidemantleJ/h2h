@@ -1,13 +1,17 @@
-require("dotenv").config();
-const express = require("express");
-const session = require("express-session");
-const pgSession = require("connect-pg-simple")(session);
-const { Pool } = require("pg");
-const passport = require("passport");
-require("./login/passportconfig");
+import "dotenv/config";
+import express from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pkg from "pg";
+const { Pool } = pkg;
+import passport from "passport";
+import "./login/passportconfig.js";
+import cors from "cors";
+import { supabase } from "./supabase.js";
+
+const pgSession = connectPgSimple(session);
+
 const app = express();
-const cors = require("cors");
-const { supabase } = require("./supabase");
 
 const pgPool = new Pool({
   connectionString: process.env.PG_CONNECTION_STRING,
@@ -39,17 +43,18 @@ app.use(
       sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24,
       domain: "localhost",
+      rolling: true
     },
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-const userRoute = require("./routes/User");
-const authRoute = require("./routes/Auth");
-const friendRoute = require("./routes/Friend");
-const matchInviteRoute = require("./routes/MatchInvite");
-const matchRoute = require("./routes/Match");
+import userRoute from "./routes/User.js";
+import authRoute from "./routes/Auth.js";
+import friendRoute from "./routes/Friend.js";
+import matchInviteRoute from "./routes/MatchInvite.js";
+import matchRoute from "./routes/Match.mjs";
 app.use("/user", userRoute);
 app.use("/auth", authRoute);
 app.use("/friend", friendRoute);

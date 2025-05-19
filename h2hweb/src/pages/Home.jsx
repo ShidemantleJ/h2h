@@ -15,10 +15,10 @@ const Home = (props) => {
             <p className='text-zinc-200'>Compete with other cubers</p>
           </div>
         </div>
-        <div className="text-white font-semibold text-2xl">
+        {/* <div className="text-white font-semibold text-2xl">
           {numUsers === 1 ? numUsers + " User" : numUsers + " Users"} Online Now
           {numUsers === 0 && " :("} 
-        </div>
+        </div> */}
       </div>
     )
 }
