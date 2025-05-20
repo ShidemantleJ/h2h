@@ -13,6 +13,8 @@ async function createMatch(match) {
     event: match.event,
     countdown_secs: match.countdown_secs,
   });
+
+  return {data, error};
 }
 
 // friend.js /sendreq endpoint referenced to write this

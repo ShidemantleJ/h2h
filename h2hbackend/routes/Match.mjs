@@ -8,21 +8,24 @@ function isPlaying(match, userId) {
   return match.player_1_id === userId || match.player_2_id === userId;
 }
 
-// Returns 0 if first time won, 1 if second time won
+// Returns 0 if first time won, 1 if second time won, -1 if invalid, -2 if same time
 function whoWonSolve(solve1, solve2) {
-  if (solve2 === -1) return 0;
+  if (isNaN(solve1) || isNaN(solve2)) return -1;
+  else if (solve2 === solve1) return -2;
+  else if (solve2 === -1) return 0;
   else if (solve1 === -1) return 1;
   else if (solve1 < solve2) return 0;
   else if (solve2 < solve1) return 1;
 }
 
 function wonSet(boSolve, p1setarr, p2setarr) {
-  const solvesToWin = Math.ceil(boSolve / 2);
-  if (p1setarr.length !== p2setarr.length /* || p1setarr.length < solvesToWin*/)
+  const solvesToWin = Math.ceil((boSolve + 1) / 2);
+  if (p1setarr.length !== p2setarr.length || p1setarr.length < solvesToWin)
     return "SET_NOT_OVER";
   let solvesWonArr = [0, 0];
   for (let i = 0; i < p1setarr.length; i++) {
     const winningPlayer = whoWonSolve(p1setarr[i], p2setarr[i]);
+    if (winningPlayer < 0) continue;
     solvesWonArr[winningPlayer]++;
     console.assert(winningPlayer === 0 || winningPlayer === 1);
   }
@@ -50,6 +53,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   const { match, matchError } = await getMatch(matchId);
   if (matchError) return res.status(500).send(matchError);
   console.log("Got match");
+
   // TODO: check if countdown has passed
 
   // Check if user is participating in match
@@ -86,9 +90,20 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
     if (newP2TimeArr.length === 0) newP2TimeArr.push([newTime]);
     else newP2TimeArr[newP2TimeArr.length - 1].push(newTime);
   }
+  console.log(
+    whoWonSolve(newP1TimeArr.at(-1).at(-1), newP2TimeArr.at(-1).at(-1))
+  );
+  console.log(newP1TimeArr.at(-1).at(-1), newP2TimeArr.at(-1).at(-1));
+  let newBoSolveFormat = structuredClone(match.best_of_solve_format);
+  if (
+    whoWonSolve(newP1TimeArr.at(-1).at(-1), newP2TimeArr.at(-1).at(-1)) === -2
+  ) {
+    console.log("increasing bosolve format");
+    newBoSolveFormat[newP1TimeArr.length - 1]++;
+  }
   if (
     wonSet(
-      match.best_of_solve_format,
+      newBoSolveFormat[newP1TimeArr.length - 1],
       newP1TimeArr[newP1TimeArr.length - 1],
       newP2TimeArr[newP2TimeArr.length - 1]
     ) !== "SET_NOT_OVER"
@@ -108,9 +123,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   let newScrambleArr = structuredClone(prevScrambleArr);
   // If scramble array doesn't contain a subarray for the current set, create subarray
   // and add scramble to the subarray
-  if (
-    !Array.isArray(prevScrambleArr[currSet - 1])
-  ) {
+  if (!Array.isArray(prevScrambleArr[currSet - 1])) {
     let scramble;
     try {
       scramble = await randomScrambleForEvent(match.event);
@@ -142,6 +155,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
       player_turn: newTurn,
       countdown_timestamp: currTime,
       scrambles: newScrambleArr,
+      best_of_solve_format: newBoSolveFormat,
     })
     .eq("id", matchId);
   if (addTimeError) return res.status(400).send(addTimeError);

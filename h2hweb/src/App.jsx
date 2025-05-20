@@ -11,6 +11,7 @@ import supabase from './supabase';
 import {UserContext} from './user/UserContext';
 import { User } from 'lucide-react';
 import {subscribeToFriendChanges, getFriendInfo} from './user/friendinfo';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -56,6 +57,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    <ToastContainer/>
     </UserContext.Provider>
   )
 }
