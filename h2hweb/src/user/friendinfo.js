@@ -46,10 +46,10 @@ const getFriendInfo = async (user, setUser) => {
     outgoingReqs: outReqsData.map((u) => u.recipient_user_id) || [],
     friends: friendsData || [],
   };
-  setUser({
-    ...user,
+  setUser(prevUser => ({
+    ...prevUser,
     friendInfo: friendInfo,
-  });
+  }));
 };
 
 // TODO: change channel name to something user-specific and optimize to only query for rows specific

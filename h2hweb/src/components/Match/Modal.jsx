@@ -1,13 +1,27 @@
-import React from "react";
-
-function Modal({ showModal, setShowModal }) {
+function Modal({ open, onClose, children, canExit = false }) {
   return (
-    <div className="w-full h-full bg-black opacity-50 fixed top-0 left-0 z-1 backdrop-blur-xl">
+    <div
+      onClick={onClose}
+      className={`
+        fixed inset-0 flex justify-center items-center transition-colors
+        ${open ? "visible bg-black/20" : "invisible"}
+      `}
+    >
       <div
-        className={`left-1/3 top-1/4 fixed z-50 w-1/3 h-1/2 bg-zinc-600 ${
-          showModal ? "block" : "hidden"
-        }`}
-      ></div>
+        onClick={(e) => e.stopPropagation()}
+        className={`
+          bg-neutral-950 text-white rounded-xl shadow p-6 transition-all
+          ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}
+        `}
+      >
+        {canExit && <button
+          onClick={onClose}
+          className="absolute top-2 right-2 p-1 rounded-lg text-gray-400 hover:bg-zinc-800 hover:text-gray-600"
+        >
+          X
+        </button>}
+        {children}
+      </div>
     </div>
   );
 }

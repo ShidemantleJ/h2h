@@ -1,0 +1,86 @@
+import supabase from "../supabase";
+import { toast } from "react-toastify";
+import { getNameFromId } from "../utils/dbutils";
+
+const getMatchInviteInfo = async (user, setUser) => {
+  const { data: incInviteData, error: incInviteError } = await supabase
+    .from("matchinvites")
+    .select("*")
+    .eq("recipient_user_id", user.dbInfo.id)
+    .eq("status", "pending");
+
+  const { data: outInviteData, error: outInviteError } = await supabase
+    .from("matchinvites")
+    .select("*")
+    .eq("sender_user_id", user.dbInfo.id)
+    .eq("status", "pending");
+
+  if (incInviteError || outInviteError) {
+    console.error(incInviteError, outInviteError);
+    return;
+  }
+  const matchInviteInfo = {
+    incomingReqs: incInviteData || [],
+    outgoingReqs: outInviteData || [],
+  };
+  setUser((prevUser) => ({
+    ...prevUser,
+    matchInviteInfo: matchInviteInfo,
+  }));
+};
+
+// TODO: optimize to only update for column updates involving the querying user
+const subscribeToMatchInviteChanges = (user, setUser) => {
+  const channelA = supabase
+    .channel(`match-invite-changes-${user.dbInfo.id}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "matchinvites",
+        filter: `sender_user_id=eq.${user.dbInfo.id}`,
+      },
+      async (payload) => {
+        if (payload.new.status === "accepted") {
+          const name = await getNameFromId(payload.new.recipient_user_id);
+          toast.success(
+            <p>
+              {name} accepted your match invite! Join the match by clicking
+              <a
+                className="font-bold text-emerald-600"
+                href={`/match/${payload.new.id}`}
+              >
+                here
+              </a>
+            </p>,
+            {
+              autoClose: 60000,
+              pauseOnHover: false,
+            }
+          );
+        }
+        await getMatchInviteInfo(user, setUser);
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "matchinvites",
+        filter: `recipient_user_id=eq.${user.dbInfo.id}`,
+      },
+      async (payload) => {
+        if (payload.new.status === "accepted") {
+          window.location.href = `/match/${payload.new.id}`;
+        }
+        await getMatchInviteInfo(user, setUser);
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(channelA);
+};
+
+export { subscribeToMatchInviteChanges, getMatchInviteInfo };

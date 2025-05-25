@@ -59,8 +59,7 @@ function SolveTable(props) {
     // New subarray with 1 scramble in the scrambles array means there is a new set
     const currSetIndex = match.scrambles.length - 1;
     if (match.scrambles[currSetIndex].length === 1 && currSetIndex !== 0) {
-      console.log("new set");
-      // toast('new set!');
+      toast(`This set is over, going to next set...`, {autoClose: 2000});
       setSetToDisplay(currSetIndex);
     }
   }, [match.scrambles]);

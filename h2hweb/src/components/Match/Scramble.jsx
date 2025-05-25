@@ -7,13 +7,13 @@ function Scramble(props) {
   const currSet = props.currSet;
   const currSolve = props.currSolve;
 
-  console.log(currSet, currSolve);
+  // console.log(currSet, currSolve);
   const [currScramble, setCurrScramble] = useState("");
   useEffect(() => {
     setCurrScramble(scrambleArray?.[currSet - 1]?.[currSolve - 1]);
   }, [props.currSet, props.currSolve, scrambleArray]);
-  console.log(currScramble);
-  console.log(scrambleArray);
+  // console.log(currScramble);
+  // console.log(scrambleArray);
 
   return (
     <div className="w-full">

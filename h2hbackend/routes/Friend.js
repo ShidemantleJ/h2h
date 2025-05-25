@@ -64,7 +64,10 @@ router.post("/declineReq", isLoggedIn, async (req, res) => {
     .eq("recipient_user_id", recipientId)
     .eq("status", "pending");
 
-  if (error) return res.status(500).send("Could not find friend request");
+  if (error) {
+    console.error(error);
+    return res.status(500).send("Could not find friend request");
+  }
   return res.status(200).send("Friend request declined");
 });
 

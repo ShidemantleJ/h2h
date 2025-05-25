@@ -3,40 +3,50 @@ const router = express.Router();
 import { supabase } from "../supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
-// TODO: finish create match function
 async function createMatch(match) {
-  const { data, error } = await supabase.from("matches").insert({
-    player_1_id: match.player_1_id,
-    player_2_id: match.player_2_id,
-    best_of_set_format: match.boSetFormat,
-    best_of_solve_format: match.boSolveFormat,
-    event: match.event,
-    countdown_secs: match.countdown_secs,
-  });
+  const senderGoesFirst = Math.round(Math.random());
 
-  return {data, error};
+  const { data, error } = await supabase
+    .from("matches")
+    .insert({
+      id: match.id,
+      player_1_id: senderGoesFirst
+        ? match.sender_user_id
+        : match.recipient_user_id,
+      player_2_id: senderGoesFirst
+        ? match.recipient_user_id
+        : match.sender_user_id,
+      best_of_set_format: match.best_of_set_format,
+      best_of_solve_format: match.best_of_solve_format,
+      event: match.event,
+      countdown_secs: match.countdown_secs,
+      status: "notstarted",
+    })
+    .select();
+  // console.log(error);
+  return { data, error };
 }
 
-// friend.js /sendreq endpoint referenced to write this
 router.post("/send", isLoggedIn, async (req, res) => {
-  let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } = req.body;
+  let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } =
+    req.body;
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
-  const senderGetsFirstTurn = Math.floor(Math.random() * 2);
-
   const { data, error } = await supabase
     .from("matchinvites")
     .insert({
-      player_1_id: senderGetsFirstTurn ? senderId : recipientId,
-      player_2_id: senderGetsFirstTurn ? recipientId : senderId,
-      best_of_set_format: boSetFormat,
-      best_of_solve_format: boSolveFormat,
+      sender_user_id: senderId,
+      recipient_user_id: recipientId,
+      best_of_set_format: Number(boSetFormat),
+      best_of_solve_format: Array(Number(boSetFormat)).fill(
+        Number(boSolveFormat)
+      ),
       event: event,
-      countdown_secs: countdown_secs,
+      countdown_secs: Number(countdown_secs),
     })
     .select("*");
 
   if (error) {
-    res.status(404).json({ msg: "Could not send invite", error: error });
+    res.status(500).json({ msg: "Could not send invite", error: error });
     return;
   }
 
@@ -45,26 +55,50 @@ router.post("/send", isLoggedIn, async (req, res) => {
 
 router.post("/accept", isLoggedIn, async (req, res) => {
   const { inviteId } = req.body;
-  const { inviteData, fetchError } = await supabase
+  const { data, error } = await supabase
     .from("matchinvites")
-    .select("*")
+    .update({ status: "accepted" })
     .eq("id", Number.parseInt(inviteId, 10))
+    .eq("recipient_user_id", req.user.dbInfo.id)
+    .select()
     .single();
 
-  if (fetchError)
-    res
-      .status(404)
-      .send("Could not find this invite, could have been canceled or deleted");
+  if (error)
+    return res
+      .status(500)
+      .send("Could not find this invite, may have been canceled or deleted");
 
-  const { deleteError } = await supabase
+  const { data: createMatchData, error: createMatchError } = createMatch(data);
+  if (createMatchError) return res.status(500).send(createMatchError);
+  return res.status(200).send(createMatchData);
+});
+
+router.post("/decline", isLoggedIn, async (req, res) => {
+  const { inviteId } = req.body;
+  const { error } = await supabase
     .from("matchinvites")
-    .delete()
-    .eq("id", Number.parseInt(inviteId));
+    .update({ status: "declined" })
+    .eq("id", inviteId)
+    .or(
+      `sender_user_id.eq.${req.user.dbInfo.id},recipient_user_id.eq.${req.user.dbInfo.id}`
+    );
 
-  if (deleteError)
-    res.status(404).send("Could not remove invite and create match");
+  if (!error) return res.status(200);
+  return res.status(500).send(error);
+});
 
-  createMatch(inviteData);
+router.post("/cancel", isLoggedIn, async (req, res) => {
+  const { inviteId } = req.body;
+  const { error } = await supabase
+    .from("matchinvites")
+    .update({ status: "canceled" })
+    .eq("id", inviteId)
+    .or(
+      `sender_user_id.eq.${req.user.dbInfo.id},recipient_user_id.eq.${req.user.dbInfo.id}`
+    );
+
+  if (!error) return res.status(200);
+  return res.status(500).send(error);
 });
 
 export default router;

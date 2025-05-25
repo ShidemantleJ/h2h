@@ -1,23 +1,70 @@
-import React, {useEffect, useState} from 'react';
-import UserCard from '../UserCard';
-import CountdownTimer from './CountdownTimer';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useEffect, useState, useContext } from "react";
+import UserCard from "../UserCard";
+import CountdownTimer from "./CountdownTimer";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { UserContext } from "../../user/UserContext";
+import axios from "axios";
 
 function TopBar(props) {
-    const match = props.match;
-    const countdownTimestamp = match.countdown_timestamp;
-    const countdownSecs = match.countdown_secs;
-    const playerTurn = match.player_turn;
+  const match = props.match;
+  const countdownTimestamp = match.countdown_timestamp;
+  const countdownSecs = match.countdown_secs;
+  const playerTurn = match.player_turn;
+  const { user } = useContext(UserContext);
 
-    return (
-        <div className='flex p-2 items-center'>
-            <CountdownTimer player={1} turn={playerTurn} countdownSecs={countdownSecs} timestamp={countdownTimestamp}/>
-            <UserCard key={match.player_1_id} className="" variant="MatchDisplay" userId={match.player_1_id}/>
-            <p className='my-auto mx-auto font-bold text-xl'>vs</p>
-            <UserCard key={match.player_2_id} className="" variant="MatchDisplay" userId={match.player_2_id}/>
-            <CountdownTimer player={2} turn={playerTurn} countdownSecs={countdownSecs} timestamp={countdownTimestamp}/>
-        </div>
-    );
+  const [p1countdownIsUp, setP1CountdownIsUp] = useState(false);
+  const [p2countdownIsUp, setP2CountdownIsUp] = useState(false);
+
+  useEffect(() => {
+    if (p1countdownIsUp && user.dbInfo.id === match.player_2_id) {
+      axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/match/addDNFForOpponent`,
+        { matchId: match.id },
+        { withCredentials: true }
+      );
+      setP1CountdownIsUp(false);
+    }
+    if (p2countdownIsUp && user.dbInfo.id === match.player_1_id) {
+      axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/match/addDNFForOpponent`,
+        { matchId: match.id },
+        { withCredentials: true }
+      );
+      setP2CountdownIsUp(true);
+    }
+  }, [p1countdownIsUp, p2countdownIsUp]);
+
+  return (
+    <div className="flex p-2 items-center">
+      <CountdownTimer
+        player={1}
+        turn={playerTurn}
+        countdownSecs={countdownSecs}
+        timestamp={countdownTimestamp}
+        setTimeIsUp={setP1CountdownIsUp}
+      />
+      <UserCard
+        key={match.player_1_id}
+        className=""
+        variant="MatchDisplay"
+        userId={match.player_1_id}
+      />
+      <p className="my-auto mx-auto font-bold text-xl">vs</p>
+      <UserCard
+        key={match.player_2_id}
+        className=""
+        variant="MatchDisplay"
+        userId={match.player_2_id}
+      />
+      <CountdownTimer
+        player={2}
+        turn={playerTurn}
+        countdownSecs={countdownSecs}
+        timestamp={countdownTimestamp}
+        setTimeIsUp={setP2CountdownIsUp}
+      />
+    </div>
+  );
 }
 
 export default TopBar;

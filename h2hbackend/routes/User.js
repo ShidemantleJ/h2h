@@ -28,7 +28,7 @@ router.get("/userSearch", async (req, res) => {
       .select("*")
       .or(`wcaid.ilike.%${req.query.term}%, name.ilike.%${req.query.term}%`)
       .limit(5);
-    console.log(data, req.query.term);
+    // console.log(data, req.query.term);
     // console.log(error);
     res.send(data);
   } catch (e) {

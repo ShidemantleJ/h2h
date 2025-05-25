@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const submitTime = async (time, matchId) => {
   try {
@@ -13,9 +14,9 @@ const submitTime = async (time, matchId) => {
     return res;
   } catch (err) {
     if (err.response) {
-      alert(err.response.data);
+      toast.error(err.response.data);
     } else {
-      alert("something went wrong: ", err.message);
+      toast.error("Something went wrong: ", err.message);
     }
     return null;
   }
@@ -158,7 +159,7 @@ function Timer(props) {
             +2
           </button>
           <button
-            className="bg-red-800 rounded-md ml-5 font-semibold p-2 cursor-pointer"
+            className="bg-red-900 rounded-md ml-5 font-semibold p-2 cursor-pointer"
             onClick={() => handleDnfInput(setDnfInputted, setTimeInputVal)}
           >
             DNF

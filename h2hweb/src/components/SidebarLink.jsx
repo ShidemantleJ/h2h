@@ -30,11 +30,7 @@ function SidebarLink(props) {
       return (
         <li
           className="flex items-center cursor-pointer mt-3 p-2 rounded-[6px] bg-emerald-700 hover:bg-emerald-800 transition-all duration-400 text-center text-zinc-200 font-sans font-semibold"
-          onClick={() =>
-            (window.location.href = `${
-              import.meta.env.VITE_BACKEND_URL
-            }/auth/logout`)
-          }
+          onClick={() => (window.location.href = link)}
         >
           <div className="font-sans justify-center text-zinc-300 inline-block">
             {icon}
