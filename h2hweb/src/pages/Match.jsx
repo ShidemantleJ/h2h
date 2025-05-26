@@ -63,7 +63,10 @@ function Match(props) {
         console.log(usersPresent);
 
         const competitors = [match.player_1_id, match.player_2_id];
-        if (competitors.every((element) => usersPresent.includes(element)) && match.status === "notstarted")
+        if (
+          competitors.every((element) => usersPresent.includes(element)) &&
+          match.status === "notstarted"
+        )
           axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/match/startMatch`,
             { matchId: matchId },
@@ -95,14 +98,14 @@ function Match(props) {
     };
   }, [matchId, user]);
 
-  if (!match || !user || !match.player_1_id)
+  if (!match || !user || !match.player_1_id || !match.created_at)
     return <div className="bg-zinc-900 w-full min-h-screen"></div>;
   const playerTimesArr =
     user.dbInfo.id === match.player_1_id
       ? match.player_1_times
       : match.player_2_times;
   const currSet = playerTimesArr.length || 1;
-  const currSolve = playerTimesArr[playerTimesArr.length - 1].length + 1 || 1;
+  const currSolve = playerTimesArr.at(-1).length + 1 || 1;
 
   return (
     <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-2 auto-rows-min text-white gap-5 p-5">

@@ -16,8 +16,11 @@ function Scramble(props) {
   // console.log(scrambleArray);
 
   return (
-    <div className="w-full">
-      <h2 className="text-2xl font-semibold mb-2">Current Scramble</h2>
+    <div className="w-full space-y-2">
+      <h2 className="text-2xl font-semibold">Current Scramble</h2>
+      <h3 className="text-zinc-300">
+        Set {currSet}, solve {currSolve}
+      </h3>
       <p className="text-xl mb-2">{currScramble}</p>
       <scramble-display
         className="w-full"

@@ -2,31 +2,24 @@ import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
 import { getNameFromId } from "../../utils/dbutils";
 import { toast } from "react-toastify";
-
-function p1WonSolve(p1time, p2time) {
-  if (isNaN(p1time) || isNaN(p2time)) return -1;
-  else if (p1time == -1) return 0;
-  else if (p2time == -1) return 1;
-  else if (p1time < p2time) return 1;
-  else if (p1time > p2time) return 0;
-}
+import { whoWonSolve, wonSet } from "../../helpers/matchHelpers";
 
 function getTimes(p1timearr, p2timearr, setNum, boSolveFormat) {
   let tableElements = [];
   for (let i = 0; i < boSolveFormat; i++) {
     const p1time = parseFloat(p1timearr?.[setNum]?.[i])?.toFixed(2);
     const p2time = parseFloat(p2timearr?.[setNum]?.[i])?.toFixed(2);
-    const p1won = p1WonSolve(p1time, p2time);
+    const winner = whoWonSolve(p1time, p2time);
     tableElements.push(
       <tr
         key={i}
         className="hover:bg-zinc-700 rounded-2xl border-b-1 border-zinc-600"
       >
         <td className="px-6 py-4 text-center">{i + 1}</td>
-        <td className={`px-6 py-4 ${p1won === 1 && "font-bold"}`}>
+        <td className={`px-6 py-4 ${winner === 0 && "font-bold"}`}>
           {isNaN(p1time) ? "-" : p1time == -1 ? "DNF" : p1time}
         </td>
-        <td className={`px-6 py-4 ${p1won === 0 && "font-bold"}`}>
+        <td className={`px-6 py-4 ${winner === 1 && "font-bold"}`}>
           {isNaN(p2time) ? "-" : p2time == -1 ? "DNF" : p2time}
         </td>
       </tr>
@@ -59,7 +52,7 @@ function SolveTable(props) {
     // New subarray with 1 scramble in the scrambles array means there is a new set
     const currSetIndex = match.scrambles.length - 1;
     if (match.scrambles[currSetIndex].length === 1 && currSetIndex !== 0) {
-      toast(`This set is over, going to next set...`, {autoClose: 2000});
+      toast(`${wonSet(boSolve)}`, { autoClose: 2000 });
       setSetToDisplay(currSetIndex);
     }
   }, [match.scrambles]);

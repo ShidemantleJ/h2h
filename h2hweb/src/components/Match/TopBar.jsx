@@ -15,25 +15,6 @@ function TopBar(props) {
   const [p1countdownIsUp, setP1CountdownIsUp] = useState(false);
   const [p2countdownIsUp, setP2CountdownIsUp] = useState(false);
 
-  useEffect(() => {
-    if (p1countdownIsUp && user.dbInfo.id === match.player_2_id) {
-      axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/match/addDNFForOpponent`,
-        { matchId: match.id },
-        { withCredentials: true }
-      );
-      setP1CountdownIsUp(false);
-    }
-    if (p2countdownIsUp && user.dbInfo.id === match.player_1_id) {
-      axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/match/addDNFForOpponent`,
-        { matchId: match.id },
-        { withCredentials: true }
-      );
-      setP2CountdownIsUp(true);
-    }
-  }, [p1countdownIsUp, p2countdownIsUp]);
-
   return (
     <div className="flex p-2 items-center">
       <CountdownTimer

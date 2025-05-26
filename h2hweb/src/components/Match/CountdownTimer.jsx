@@ -25,9 +25,7 @@ function CountdownTimer(props) {
   const player = props.player;
   const setTimeIsUp = props.setTimeIsUp;
 
-  const [timeLeft, setTimeLeft] = useState(
-    calculateTimeLeft(startTimestamp, countdownSecs)
-  );
+  const [timeLeft, setTimeLeft] = useState({ text: "0:00", seconds: 1 });
   const timeLeftRef = useRef(calculateTimeLeft(startTimestamp, countdownSecs));
 
   useEffect(() => {
@@ -36,18 +34,24 @@ function CountdownTimer(props) {
         startTimestamp,
         countdownSecs
       );
-      if (calculatedTimeLeft.secsRemaining >= -1) {
+      if (calculatedTimeLeft.seconds >= -1) {
         setTimeLeft(calculatedTimeLeft);
         timeLeftRef.current = calculateTimeLeft(startTimestamp, countdownSecs);
       }
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [startTimestamp]);
+  }, [startTimestamp, countdownSecs]);
 
   useEffect(() => {
-    if (typeof setTimeIsUp === "function" && timeLeft.seconds < 0)
+    if (typeof setTimeIsUp === "function" && timeLeft.seconds < 0) {
+      console.log(
+        "Time is up",
+        timeLeft.seconds,
+        countdownSecs - Math.floor((Date.now() - startTimestamp) / 1000)
+      );
       setTimeIsUp(true);
+    }
   }, [timeLeft, setTimeIsUp]);
 
   return (
@@ -56,8 +60,7 @@ function CountdownTimer(props) {
     >
       <p
         className={`${
-          player === playerTurn &&
-          timeLeftRef.current.seconds < countdownSecs / 3
+          player === playerTurn && timeLeft.seconds < countdownSecs / 3
             ? "text-red-600"
             : "text-black"
         }`}

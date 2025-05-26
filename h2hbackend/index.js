@@ -7,6 +7,7 @@ const { Pool } = pkg;
 import passport from "passport";
 import "./login/passportconfig.js";
 import cors from "cors";
+import "./MatchMonitor.js";
 import { supabase } from "./supabase.js";
 
 const pgSession = connectPgSimple(session);
