@@ -19,7 +19,8 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   if (matchError) return res.status(500).send(matchError);
 
   // Check if match is ongoing
-  if (match.status !== "ongoing") return res.status(400).send("This match has concluded.");
+  if (match.status !== "ongoing")
+    return res.status(400).send("This match has concluded.");
 
   // Check if user is participating in match
   const userIsP1 = req.user.dbInfo.id === match.player_1_id;

@@ -86,6 +86,7 @@ getOngoingMatches();
 subscribeToRealtimeChanges();
 
 setInterval(() => {
+  console.log(ongoingMatches);
   ongoingMatches.forEach((match) => {
     if (
       match.status === "ongoing" &&
@@ -97,10 +98,11 @@ setInterval(() => {
         ) <
         0
     ) {
+      console.log("handling match countdown:");
       handleMatchCountdownComplete(match);
     }
   });
-}, 1000);
+}, 2000);
 
 async function handleMatchCountdownComplete(match) {
   const matchId = match.id;
@@ -145,11 +147,13 @@ async function handleMatchCountdownComplete(match) {
         player_1_times: newP1TimeArr,
         player_2_times: newP2TimeArr,
         player_turn: newTurn,
-        countdown_timestamp: new Date().toUTCString(),
+        countdown_timestamp: matchRoomIsEmpty ? match.countdown_timestamp : new Date().toUTCString(),
         scrambles: newScrambleArr,
         best_of_solve_format: newBoSolveFormat,
         status: matchRoomIsEmpty ? "both_left" : gameState,
       })
       .eq("id", matchId);
+
+    console.log("successfully dnf'd");
   }
 }
