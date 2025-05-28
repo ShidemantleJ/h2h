@@ -46,9 +46,10 @@ const subscribeToMatchInviteChanges = (user, setUser) => {
           const name = await getNameFromId(payload.new.recipient_user_id);
           toast.success(
             <p>
-              {name} accepted your match invite! Join the match by clicking
+              {name} accepted your match invite! Join the match by
+              {" clicking "}
               <a
-                className="font-bold text-emerald-600"
+                className="font-bold text-emerald-600 ml-2"
                 href={`/match/${payload.new.id}`}
               >
                 here

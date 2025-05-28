@@ -62,67 +62,55 @@ const SendMatchInviteButton = ({
 
 const AcceptReqButton = (props) => {
   return (
-    <button
+    <Button
       onClick={() => acceptFriendReq(props.userId)}
-      className="bg-emerald-700 px-4 mr-1 py-2 rounded-lg cursor-pointer"
-    >
-      Accept
-    </button>
+      color="green"
+      text="Accept"
+    />
   );
 };
 
 const DeclineReqButton = (props) => {
   return (
-    <button
+    <Button
       onClick={() => declineFriendReq(props.userId)}
-      className="bg-red-900 px-4 ml-1 py-2 rounded-lg cursor-pointer"
-    >
-      Decline
-    </button>
+      color="red"
+      text="Decline"
+    />
   );
 };
 
 const CancelReqButton = (props) => {
   return (
-    <button
+    <Button
       onClick={() => cancelFriendReq(props.userId)}
-      className="bg-red-900 px-4 py-2 rounded-lg cursor-pointer"
-    >
-      Cancel
-    </button>
+      color="red"
+      text="Cancel"
+    />
   );
 };
 
 const RemoveFriendButton = (props) => {
   return (
-    <button
+    <Button
       onClick={() => removeFriend(props.userId)}
-      className="bg-red-900 px-4 py-2 rounded-lg cursor-pointer"
-    >
-      Remove Friend
-    </button>
+      color="red"
+      text="Remove Friend"
+    />
   );
 };
 
 const SendReqButton = (props) => {
   return (
-    <button
+    <Button
       onClick={() => sendFriendReq(props.userId)}
-      className="bg-emerald-700 cursor-pointer ml-auto my-auto p-4 rounded-2xl font-semibold"
-    >
-      Send Friend Request
-    </button>
+      color="green"
+      text="Send Friend Request"
+    />
   );
 };
 
 const checkAlreadyFriends = (userId, friendInfo) => {
-  console.log(
-    "Checking if ",
-    userId,
-    " is friends.",
-    friendInfo?.friends?.includes(userId)
-  );
-  console.log(friendInfo);
   return friendInfo?.friends?.includes(userId);
 };
 
@@ -214,11 +202,13 @@ const UserCard = ({
           {user.wcaid}
         </a>
       </div>
-      {buttons?.length > 1
-        ? buttons?.map((button) => {
-            return button;
-          })
-        : buttons}
+      <div className="flex gap-2">
+        {buttons?.length > 1
+          ? buttons?.map((button) => {
+              return button;
+            })
+          : buttons}
+      </div>
     </div>
   );
 };

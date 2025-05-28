@@ -34,10 +34,8 @@ function CountdownTimer(props) {
         startTimestamp,
         countdownSecs
       );
-      if (calculatedTimeLeft.seconds >= -1) {
-        setTimeLeft(calculatedTimeLeft);
-        timeLeftRef.current = calculateTimeLeft(startTimestamp, countdownSecs);
-      }
+      setTimeLeft(calculatedTimeLeft);
+      timeLeftRef.current = calculateTimeLeft(startTimestamp, countdownSecs);
     }, 1000);
 
     return () => clearInterval(intervalId);

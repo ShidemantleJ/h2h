@@ -79,7 +79,7 @@ function MatchInviteCard({ inviteData, variant }) {
         />
       )}
       {variant === "incoming" && (
-        <div className="space-x-2">
+        <div className="flex gap-2 mx-auto">
           <Button
             color="green"
             text="Accept"

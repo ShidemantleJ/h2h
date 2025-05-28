@@ -22,6 +22,7 @@ import Modal from "../components/Match/Modal";
 import { UserContext } from "../user/UserContext";
 import CountdownTimer from "../components/Match/CountdownTimer";
 import axios from "axios";
+import Button from "../components/Button";
 
 function Match(props) {
   let { matchId } = useParams();
@@ -113,7 +114,14 @@ function Match(props) {
         <Modal open={modalOpen}>
           <div className="space-y-4 flex flex-col items-center">
             {timeIsUp ? (
-              <p>Your opponent did not join in time</p>
+              <>
+                <p>Your opponent did not join in time</p>
+                <Button
+                  text="Return to homepage"
+                  color="green"
+                  onClick={() => (window.location.href = "/play")}
+                />
+              </>
             ) : (
               <>
                 <p>Waiting for your opponent to join...</p>
