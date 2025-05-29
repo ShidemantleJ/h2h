@@ -186,6 +186,21 @@ const UserCard = ({
       );
       break;
   }
+  if (variant === "MatchDisplay") {
+    return (
+      <div
+        className={`bg-zinc-700 ${
+          hover && "hover:bg-zinc-700"
+        } py-2 px-4 flex space-x-4 items-center w-fit rounded-2xl`}
+      >
+        <img className="block w-9 h-9" src={user.profile_pic_url} />
+        <div>
+          <h1 className="font-semibold">{user.name}</h1>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`bg-zinc-700 ${hover && "hover:bg-zinc-700"} py-2 px-4 flex ${

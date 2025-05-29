@@ -109,7 +109,7 @@ function Match(props) {
   const currSolve = playerTimesArr.at(-1).length + 1 || 1;
 
   return (
-    <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-2 auto-rows-min text-white gap-5 p-5">
+    <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-1 md:grid-cols-2 text-white gap-5 p-5">
       {match.status === "notstarted" && (
         <Modal open={modalOpen}>
           <div className="space-y-4 flex flex-col items-center">
@@ -138,24 +138,26 @@ function Match(props) {
         </Modal>
       )}
       {/* Profile picture and username of opponents and timer */}
-      <div className="bg-zinc-800 rounded-2xl col-span-2">
+      <div className="bg-zinc-800 rounded-2xl md:col-span-2">
         <TopBar match={match} />
       </div>
-      {/* Current Scramble */}
-      <div className="bg-zinc-800 rounded-2xl p-5">
-        <Scramble
-          event={match.event}
-          scrambleArray={match.scrambles}
-          currSet={currSet}
-          currSolve={currSolve}
-        />
-      </div>
-      {/* Submit Times */}
-      <div className="bg-zinc-800 rounded-2xl p-5">
-        <Timer matchId={matchId} />
+      <div className="space-y-5">
+        {/* Submit Times */}
+        <div className="bg-zinc-800 rounded-2xl p-5">
+          <Timer matchId={matchId} />
+        </div>
+        {/* Current Scramble */}
+        <div className="bg-zinc-800 rounded-2xl p-5 h-fit">
+          <Scramble
+            event={match.event}
+            scrambleArray={match.scrambles}
+            currSet={currSet}
+            currSolve={currSolve}
+          />
+        </div>
       </div>
       {/* Table of solves */}
-      <div className="col-span-2">
+      <div className="max-h-fit">
         <SolveTable match={match} />
       </div>
     </div>

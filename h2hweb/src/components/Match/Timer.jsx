@@ -120,14 +120,14 @@ function Timer(props) {
         >
           {timerVal.toFixed(2)}
         </p>
-        <div className="relative inline-block">
+        <div className="relative">
           <input
             type="number"
             min="0.00"
             step="0.01"
             className={`${
               dnfInputted ? "text-zinc-950" : "text-white"
-            } mr-5 p-2 rounded-xl bg-zinc-950`}
+            } p-2 rounded-xl bg-zinc-950`}
             placeholder="Enter your time"
             value={dnfInputted ? -1 : timeInputVal}
             onChange={(e) => setTimeInputVal(e.target.value)}
@@ -143,7 +143,7 @@ function Timer(props) {
             DNF
           </p>
         </div>
-        <div>
+        <div className="space-x-5">
           <button
             className="bg-emerald-700 rounded-md font-semibold p-2 cursor-pointer"
             onClick={() => submitTime(timeInputVal, matchId)}
@@ -151,7 +151,7 @@ function Timer(props) {
             Submit
           </button>
           <button
-            className="bg-amber-700 rounded-md ml-5 font-semibold p-2 cursor-pointer"
+            className="bg-amber-700 rounded-md font-semibold p-2 cursor-pointer"
             onClick={() =>
               setTimeInputVal((prev) => parseFloat(prev) + 2)?.toFixed(2)
             }
@@ -159,7 +159,7 @@ function Timer(props) {
             +2
           </button>
           <button
-            className="bg-red-900 rounded-md ml-5 font-semibold p-2 cursor-pointer"
+            className="bg-red-900 rounded-md font-semibold p-2 cursor-pointer"
             onClick={() => handleDnfInput(setDnfInputted, setTimeInputVal)}
           >
             DNF

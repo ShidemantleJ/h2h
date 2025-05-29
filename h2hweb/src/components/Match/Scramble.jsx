@@ -16,18 +16,25 @@ function Scramble(props) {
   // console.log(scrambleArray);
 
   return (
-    <div className="w-full space-y-2">
-      <h2 className="text-2xl font-semibold">Current Scramble</h2>
-      <h3 className="text-zinc-300">
-        Set {currSet}, solve {currSolve}
-      </h3>
-      <p className="text-xl mb-2">{currScramble}</p>
-      <scramble-display
-        className="w-full"
-        scramble={currScramble}
-        event={event}
-      />
-    </div>
+      <>
+        <h3 className="text-zinc-300">
+          Scramble for set {currSet}, solve {currSolve}
+        </h3>
+      <div className="w-full space-y-2 flex">
+        {/* Scramble text */}
+        <div className="flex-1">
+          <p className="text-xl mb-2">{currScramble}</p>
+        </div>
+        {/* Draw scramble */}
+        <div className="flex flex-1 items-start justify-start">
+          <scramble-display
+            className="w-full h-30"
+            scramble={currScramble}
+            event={event}
+          />
+        </div>
+      </div>
+      </>
   );
 }
 

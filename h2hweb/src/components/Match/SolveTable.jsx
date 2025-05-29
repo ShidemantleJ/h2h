@@ -75,9 +75,7 @@ function SolveTable(props) {
           className="cursor-pointer"
           onClick={() => setSetToDisplay((prev) => Math.max(0, prev - 1))}
         />
-        <h1 className="text-xl font-semibold">
-          Set #{setToDisplay + 1}
-        </h1>
+        <h1 className="text-xl font-semibold">Set #{setToDisplay + 1}</h1>
         <ArrowRightCircle
           className="cursor-pointer"
           onClick={() =>
@@ -90,8 +88,8 @@ function SolveTable(props) {
           }
         />
       </div>
-      <div className="inline-flex items-center h-full min-h-0">
-        <div className="max-h-screen overflow-y-auto">
+      <div className="inline-flex items-center min-h-0">
+        <div className="overflow-y-auto md:max-h-[70vh]">
           <table className="transition-all duration-300 ease-in-out text-sm">
             <thead>
               <tr className="text-zinc-400 border-b-1 border-zinc-600">
