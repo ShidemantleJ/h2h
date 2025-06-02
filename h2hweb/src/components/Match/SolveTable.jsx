@@ -4,7 +4,14 @@ import { getNameFromId } from "../../utils/dbutils";
 import { toast } from "react-toastify";
 import { whoWonSolve, wonSet } from "../../helpers/matchHelpers";
 
-function getTimes(p1timearr, p2timearr, setNum, boSolveFormat) {
+function getTimes(
+  p1timearr,
+  p2timearr,
+  setNum,
+  boSolveFormat,
+  setCurrScrambleSet,
+  setCurrScrambleSolve
+) {
   let tableElements = [];
   for (let i = 0; i < boSolveFormat; i++) {
     const p1time = parseFloat(p1timearr?.[setNum]?.[i])?.toFixed(2);
@@ -14,6 +21,16 @@ function getTimes(p1timearr, p2timearr, setNum, boSolveFormat) {
       <tr
         key={i}
         className="hover:bg-zinc-700 rounded-2xl border-b-1 border-zinc-600"
+        onClick={() => {
+          if (
+            setCurrScrambleSet &&
+            setCurrScrambleSolve &&
+            (!isNaN(p1time) || !isNaN(p2time))
+          ) {
+            setCurrScrambleSet(setNum + 1);
+            setCurrScrambleSolve(i + 1);
+          }
+        }}
       >
         <td className="px-6 py-4 text-center">{i + 1}</td>
         <td className={`px-6 py-4 ${winner === 0 && "font-bold"}`}>
@@ -30,6 +47,8 @@ function getTimes(p1timearr, p2timearr, setNum, boSolveFormat) {
 
 function SolveTable(props) {
   const match = props.match;
+  const setCurrScrambleSet = props.setCurrScrambleSet;
+  const setCurrScrambleSolve = props.setCurrScrambleSolve;
   const [p1name, setp1name] = useState("");
   const [p2name, setp2name] = useState("");
   const [setToDisplay, setSetToDisplay] = useState(0);
@@ -45,28 +64,38 @@ function SolveTable(props) {
     getNames();
   }, [match.player_1_id, match.player_2_id]);
 
-  if (!match || !match.player_1_id || !match.player_2_id || !match.scrambles)
-    return <h1>Loading</h1>;
-
+  // Notify user when someone wins a set
   useEffect(() => {
-    // New subarray with 1 scramble in the scrambles array means there is a new set
-    const currSetIndex = match.scrambles.length - 1;
-    if (match.scrambles[currSetIndex].length === 1 && currSetIndex !== 0) {
+    if (
+      !Array.isArray(match?.player_1_times) ||
+      !Array.isArray(match?.player_2_times) ||
+      match.status !== "ongoing"
+    )
+      return;
+    if (match.player_1_times.length === 0 || match.player_2_times.length === 0)
+      return;
+    const p1LastSet =
+      match.player_1_times.at(-1).length === 0
+        ? match.player_1_times.at(-2)
+        : match.player_1_times.at(-1);
+    const p2LastSet =
+      match.player_2_times.at(-1).length === 0
+        ? match.player_2_times.at(-2)
+        : match.player_2_times.at(-1);
+    const whoWonSet = wonSet(match.best_of_solve_format, p1LastSet, p2LastSet);
+    const currSetIndex = match.player_1_times.length - 1;
+    if (whoWonSet !== "SET_NOT_OVER") {
       toast(
         `${
-          wonSet(
-            match.best_of_solve_format[currSetIndex - 1],
-            match.player_1_times[currSetIndex - 1],
-            match.player_2_times[currSetIndex - 1]
-          ) === "P1_WON"
-            ? p1name
-            : p2name + " won this set! Moving on to set #" + currSetIndex + 1
+          (whoWonSet === "P1_WON" ? p1name : p2name) +
+          " won this set! Moving on to set #" +
+          (currSetIndex + 1)
         }`,
         { autoClose: 5000 }
       );
       setSetToDisplay(currSetIndex);
     }
-  }, [match.scrambles]);
+  }, [match?.player_1_times, match?.player_2_times]);
 
   return (
     <div className="m-auto w-fit bg-zinc-800 rounded-2xl p-5 h-full min-h-0">
@@ -89,7 +118,7 @@ function SolveTable(props) {
         />
       </div>
       <div className="inline-flex items-center min-h-0">
-        <div className="overflow-y-auto md:max-h-[70vh]">
+        <div className="overflow-y-auto md:max-h-[50vh]">
           <table className="transition-all duration-300 ease-in-out text-sm">
             <thead>
               <tr className="text-zinc-400 border-b-1 border-zinc-600">
@@ -103,7 +132,9 @@ function SolveTable(props) {
                 match?.player_1_times || [[]],
                 match?.player_2_times || [[]],
                 setToDisplay,
-                match.best_of_solve_format[setToDisplay]
+                match.max_solves[setToDisplay],
+                setCurrScrambleSet,
+                setCurrScrambleSolve
               )}
             </tbody>
           </table>

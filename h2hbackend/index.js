@@ -42,7 +42,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60 * 24 * 3, // Max cookie age of 3 days 
       // domain: "localhost",
       rolling: true,
     },

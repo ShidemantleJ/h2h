@@ -7,13 +7,13 @@ function whoWonSolve(solve1, solve2) {
   else if (solve2 === solve1) return -2;
   else if (solve2 == -1) return 0;
   else if (solve1 == -1) return 1;
-  
   else if (solve1 < solve2) return 0;
   else if (solve2 < solve1) return 1;
 }
 
 function wonSet(boSolve, p1setarr, p2setarr) {
-  const solvesToWin = Math.ceil((boSolve + 1) / 2);
+  const solvesToWin = Math.ceil(boSolve / 2);
+  console.log(boSolve, p1setarr, p2setarr);
   if (
     !p1setarr ||
     !p1setarr ||
@@ -34,18 +34,20 @@ function wonSet(boSolve, p1setarr, p2setarr) {
 }
 
 function getGameState(boSolve, boSet, p1timearr, p2timearr) {
+  const totalSets = Math.max(p1timearr.length, p2timearr.length);
   const setsToWin = Math.ceil(boSet / 2);
   if (Math.min(p1timearr.length, p2timearr.length) < Math.ceil(boSet / 2))
     return "ongoing";
 
   const setsWon = [0, 0];
-  for (let i = 0; i < boSet; i++) {
-    if (wonSet(boSolve, p1timearr[i], p2timearr[i]) === "P1_WON") setsWon[0]++;
-    else if (wonSet(boSolve, p1timearr[i], p2timearr[i]) === "P2_WON")
-      setsWon[0]++;
-    if (setsWon[0] >= setsToWin) return "P1_WON";
-    else if (setsWon[1] >= setsToWin) return "P2_WON";
+  for (let i = 0; i < totalSets; i++) {
+    const whoWonSet = wonSet(boSolve, p1timearr[i], p2timearr[i]);
+    console.log(whoWonSet);
+    if (whoWonSet === "P1_WON") setsWon[0]++;
+    else if (whoWonSet === "P2_WON") setsWon[1]++;
   }
+  if (setsWon[0] >= setsToWin) return "P1_WON";
+  else if (setsWon[1] >= setsToWin) return "P2_WON";
   return "ongoing";
 }
 
@@ -70,26 +72,25 @@ function getUpdatedTimeArr(match, newTime, addForP1, addForP2) {
     else newP2TimeArr.at(-1).push(newTime);
   }
 
-  let newBoSolveFormat = structuredClone(match.best_of_solve_format);
+  // If neither competitor won a solve, add another solve to the set
+  let newMaxSolves = structuredClone(match.max_solves);
   if (
     newP1TimeArr.at(-1).length === newP2TimeArr.at(-1).length &&
     newP1TimeArr.length === newP2TimeArr.length &&
     whoWonSolve(newP1TimeArr.at(-1).at(-1), newP2TimeArr.at(-1).at(-1)) === -2
   ) {
-    newBoSolveFormat[newP1TimeArr.length - 1]++;
+    newMaxSolves[newP1TimeArr.length - 1]++;
   }
+  // If either player wins the set, push an empty array
   if (
-    wonSet(
-      newBoSolveFormat.at(-1),
-      newP1TimeArr.at(-1),
-      newP2TimeArr.at(-1)
-    ) !== "SET_NOT_OVER"
+    wonSet(newMaxSolves.at(-1), newP1TimeArr.at(-1), newP2TimeArr.at(-1)) !==
+    "SET_NOT_OVER"
   ) {
     newP1TimeArr.push([]);
     newP2TimeArr.push([]);
   }
 
-  return { newP1TimeArr, newP2TimeArr, newBoSolveFormat };
+  return { newP1TimeArr, newP2TimeArr, newMaxSolves };
 }
 
 function getCurrSet(p1timearr, p2timearr) {
@@ -111,11 +112,12 @@ function getNewTurn(p1timearr, p2timearr) {
 }
 
 async function getNewScrambleArr(match, newP1TimeArr, newP2TimeArr) {
-  // Get previous scramble array (2D) and update
+  // Get previous scramble array
   const currSet = getCurrSet(newP1TimeArr, newP2TimeArr);
   const currSolve = getCurrSolve(newP1TimeArr, newP2TimeArr);
   const prevScrambleArr = structuredClone(match.scrambles) || [[]];
   let newScrambleArr = structuredClone(prevScrambleArr);
+
   // If scramble array doesn't contain a subarray for the current set, create subarray
   // and add scramble to the subarray
   if (!Array.isArray(prevScrambleArr[currSet - 1])) {

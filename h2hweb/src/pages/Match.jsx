@@ -1,15 +1,3 @@
-/*
-    Info to include:
-    Top rectangle (full width):
-        Profile picture and username of both opponents (modify usercard to do this)
-    Next row: 1 full width rectangle displaying scramble
-    Next row: 2 rectangles of equal width:
-        Timer with box to submit time, buttons for DNF, +2, lists time remaining
-        Text chat (add later)
-    Next row: 1 rectangle with full width:
-        Table of each solve with arrows on each side to switch between viewing different sets
-*/
-
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import Timer from "../components/Match/Timer";
@@ -23,6 +11,19 @@ import { UserContext } from "../user/UserContext";
 import CountdownTimer from "../components/Match/CountdownTimer";
 import axios from "axios";
 import Button from "../components/Button";
+import InProgressMatch from "../components/Match/InProgressMatch";
+import CompleteMatch from "../components/Match/CompleteMatch";
+
+async function getMatch(matchId, setMatch) {
+  const { data, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .single();
+
+  if (error) setMatch(null);
+  else setMatch(data);
+}
 
 function Match(props) {
   let { matchId } = useParams();
@@ -33,71 +34,8 @@ function Match(props) {
   const [timeIsUp, setTimeIsUp] = useState(false);
 
   useEffect(() => {
-    if (!user?.dbInfo?.id) return;
-
-    const changes = supabase
-      .channel(`match-updates-${matchId}`)
-      .on(
-        "postgres_changes",
-        {
-          schema: "public",
-          event: "*",
-          table: "matches",
-          filter: `id=eq.${matchId}`,
-        },
-        (payload) => {
-          setMatch(payload.new);
-        }
-      )
-      .subscribe();
-
-    const matchRoom = supabase.channel(`match_room_${matchId}`, {
-      config: { presence: { key: user.dbInfo.id } },
-    });
-
-    matchRoom
-      .on("presence", { event: "sync" }, () => {
-        const usersPresent = Object.values(matchRoom.presenceState())
-          .flat()
-          .map((user) => user.userId);
-
-        console.log(usersPresent);
-
-        const competitors = [match.player_1_id, match.player_2_id];
-        if (
-          competitors.every((element) => usersPresent.includes(element)) &&
-          match.status === "notstarted"
-        )
-          axios.post(
-            `${import.meta.env.VITE_BACKEND_URL}/match/startMatch`,
-            { matchId: matchId },
-            { withCredentials: true }
-          );
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await matchRoom.track({ userId: user.dbInfo.id });
-        }
-      });
-
-    async function getMatch(matchId) {
-      const { data, error } = await supabase
-        .from("matches")
-        .select("*")
-        .eq("id", matchId)
-        .single();
-
-      if (error) setMatch(null);
-      else setMatch(data);
-    }
-
-    getMatch(matchId);
-
-    return () => {
-      changes.unsubscribe();
-      matchRoom.unsubscribe();
-    };
-  }, [matchId, user]);
+    getMatch(matchId, setMatch);
+  }, [matchId]);
 
   if (!match || !user || !match.player_1_id || !match.created_at)
     return <div className="bg-zinc-900 w-full min-h-screen"></div>;
@@ -108,60 +46,8 @@ function Match(props) {
   const currSet = playerTimesArr.length || 1;
   const currSolve = playerTimesArr.at(-1).length + 1 || 1;
 
-  return (
-    <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-1 md:grid-cols-2 text-white gap-5 p-5">
-      {match.status === "notstarted" && (
-        <Modal open={modalOpen}>
-          <div className="space-y-4 flex flex-col items-center">
-            {timeIsUp ? (
-              <>
-                <p>Your opponent did not join in time</p>
-                <Button
-                  text="Return to homepage"
-                  color="green"
-                  onClick={() => (window.location.href = "/play")}
-                />
-              </>
-            ) : (
-              <>
-                <p>Waiting for your opponent to join...</p>
-                <CountdownTimer
-                  timestamp={new Date(match.created_at)}
-                  countdownSecs={60}
-                  turn={1}
-                  player={1}
-                  setTimeIsUp={setTimeIsUp}
-                />
-              </>
-            )}
-          </div>
-        </Modal>
-      )}
-      {/* Profile picture and username of opponents and timer */}
-      <div className="bg-zinc-800 rounded-2xl md:col-span-2">
-        <TopBar match={match} />
-      </div>
-      <div className="space-y-5">
-        {/* Submit Times */}
-        <div className="bg-zinc-800 rounded-2xl p-5">
-          <Timer matchId={matchId} />
-        </div>
-        {/* Current Scramble */}
-        <div className="bg-zinc-800 rounded-2xl p-5 h-fit">
-          <Scramble
-            event={match.event}
-            scrambleArray={match.scrambles}
-            currSet={currSet}
-            currSolve={currSolve}
-          />
-        </div>
-      </div>
-      {/* Table of solves */}
-      <div className="max-h-fit">
-        <SolveTable match={match} />
-      </div>
-    </div>
-  );
+  if (match.status === 'ongoing' || match.status === 'notstarted') return <InProgressMatch match={match} matchId={matchId} setMatch={setMatch} />
+  else return <CompleteMatch match={match} />
 }
 
 export default Match;

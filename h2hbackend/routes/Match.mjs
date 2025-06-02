@@ -51,7 +51,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
     return res.status(400).send("Cannot add a time out of turn!");
 
   // Get previous time array (2D) and update
-  const { newP1TimeArr, newP2TimeArr, newBoSolveFormat } = getUpdatedTimeArr(
+  const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
     match,
     newTime,
     userIsP1,
@@ -69,7 +69,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
   const currTime = new Date().toUTCString();
   const gameState = getGameState(
-    newBoSolveFormat,
+    match.best_of_solve_format,
     match.best_of_set_format,
     newP1TimeArr,
     newP2TimeArr
@@ -83,7 +83,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
       player_turn: newTurn,
       countdown_timestamp: currTime,
       scrambles: newScrambleArr,
-      best_of_solve_format: newBoSolveFormat,
+      max_solves: newMaxSolves,
       status: gameState,
     })
     .eq("id", matchId)
@@ -117,7 +117,10 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
 
   const { data, error } = await supabase
     .from("matches")
-    .update({ status: "ongoing" })
+    .update({
+      status: "ongoing",
+      countdown_timestamp: new Date().toUTCString(),
+    })
     .eq("status", "notstarted")
     .eq("id", matchId)
     .select()
@@ -130,7 +133,6 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
     .from("matches")
     .update({
       scrambles: [[firstScramble.toString()]],
-      countdown_timestamp: new Date().toUTCString(),
     })
     .eq("id", matchId)
     .select()

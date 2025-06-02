@@ -11,7 +11,6 @@ import {
   getGameState,
   getMatch,
 } from "./helpers/matchHelpers.js";
-import { GitCommitVerticalIcon } from "lucide-react";
 
 let ongoingMatches = [];
 
@@ -38,7 +37,24 @@ async function subscribeToRealtimeChanges() {
         event: "*",
         schema: "public",
       },
-      () => getOngoingMatches()
+      (payload) => {
+        if (payload.eventType === "UPDATE" || payload.eventType === "INSERT") {
+          const index = ongoingMatches.findIndex(
+            (match) => match.id === payload.new.id
+          );
+          if (
+            payload.new.status !== "ongoing"
+          ) {
+            if (index !== -1) ongoingMatches.splice(index, 1);
+          }
+
+          if (index === -1 && payload.new.status === "ongoing") {
+            ongoingMatches.push(payload.new);
+          } else if (index !== -1 && payload.new.status === "ongoing") {
+            ongoingMatches[index] = payload.new;
+          }
+        }
+      }
     )
     .subscribe();
 }
@@ -58,8 +74,6 @@ function getMatchRoomEmpty(match) {
           .flat()
           .map((user) => user.userId);
 
-        console.log("snapshot of active users:", usersPresent);
-
         if (!usersPresent.includes("monitor")) return;
 
         if (
@@ -71,7 +85,6 @@ function getMatchRoomEmpty(match) {
         } else if (usersPresent.length > 1) {
           resolve(0);
         }
-        console.log("unsubscribing from channel");
         matchRoom.unsubscribe();
       })
       .subscribe(async (status) => {
@@ -86,7 +99,7 @@ getOngoingMatches();
 subscribeToRealtimeChanges();
 
 setInterval(() => {
-  console.log(ongoingMatches);
+  // console.log(ongoingMatches);
   ongoingMatches.forEach((match) => {
     if (
       match.status === "ongoing" &&
@@ -98,7 +111,6 @@ setInterval(() => {
         ) <
         0
     ) {
-      console.log("handling match countdown:");
       handleMatchCountdownComplete(match);
     }
   });
@@ -106,6 +118,13 @@ setInterval(() => {
 
 async function handleMatchCountdownComplete(match) {
   const matchId = match.id;
+
+  // Don't DNF if it's the first solve since players have just joined.
+  // TODO: add cron job to delete old matches where players never submitted times.
+  // if (match.player_1_times.length === 0 || match.player_2_times.length === 0) return;
+
+  console.log((new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
+          1000)
 
   // Check if anyone should be DNF'd (if the time has run out)
   if (
@@ -116,7 +135,7 @@ async function handleMatchCountdownComplete(match) {
       ) <
     0
   ) {
-    const { newP1TimeArr, newP2TimeArr, newBoSolveFormat } = getUpdatedTimeArr(
+    const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
       match,
       -1,
       match.player_turn === 1,
@@ -130,15 +149,13 @@ async function handleMatchCountdownComplete(match) {
     );
 
     const gameState = getGameState(
-      newBoSolveFormat,
+      match.best_of_solve_format,
       match.best_of_set_format,
       newP1TimeArr,
       newP2TimeArr
     );
 
     const matchRoomIsEmpty = await getMatchRoomEmpty(match);
-    if (matchRoomIsEmpty) console.log("match room is empty");
-    else console.log("match room is not empty");
 
     const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
     const { error } = await supabase
@@ -147,13 +164,15 @@ async function handleMatchCountdownComplete(match) {
         player_1_times: newP1TimeArr,
         player_2_times: newP2TimeArr,
         player_turn: newTurn,
-        countdown_timestamp: matchRoomIsEmpty ? match.countdown_timestamp : new Date().toUTCString(),
+        countdown_timestamp: matchRoomIsEmpty
+          ? match.countdown_timestamp
+          : new Date().toUTCString(),
         scrambles: newScrambleArr,
-        best_of_solve_format: newBoSolveFormat,
+        max_solves: newMaxSolves,
         status: matchRoomIsEmpty ? "both_left" : gameState,
       })
       .eq("id", matchId);
 
-    console.log("successfully dnf'd");
+    if (error) console.error(error);
   }
 }

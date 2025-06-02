@@ -5,6 +5,7 @@ function SidebarLinkList(props) {
   const items = props.items;
   const dropdownCollapsed = props.dropdownCollapsed;
   const variant = props.variant;
+  
   return (
     <ul className="space-y-1">
       {items.map(([icon, name, link], index) => {

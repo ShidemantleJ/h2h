@@ -36,9 +36,11 @@ function validateForm(setFormat, solveFormat, selectedEvent, minutes, seconds) {
   if (isNaN(Number(solveFormat)) || Number(solveFormat) < 1)
     error += "Solve format must be a whole number greater than or equal to 1\n";
   if (isNaN(Number(minutes)) || Number(minutes) < 0)
-    error += "Minutes must be zero or a positive whole number";
+    error += "Minutes must be zero or a positive whole number\n";
   if (isNaN(Number(seconds)) || Number(seconds) < 0)
-    error += "Seconds must be zero or a positive whole number";
+    error += "Seconds must be zero or a positive whole number\n";
+  if (Number(seconds) + Number(minutes) * 60 < 10)
+    error += "There must be at least 10 seconds allowed between solves.\n";
 
   if (error !== "") {
     toast.error(error);
@@ -108,6 +110,7 @@ function SendChallengeModal({ recipientId, setShowModal }) {
               <input
                 type="number"
                 className={`p-2 rounded-xl bg-zinc-900 block w-20 text-right`}
+                min="0"
                 step="1"
                 placeholder="minutes"
                 value={minutes}
@@ -117,6 +120,7 @@ function SendChallengeModal({ recipientId, setShowModal }) {
               <input
                 type="number"
                 className={`p-2 rounded-xl bg-zinc-900 block w-20`}
+                min="0"
                 step="1"
                 placeholder="seconds"
                 max="59"

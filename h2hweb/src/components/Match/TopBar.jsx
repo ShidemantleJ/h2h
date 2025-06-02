@@ -7,6 +7,7 @@ import axios from "axios";
 
 function TopBar(props) {
   const match = props.match;
+  const variant = props.variant;
   const countdownTimestamp = match.countdown_timestamp;
   const countdownSecs = match.countdown_secs;
   const playerTurn = match.player_turn;
@@ -16,34 +17,35 @@ function TopBar(props) {
   const [p2countdownIsUp, setP2CountdownIsUp] = useState(false);
 
   return (
-    <div className="flex p-2 items-center">
-      <CountdownTimer
-        player={1}
-        turn={playerTurn}
-        countdownSecs={countdownSecs}
-        timestamp={countdownTimestamp}
-        setTimeIsUp={setP1CountdownIsUp}
-      />
-      <UserCard
-        key={match.player_1_id}
-        className=""
-        variant="MatchDisplay"
-        userId={match.player_1_id}
-      />
-      <p className="my-auto mx-auto font-bold text-xl">vs</p>
-      <UserCard
-        key={match.player_2_id}
-        className=""
-        variant="MatchDisplay"
-        userId={match.player_2_id}
-      />
-      <CountdownTimer
-        player={2}
-        turn={playerTurn}
-        countdownSecs={countdownSecs}
-        timestamp={countdownTimestamp}
-        setTimeIsUp={setP2CountdownIsUp}
-      />
+    <div className="flex flex-col lg:flex-row py-3 px-5 gap-y-2 lg:space-y-0 items-center h-fit justify-between">
+      <div className="flex items-center gap-x-5">
+        {variant !== "CompleteMatch" && <CountdownTimer
+          player={1}
+          turn={playerTurn}
+          countdownSecs={countdownSecs}
+          timestamp={countdownTimestamp}
+          setTimeIsUp={setP1CountdownIsUp}
+        />}
+        <UserCard
+          key={match.player_1_id}
+          userId={match.player_1_id}
+          variant="MatchDisplay"
+        />
+      </div>
+      <div className="flex items-center gap-x-5 flex-row-reverse lg:flex-row">
+        <UserCard
+          key={match.player_2_id}
+          userId={match.player_2_id}
+          variant="MatchDisplay"
+        />
+        {variant !== "CompleteMatch" && <CountdownTimer
+          player={2}
+          turn={playerTurn}
+          countdownSecs={countdownSecs}
+          timestamp={countdownTimestamp}
+          setTimeIsUp={setP2CountdownIsUp}
+        />}
+      </div>
     </div>
   );
 }

@@ -63,7 +63,7 @@ function MatchInviteCard({ inviteData, variant }) {
       </p>
       <p className="text-zinc-600">bo{inviteData.best_of_set_format} sets</p>
       <p className="text-zinc-600">
-        bo{inviteData.best_of_solve_format[0]} solves
+        bo{inviteData.best_of_solve_format} solves
       </p>
       <p className="text-zinc-600">
         Event: {getEventNameFromId(inviteData.event)}

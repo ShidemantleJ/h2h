@@ -18,6 +18,9 @@ async function createMatch(match) {
         : match.sender_user_id,
       best_of_set_format: match.best_of_set_format,
       best_of_solve_format: match.best_of_solve_format,
+      max_solves: Array(Number(match.best_of_set_format)).fill(
+        Number(match.best_of_solve_format)
+      ),
       event: match.event,
       countdown_secs: match.countdown_secs,
       status: "notstarted",
@@ -31,15 +34,14 @@ router.post("/send", isLoggedIn, async (req, res) => {
   let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } =
     req.body;
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  console.log(recipientId, boSetFormat, boSolveFormat, event, countdown_secs);
   const { data, error } = await supabase
     .from("matchinvites")
     .insert({
       sender_user_id: senderId,
       recipient_user_id: recipientId,
       best_of_set_format: Number(boSetFormat),
-      best_of_solve_format: Array(Number(boSetFormat)).fill(
-        Number(boSolveFormat)
-      ),
+      best_of_solve_format: boSolveFormat,
       event: event,
       countdown_secs: Number(countdown_secs),
     })

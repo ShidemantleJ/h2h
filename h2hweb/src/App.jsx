@@ -56,7 +56,7 @@ function App() {
       };
     }
   }, [user?.dbInfo?.id]);
-  console.log(user);
+  // console.log(user);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

@@ -16,8 +16,8 @@ const fetchPublicUserInfo = async (searchTerm, setUserResult, userId) => {
       { withCredentials: true }
     )
     .then((res) => {
-      console.log(res.data);
-      console.log(searchTerm);
+      // console.log(res.data);
+      // console.log(searchTerm);
       setUserResult(res.data.filter((user) => user.id !== userId) || []);
     });
 };
@@ -28,7 +28,7 @@ const Friends = (props) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const { user } = useContext(UserContext);
   const dropdownRef = useRef(null);
-  console.log(user?.friendInfo);
+  // console.log(user?.friendInfo);
 
   useEffect(() => {
     if (!user) return;

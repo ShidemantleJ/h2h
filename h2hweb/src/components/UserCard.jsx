@@ -194,8 +194,10 @@ const UserCard = ({
         } py-2 px-4 flex space-x-4 items-center w-fit rounded-2xl`}
       >
         <img className="block w-9 h-9" src={user.profile_pic_url} />
-        <div>
-          <h1 className="font-semibold">{user.name}</h1>
+        <div className="overflow-hidden">
+          <h1 className="font-semibold overflow-hidden whitespace-nowrap text-ellipsis">
+            {user.name}
+          </h1>
         </div>
       </div>
     );
