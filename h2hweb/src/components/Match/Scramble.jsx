@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { ScrambleDisplay } from "scramble-display";
 
-function Scramble(props) {
-  const scrambleArray = props.scrambleArray;
-  const event = props.event;
-  const currSet = props.currSet;
-  const currSolve = props.currSolve;
-
-  // console.log(currSet, currSolve);
-  const [currScramble, setCurrScramble] = useState("");
-  useEffect(() => {
-    setCurrScramble(scrambleArray?.[currSet - 1]?.[currSolve - 1]);
-  }, [props.currSet, props.currSolve, scrambleArray]);
-  // console.log(currScramble);
-  // console.log(scrambleArray);
+function Scramble({scrambleArray, event, playerNum, currSet, currSolve}) {
+  const currScramble = scrambleArray?.[currSet]?.[currSolve];
 
   return (
-      <>
+      <div className="p-5">
         <h3 className="text-zinc-300">
-          Scramble for set {currSet}, solve {currSolve}
+          Scramble for set {currSet + 1}, solve {currSolve + 1}
         </h3>
       <div className="w-full space-y-2 flex">
         {/* Scramble text */}
@@ -34,7 +23,7 @@ function Scramble(props) {
           />
         </div>
       </div>
-      </>
+      </div>
   );
 }
 

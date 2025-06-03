@@ -9,24 +9,33 @@ import Scramble from "./Scramble";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
 
 function CompleteMatch({ match }) {
-  const [currSet, setCurrSet] = useState(1);
-  const [currSolve, setCurrSolve] = useState(1);
+  const [currSet, setCurrSet] = useState(0);
+  const [currSolve, setCurrSolve] = useState(0);
 
   return (
-    <div className="bg-zinc-900 w-full grid grid-cols-1 gap-5 p-5 text-white auto-rows-min">
+    <div className="bg-zinc-900 w-full flex flex-col gap-5 p-5 text-white auto-rows-min">
       <div className="bg-zinc-800 rounded-2xl lg:col-span-2 h-fit">
-        <TopBar match={match} variant="CompleteMatch" />
+        <TopBar match={match} variant="CompleteMatch" currSet={currSet} />
       </div>
-      <div className="bg-zinc-800 rounded-2xl w-fit">
-        <SolveTable match={match} variant="CompleteMatch" setCurrScrambleSet={setCurrSet} setCurrScrambleSolve={setCurrSolve}/>
-      </div>
-      <div className="bg-zinc-800 rounded-2xl p-5">
-        <Scramble
-          event={match.event}
-          scrambleArray={match.scrambles}
-          currSet={currSet}
-          currSolve={currSolve}
-        />
+      <div className="flex flex-col lg:flex-row gap-5 mx-auto">
+        <div className="bg-zinc-800 rounded-2xl">
+          <SolveTable
+            currSet={currSet}
+            setCurrSet={setCurrSet}
+            currSolve={currSolve}
+            setCurrSolve={setCurrSolve}
+            match={match}
+            variant="CompleteMatch"
+          />
+        </div>
+        <div className="bg-zinc-800 rounded-2xl">
+          <Scramble
+            event={match.event}
+            scrambleArray={match.scrambles}
+            currSet={currSet}
+            currSolve={currSolve}
+          />
+        </div>
       </div>
     </div>
   );

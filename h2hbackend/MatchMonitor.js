@@ -119,13 +119,6 @@ setInterval(() => {
 async function handleMatchCountdownComplete(match) {
   const matchId = match.id;
 
-  // Don't DNF if it's the first solve since players have just joined.
-  // TODO: add cron job to delete old matches where players never submitted times.
-  // if (match.player_1_times.length === 0 || match.player_2_times.length === 0) return;
-
-  console.log((new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
-          1000)
-
   // Check if anyone should be DNF'd (if the time has run out)
   if (
     match.countdown_secs -

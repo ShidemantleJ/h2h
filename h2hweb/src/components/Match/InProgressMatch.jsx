@@ -11,7 +11,7 @@ import Modal from "./Modal";
 import axios from "axios";
 
 export default function InProgressMatch({ match, matchId, setMatch }) {
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [modalOpen, setModalOpen] = useState(true);
   const [timeIsUp, setTimeIsUp] = useState(false);
 
@@ -86,8 +86,12 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
     playerTimesArr = match.player_1_times;
   else if (user.dbInfo.id === match.player_2_id)
     playerTimesArr = match.player_2_times;
-  const currSet = playerTimesArr?.length || 1;
-  const currSolve = playerTimesArr.at(-1)?.length + 1 || 1;
+
+  const [currSet, setCurrSet] = useState(playerTimesArr?.length - 1 || 0);
+  const [currSolve, setCurrSolve] = useState(
+    playerTimesArr.at(-1)?.length || 0
+  );
+
   return (
     <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-1 lg:grid-cols-2 grid-rows-[auto_1fr] text-white gap-5 p-5">
       {match.status === "notstarted" && (
@@ -119,7 +123,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
       )}
       {/* Profile picture and username of opponents and timer */}
       <div className="bg-zinc-800 rounded-2xl lg:col-span-2 h-fit">
-        <TopBar match={match} />
+        <TopBar match={match} currSet={currSet} />
       </div>
       <div className="space-y-5">
         {/* Submit Times */}
@@ -127,7 +131,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
           <Timer matchId={matchId} />
         </div>
         {/* Current Scramble */}
-        <div className="bg-zinc-800 rounded-2xl p-5 h-fit">
+        <div className="bg-zinc-800 rounded-2xl h-fit">
           <Scramble
             event={match.event}
             scrambleArray={match.scrambles}
@@ -138,7 +142,13 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
       </div>
       {/* Table of solves */}
       <div className="h-[70vh]">
-        <SolveTable match={match} />
+        <SolveTable
+          match={match}
+          currSet={currSet}
+          setCurrSet={setCurrSet}
+          currSolve={currSolve}
+          setCurrSolve={setCurrSolve}
+        />
       </div>
     </div>
   );

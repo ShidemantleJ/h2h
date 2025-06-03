@@ -27,8 +27,8 @@ function getTimes(
             setCurrScrambleSolve &&
             (!isNaN(p1time) || !isNaN(p2time))
           ) {
-            setCurrScrambleSet(setNum + 1);
-            setCurrScrambleSolve(i + 1);
+            setCurrScrambleSet(setNum);
+            setCurrScrambleSolve(i);
           }
         }}
       >
@@ -47,11 +47,12 @@ function getTimes(
 
 function SolveTable(props) {
   const match = props.match;
-  const setCurrScrambleSet = props.setCurrScrambleSet;
-  const setCurrScrambleSolve = props.setCurrScrambleSolve;
+  const setCurrSet = props.setCurrSet;
+  const currSet = props.currSet;
+  const setCurrSolve = props.setCurrSolve;
+  const currSolve = props.currSolve;
   const [p1name, setp1name] = useState("");
   const [p2name, setp2name] = useState("");
-  const [setToDisplay, setSetToDisplay] = useState(0);
 
   useEffect(() => {
     if (!match || !match.player_1_id || !match.player_2_id) return;
@@ -82,7 +83,11 @@ function SolveTable(props) {
       match.player_2_times.at(-1).length === 0
         ? match.player_2_times.at(-2)
         : match.player_2_times.at(-1);
-    const whoWonSet = wonSet(match.best_of_solve_format, p1LastSet, p2LastSet);
+    const { setResult: whoWonSet } = wonSet(
+      match.best_of_solve_format,
+      p1LastSet,
+      p2LastSet
+    );
     const currSetIndex = match.player_1_times.length - 1;
     if (whoWonSet !== "SET_NOT_OVER") {
       toast(
@@ -93,7 +98,7 @@ function SolveTable(props) {
         }`,
         { autoClose: 5000 }
       );
-      setSetToDisplay(currSetIndex);
+      setCurrSet(currSetIndex);
     }
   }, [match?.player_1_times, match?.player_2_times]);
 
@@ -102,19 +107,23 @@ function SolveTable(props) {
       <div className="flex items-center justify-center space-x-5 mb-2">
         <ArrowLeftCircle
           className="cursor-pointer"
-          onClick={() => setSetToDisplay((prev) => Math.max(0, prev - 1))}
+          onClick={() => {
+            setCurrSet((prev) => Math.max(0, prev - 1));
+            setCurrSolve(0);
+          }}
         />
-        <h1 className="text-xl font-semibold">Set #{setToDisplay + 1}</h1>
+        <h1 className="text-xl font-semibold">Set #{currSet + 1}</h1>
         <ArrowRightCircle
           className="cursor-pointer"
-          onClick={() =>
-            setSetToDisplay((prev) =>
+          onClick={() => {
+            setCurrSet((prev) =>
               Math.max(
                 Math.min(match?.player_1_times?.length - 1, prev + 1),
                 Math.min(match?.player_2_times?.length - 1, prev + 1)
               )
-            )
-          }
+            );
+            setCurrSolve(0);
+          }}
         />
       </div>
       <div className="inline-flex items-center min-h-0">
@@ -131,10 +140,10 @@ function SolveTable(props) {
               {getTimes(
                 match?.player_1_times || [[]],
                 match?.player_2_times || [[]],
-                setToDisplay,
-                match.max_solves[setToDisplay],
-                setCurrScrambleSet,
-                setCurrScrambleSolve
+                currSet,
+                match.max_solves[currSet],
+                setCurrSet,
+                setCurrSolve
               )}
             </tbody>
           </table>

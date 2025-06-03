@@ -84,7 +84,13 @@ function getUpdatedTimeArr(match, newTime, addForP1, addForP2) {
   // If either player wins the set, push an empty array
   if (
     wonSet(newMaxSolves.at(-1), newP1TimeArr.at(-1), newP2TimeArr.at(-1)) !==
-    "SET_NOT_OVER"
+      "SET_NOT_OVER" &&
+    getGameState(
+      match.best_of_solve_format,
+      match.best_of_set_format,
+      newP1TimeArr,
+      newP2TimeArr
+    ) === "ongoing"
   ) {
     newP1TimeArr.push([]);
     newP2TimeArr.push([]);

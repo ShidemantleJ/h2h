@@ -211,7 +211,9 @@ const UserCard = ({
     >
       <img className="block w-15 h-15" src={user.profile_pic_url} />
       <div>
-        <h1 className="font-semibold">{user.name}</h1>
+        <h1 className="font-semibold">
+          {user.name}
+        </h1>
         <a
           className="text-sm"
           href={`http://worldcubeassociation.org/persons/${user.wcaid}`}
