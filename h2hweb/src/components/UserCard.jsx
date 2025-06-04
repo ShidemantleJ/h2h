@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import axios from "axios";
 import { getUserInfo } from "../utils/dbutils";
+import { Crown } from "lucide-react";
 
 const sendFriendReq = async (userId) => {
   axios.post(
@@ -130,6 +131,7 @@ const UserCard = ({
   hover = true,
   setShowChallengeModal,
   setChallengedUser,
+  wonMatch = false,
 }) => {
   const [user, setUser] = useState(null);
   // console.log(props.userId);
@@ -146,14 +148,7 @@ const UserCard = ({
   switch (variant) {
     case "FriendReq":
       if (checkAlreadyFriends(userId, friendInfo))
-        buttons = [
-          <RemoveFriendButton userId={userId} />,
-          <SendMatchInviteButton
-            userId={userId}
-            setShowChallengeModal={setShowChallengeModal}
-            setChallengedUser={setChallengedUser}
-          />,
-        ];
+        buttons = <RemoveFriendButton key="1" userId={userId} />;
       else if (checkReceivedRequest(userId, friendInfo))
         buttons = <AcceptReqButton userId={userId} />;
       else if (checkSentRequest(userId, friendInfo))
@@ -169,8 +164,8 @@ const UserCard = ({
       break;
     case "IncomingReq":
       buttons = [
-        <AcceptReqButton userId={userId} />,
-        <DeclineReqButton userId={userId} />,
+        <AcceptReqButton key="1" userId={userId} />,
+        <DeclineReqButton key="2" userId={userId} />,
       ];
       break;
     case "OutgoingReq":
@@ -193,7 +188,15 @@ const UserCard = ({
           hover && "hover:bg-zinc-700"
         } py-2 px-4 flex space-x-4 items-center w-fit rounded-2xl`}
       >
-        <img className="block w-9 h-9" src={user.profile_pic_url} />
+        <div className="relative">
+          {wonMatch && (
+            <Crown
+              fill="gold"
+              className="absolute text-white w-5 h-5 z-10 -top-2.5 -left-2.5 rotate-315"
+            />
+          )}
+          <img className="block w-9 h-9" src={user.profile_pic_url} />
+        </div>
         <div className="overflow-hidden">
           <h1 className="font-semibold overflow-hidden whitespace-nowrap text-ellipsis">
             {user.name}
@@ -211,9 +214,7 @@ const UserCard = ({
     >
       <img className="block w-15 h-15" src={user.profile_pic_url} />
       <div>
-        <h1 className="font-semibold">
-          {user.name}
-        </h1>
+        <h1 className="font-semibold">{user.name}</h1>
         <a
           className="text-sm"
           href={`http://worldcubeassociation.org/persons/${user.wcaid}`}

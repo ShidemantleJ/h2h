@@ -12,7 +12,7 @@ function handleSubmit(
   seconds,
   setShowModal
 ) {
-  console.log(setFormat, solveFormat, selectedEvent, minutes, seconds);
+  // console.log(setFormat, solveFormat, selectedEvent, minutes, seconds);
   toast("Challenge sent!");
   axios.post(
     `${import.meta.env.VITE_BACKEND_URL}/matchInvite/send`,
@@ -30,7 +30,7 @@ function handleSubmit(
 
 function validateForm(setFormat, solveFormat, selectedEvent, minutes, seconds) {
   let error = "";
-  console.log(setFormat, solveFormat, selectedEvent, minutes, seconds);
+  // console.log(setFormat, solveFormat, selectedEvent, minutes, seconds);
   if (isNaN(Number(setFormat)) || Number(setFormat) < 1)
     error += "Set format must be a whole number greater than or equal to 1\n";
   if (isNaN(Number(solveFormat)) || Number(solveFormat) < 1)

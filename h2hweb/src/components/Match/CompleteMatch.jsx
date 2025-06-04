@@ -17,8 +17,8 @@ function CompleteMatch({ match }) {
       <div className="bg-zinc-800 rounded-2xl lg:col-span-2 h-fit">
         <TopBar match={match} variant="CompleteMatch" currSet={currSet} />
       </div>
-      <div className="flex flex-col lg:flex-row gap-5 mx-auto">
-        <div className="bg-zinc-800 rounded-2xl">
+      <div className="flex flex-col lg:flex-row gap-5 w-full">
+        <div className="bg-zinc-800 rounded-2xl w-full">
           <SolveTable
             currSet={currSet}
             setCurrSet={setCurrSet}
@@ -28,7 +28,7 @@ function CompleteMatch({ match }) {
             variant="CompleteMatch"
           />
         </div>
-        <div className="bg-zinc-800 rounded-2xl">
+        <div className="bg-zinc-800 rounded-2xl w-full">
           <Scramble
             event={match.event}
             scrambleArray={match.scrambles}

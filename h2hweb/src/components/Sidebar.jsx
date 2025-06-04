@@ -56,14 +56,14 @@ const Sidebar = (props) => {
                   dropdownCollapsed={collapsed}
                   icon={<User />}
                   name="My Profile"
-                  link={`/users/${user.dbInfo.id}`}
+                  link={`/users/${user?.dbInfo?.id}`}
                   variant="normal"
                 />
                 <SidebarLink
                   dropdownCollapsed={collapsed}
                   icon={<LogOut />}
                   name="Log Out"
-                  link={`/users/${user.dbInfo.id}`}
+                  link={`/logout`}
                   variant="button"
                 />
               </>

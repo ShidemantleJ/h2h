@@ -37,10 +37,10 @@ function Match(props) {
     getMatch(matchId, setMatch);
   }, [matchId]);
 
-  if (!match || !user || !match.player_1_id || !match.created_at)
+  if (!match || !match.player_1_id || !match.created_at)
     return <div className="bg-zinc-900 w-full min-h-screen"></div>;
   const playerTimesArr =
-    user.dbInfo.id === match.player_1_id
+    user?.dbInfo?.id === match.player_1_id
       ? match.player_1_times
       : match.player_2_times;
   const currSet = playerTimesArr.length || 1;

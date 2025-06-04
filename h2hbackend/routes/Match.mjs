@@ -11,8 +11,11 @@ import {
   getUpdatedTimeArr,
 } from "../helpers/matchHelpers.js";
 
+
 router.post("/addTime", isLoggedIn, async (req, res) => {
   const { matchId, newTime } = req.body;
+
+  if (isNaN(newTime)) return res.status(400).send("Submitted time must be a number.");
 
   // Get match data
   const { match, matchError } = await getMatch(matchId);
@@ -53,7 +56,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   // Get previous time array (2D) and update
   const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
     match,
-    newTime,
+    newTime.toFixed(2),
     userIsP1,
     userIsP2
   );

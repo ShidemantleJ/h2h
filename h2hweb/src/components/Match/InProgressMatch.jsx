@@ -44,7 +44,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
     // Only subscribe to presence channel if logged in
     if (!user || !user?.dbInfo?.id || !match?.id) return;
 
-    console.log(user);
+    // console.log(user);
 
     const matchRoom = supabase.channel(`match_room_${match.id}`, {
       config: { presence: { key: user.dbInfo.id } || {} },
@@ -54,8 +54,8 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
       const usersPresent = Object.values(matchRoom.presenceState())
         .flat()
         .map((user) => user.userId);
-      console.log(matchRoom.presenceState());
-      console.log(usersPresent);
+      // console.log(matchRoom.presenceState());
+      // console.log(usersPresent);
 
       const competitors = [match.player_1_id, match.player_2_id];
       if (
@@ -87,9 +87,9 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
   else if (user.dbInfo.id === match.player_2_id)
     playerTimesArr = match.player_2_times;
 
-  const [currSet, setCurrSet] = useState(playerTimesArr?.length - 1 || 0);
+  const [currSet, setCurrSet] = useState(Math.max(playerTimesArr?.length - 1, 0));
   const [currSolve, setCurrSolve] = useState(
-    playerTimesArr.at(-1)?.length || 0
+    Math.max(playerTimesArr.at(-1)?.length, 0)
   );
 
   return (
@@ -135,8 +135,8 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
           <Scramble
             event={match.event}
             scrambleArray={match.scrambles}
-            currSet={currSet}
-            currSolve={currSolve}
+            currSet={playerTimesArr.length - 1}
+            currSolve={Math.max(playerTimesArr.at(-1)?.length - 1, 0)}
           />
         </div>
       </div>

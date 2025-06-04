@@ -1,5 +1,6 @@
 import React from "react";
 import { wonSet } from "../../helpers/matchHelpers";
+import { Crown } from "lucide-react";
 
 function sumColumn(arr, index) {
   let sum = 0;
@@ -34,9 +35,12 @@ function MiniStats({ match, playerNum, currSet }) {
 
   const setsWon = setsWonArr[playerNum - 1];
   const totalSolvesWon = sumColumn(solvesWonArr, playerNum - 1);
-  const solvesWonThisSet = solvesWonArr[currSet][playerNum - 1];
+  const solvesWonThisSet = solvesWonArr?.[currSet]?.[playerNum - 1];
+  console.log(solvesWonArr, currSet);
+
+  const playerWon = match.status === `P${playerNum}_WON`;
   return (
-    <div className="flex">
+    <div className={`flex`}>
       <div className="text-white bg-black py-1 px-2 text-center text-xs rounded-lg rounded-r-none">
         <p className="text-xl font-bold">{setsWon}</p>
         <div className="">

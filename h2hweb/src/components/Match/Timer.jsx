@@ -61,6 +61,7 @@ function Timer(props) {
       intervalIdRef.current = null;
       runningRef.current = false;
       setTimeInputVal(timerValRef.current.toFixed(2));
+      setDnfInputted(false);
     }
   };
 

@@ -3,6 +3,25 @@ const router = express.Router();
 import { supabase } from "../supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
+function validateInvite(setFormat, solveFormat, selectedEvent, minutes, seconds) {
+  let error = "";
+  // console.log(setFormat, solveFormat, selectedEvent, minutes, seconds);
+  if (isNaN(Number(setFormat)) || Number(setFormat) < 1)
+    error += "Set format must be a whole number greater than or equal to 1\n";
+  if (isNaN(Number(solveFormat)) || Number(solveFormat) < 1)
+    error += "Solve format must be a whole number greater than or equal to 1\n";
+  if (isNaN(Number(minutes)) || Number(minutes) < 0)
+    error += "Minutes must be zero or a positive whole number\n";
+  if (isNaN(Number(seconds)) || Number(seconds) < 0)
+    error += "Seconds must be zero or a positive whole number\n";
+  if (Number(seconds) + Number(minutes) * 60 < 10)
+    error += "There must be at least 10 seconds allowed between solves.\n";
+
+  if (error !== "") {
+    return false;
+  } else return true;
+}
+
 async function createMatch(match) {
   const senderGoesFirst = Math.round(Math.random());
 
@@ -34,6 +53,7 @@ router.post("/send", isLoggedIn, async (req, res) => {
   let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } =
     req.body;
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  if (!validateInvite(boSetFormat, boSolveFormat, event, 0, countdown_secs)) return res.status(400).send("Invite invalid.");
   console.log(recipientId, boSetFormat, boSolveFormat, event, countdown_secs);
   const { data, error } = await supabase
     .from("matchinvites")

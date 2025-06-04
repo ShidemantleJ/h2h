@@ -1,25 +1,19 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import UserCard from "../components/UserCard";
 import axios from "axios";
 import supabase from "../supabase";
 import { UserContext } from "../user/UserContext";
+import LoggedInMessage from "../components/LoggedInMessage";
+import debounce from "lodash.debounce";
 
 const fetchPublicUserInfo = async (searchTerm, setUserResult, userId) => {
-  axios
-    .get(
-      `${import.meta.env.VITE_BACKEND_URL}/user/userSearch`,
-      {
-        params: {
-          term: searchTerm,
-        },
-      },
-      { withCredentials: true }
-    )
-    .then((res) => {
-      // console.log(res.data);
-      // console.log(searchTerm);
-      setUserResult(res.data.filter((user) => user.id !== userId) || []);
-    });
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .or(`wcaid.ilike.%${searchTerm}%, name.ilike.%${searchTerm}%`)
+    .limit(5);
+  if (error) console.error(error);
+  else setUserResult(data.filter((user) => user.id !== userId) || []);
 };
 
 const Friends = (props) => {
@@ -28,14 +22,20 @@ const Friends = (props) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const { user } = useContext(UserContext);
   const dropdownRef = useRef(null);
-  // console.log(user?.friendInfo);
+
+  const debouncedFetch = useCallback(
+    debounce((searchTerm, setUserResult, userId) => {
+      fetchPublicUserInfo(searchTerm, setUserResult, userId);
+    }, 400),
+    []
+  );
 
   useEffect(() => {
     if (!user) return;
 
     searchTerm === ""
       ? setUserResult([])
-      : fetchPublicUserInfo(searchTerm, setUserResult, user.dbInfo.id);
+      : debouncedFetch(searchTerm, setUserResult, user.dbInfo.id);
 
     const handleOutsideDropdownClick = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
@@ -46,8 +46,10 @@ const Friends = (props) => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideDropdownClick);
     };
-  }, [searchTerm]);
-  // console.log(friendInfo);
+  }, [searchTerm, user, debouncedFetch]);
+
+  if (!user || !user?.friendInfo) return <LoggedInMessage />;
+
   return (
     <div className="bg-zinc-900 text-white min-h-screen p-8 font-sans w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

@@ -26,19 +26,12 @@ async function getNameFromId(userId) {
 }
 
 const getUserInfo = async (userId) => {
-  try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/user/userPublic`,
-      {
-        params: {
-          id: Number.parseInt(userId, 10),
-        },
-      }
-    );
-    return res.data;
-  } catch (e) {
-    console.error(e);
-  }
+  const { data, error } = await supabase
+    .from("users")
+    .select("name, wcaid, created_at, profile_pic_url")
+    .eq("id", userId)
+    .maybeSingle();
+  return data;
 };
 
 export { getProfilePicture, getNameFromId, getUserInfo };

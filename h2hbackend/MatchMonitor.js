@@ -39,13 +39,12 @@ async function subscribeToRealtimeChanges() {
       },
       (payload) => {
         if (payload.eventType === "UPDATE" || payload.eventType === "INSERT") {
+          console.log(payload);
           const index = ongoingMatches.findIndex(
             (match) => match.id === payload.new.id
           );
-          if (
-            payload.new.status !== "ongoing"
-          ) {
-            if (index !== -1) ongoingMatches.splice(index, 1);
+          if (payload.new.status !== "ongoing" && index !== -1) {
+            ongoingMatches.splice(index, 1);
           }
 
           if (index === -1 && payload.new.status === "ongoing") {
@@ -78,8 +77,7 @@ function getMatchRoomEmpty(match) {
 
         if (
           usersPresent.length === 1 &&
-          usersPresent[0] === "monitor" &&
-          match.status === "ongoing"
+          usersPresent[0] === "monitor"
         ) {
           resolve(1);
         } else if (usersPresent.length > 1) {
@@ -99,7 +97,7 @@ getOngoingMatches();
 subscribeToRealtimeChanges();
 
 setInterval(() => {
-  // console.log(ongoingMatches);
+  console.log(ongoingMatches);
   ongoingMatches.forEach((match) => {
     if (
       match.status === "ongoing" &&
@@ -120,52 +118,43 @@ async function handleMatchCountdownComplete(match) {
   const matchId = match.id;
 
   // Check if anyone should be DNF'd (if the time has run out)
-  if (
-    match.countdown_secs -
-      Math.floor(
-        (new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
-          1000
-      ) <
-    0
-  ) {
-    const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
-      match,
-      -1,
-      match.player_turn === 1,
-      match.player_turn === 2
-    );
+  const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
+    match,
+    -1,
+    match.player_turn === 1,
+    match.player_turn === 2
+  );
 
-    const newScrambleArr = await getNewScrambleArr(
-      match,
-      newP1TimeArr,
-      newP2TimeArr
-    );
+  const newScrambleArr = await getNewScrambleArr(
+    match,
+    newP1TimeArr,
+    newP2TimeArr
+  );
 
-    const gameState = getGameState(
-      match.best_of_solve_format,
-      match.best_of_set_format,
-      newP1TimeArr,
-      newP2TimeArr
-    );
+  const gameState = getGameState(
+    match.best_of_solve_format,
+    match.best_of_set_format,
+    newP1TimeArr,
+    newP2TimeArr
+  );
 
-    const matchRoomIsEmpty = await getMatchRoomEmpty(match);
+  const matchRoomIsEmpty = await getMatchRoomEmpty(match);
 
-    const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
-    const { error } = await supabase
-      .from("matches")
-      .update({
-        player_1_times: newP1TimeArr,
-        player_2_times: newP2TimeArr,
-        player_turn: newTurn,
-        countdown_timestamp: matchRoomIsEmpty
-          ? match.countdown_timestamp
-          : new Date().toUTCString(),
-        scrambles: newScrambleArr,
-        max_solves: newMaxSolves,
-        status: matchRoomIsEmpty ? "both_left" : gameState,
-      })
-      .eq("id", matchId);
+  const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
+  const { error } = await supabase
+    .from("matches")
+    .update({
+      player_1_times: newP1TimeArr,
+      player_2_times: newP2TimeArr,
+      player_turn: newTurn,
+      countdown_timestamp: matchRoomIsEmpty
+        ? match.countdown_timestamp
+        : new Date().toUTCString(),
+      scrambles: newScrambleArr,
+      max_solves: newMaxSolves,
+      status: matchRoomIsEmpty ? "both_left" : gameState,
+    })
+    .eq("id", matchId);
 
-    if (error) console.error(error);
-  }
+  if (error) console.error(error);
 }

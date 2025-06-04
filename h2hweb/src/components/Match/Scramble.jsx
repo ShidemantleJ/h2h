@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ScrambleDisplay } from "scramble-display";
 
-function Scramble({scrambleArray, event, playerNum, currSet, currSolve}) {
+function Scramble({scrambleArray, event, currSet, currSolve}) {
   const currScramble = scrambleArray?.[currSet]?.[currSolve];
 
   return (

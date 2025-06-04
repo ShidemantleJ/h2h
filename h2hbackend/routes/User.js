@@ -19,6 +19,7 @@ router.get("/userPublic", async (req, res) => {
   // console.error(error);
 });
 
+// Todo: remove endpoint and test (handled in client)
 router.get("/userSearch", async (req, res) => {
   try {
     // console.log(req.query.term);
