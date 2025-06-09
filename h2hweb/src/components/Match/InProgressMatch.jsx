@@ -15,6 +15,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
   const [modalOpen, setModalOpen] = useState(true);
   const [timeIsUp, setTimeIsUp] = useState(false);
 
+  // Subscribe to match changes (new times, scrambles, etc.)
   useEffect(() => {
     if (!match?.id) return;
 
@@ -39,7 +40,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
     };
   }, [match?.id]);
 
-  // Track presence
+  // Track presence, send request to start the match if both users are present
   useEffect(() => {
     // Only subscribe to presence channel if logged in
     if (!user || !user?.dbInfo?.id || !match?.id) return;
@@ -80,6 +81,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
   if (!match || !match.player_1_id || !match.created_at)
     return <div className="bg-zinc-900 w-full min-h-screen"></div>;
   let playerTimesArr = [];
+
   if (!user || !user?.dbInfo?.id) {
     // TODO: maybe prompt the user who they'd like to spectate maybe? or allow them to switch scrambles themselves?
   } else if (user.dbInfo.id === match.player_1_id)
@@ -87,10 +89,14 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
   else if (user.dbInfo.id === match.player_2_id)
     playerTimesArr = match.player_2_times;
 
-  const [currSet, setCurrSet] = useState(Math.max(playerTimesArr?.length - 1, 0));
-  const [currSolve, setCurrSolve] = useState(
-    Math.max(playerTimesArr.at(-1)?.length, 0)
-  );
+  const [currSet, setCurrSet] = useState(0);
+  const [currSolve, setCurrSolve] = useState(0);
+
+  useEffect(() => {
+    setCurrSet(Math.max(playerTimesArr?.length - 1, 0));
+    setCurrSolve(Math.max(playerTimesArr.at(-1)?.length, 0));
+    console.log(currSet, currSolve);
+  }, [playerTimesArr]);
 
   return (
     <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-1 lg:grid-cols-2 grid-rows-[auto_1fr] text-white gap-5 p-5">
@@ -108,7 +114,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
               </>
             ) : (
               <>
-                <p>Waiting for your opponent to join...</p>
+                <p>Waiting for all players to join...</p>
                 <CountdownTimer
                   timestamp={new Date(match.created_at)}
                   countdownSecs={60}
@@ -135,8 +141,8 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
           <Scramble
             event={match.event}
             scrambleArray={match.scrambles}
-            currSet={playerTimesArr.length - 1}
-            currSolve={Math.max(playerTimesArr.at(-1)?.length - 1, 0)}
+            currSet={currSet}
+            currSolve={currSolve}
           />
         </div>
       </div>

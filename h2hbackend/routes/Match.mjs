@@ -56,7 +56,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   // Get previous time array (2D) and update
   const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
     match,
-    newTime.toFixed(2),
+    parseFloat(newTime).toFixed(2),
     userIsP1,
     userIsP2
   );

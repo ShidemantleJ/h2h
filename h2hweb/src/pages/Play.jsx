@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import Modal from "../components/Match/Modal";
 import Button from "../components/Button";
 import SendChallengeModal from "../components/SendChallengeModal";
-import MatchInviteCard from "../components/MatchInviteCard";
+import MatchCard from "../components/MatchCard";
 import LoggedInMessage from "../components/LoggedInMessage";
 
 const Play = () => {
@@ -50,8 +50,8 @@ const Play = () => {
           <div className="space-x-2 flex overflow-x-auto">
             {user?.matchInviteInfo?.outgoingReqs?.map((invite, i) => {
               return (
-                <MatchInviteCard
-                  variant="outgoing"
+                <MatchCard
+                  variant="outgoingReq"
                   inviteData={invite}
                   key={i}
                 />
@@ -67,8 +67,8 @@ const Play = () => {
           <div className="space-x-2 flex overflow-x-auto">
             {user?.matchInviteInfo?.incomingReqs?.map((invite, i) => {
               return (
-                <MatchInviteCard
-                  variant="incoming"
+                <MatchCard
+                  variant="incomingReq"
                   inviteData={invite}
                   key={i}
                 />

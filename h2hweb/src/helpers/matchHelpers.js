@@ -19,7 +19,7 @@ function wonSet(boSolve, p1setarr, p2setarr) {
     p2setarr.length === 0
   ) {
     setResult = "SET_NOT_OVER";
-    return {setResult, solvesWonArr};
+    return { setResult, solvesWonArr };
   }
   for (let i = 0; i < p1setarr.length; i++) {
     const winningPlayer = whoWonSolve(p1setarr[i], p2setarr[i]);
@@ -34,4 +34,29 @@ function wonSet(boSolve, p1setarr, p2setarr) {
   return { setResult, solvesWonArr };
 }
 
-export { whoWonSolve, wonSet };
+function getMatchScore(numSets, match) {
+  const p1timearr = match.player_1_times;
+  const p2timearr = match.player_2_times;
+
+  // Creates array with a row for each set. Each row contains solves won by p1 at index 0,
+  // and solves won by p2 at index 1
+  let solvesWonArr = Array.from({ length: numSets }, () => Array(2).fill(0));
+  let setsWonArr = [0, 0];
+
+  for (let i = 0; i < numSets; i++) {
+    const { setResult, solvesWonArr: solvesWonInSetArr } = wonSet(
+      match.best_of_solve_format,
+      p1timearr?.[i],
+      p2timearr?.[i]
+    );
+
+    solvesWonArr[i][0] += solvesWonInSetArr[0];
+    solvesWonArr[i][1] += solvesWonInSetArr[1];
+    if (setResult === "P1_WON") setsWonArr[0]++;
+    else if (setResult === "P2_WON") setsWonArr[1]++;
+  }
+
+  return { setsWonArr, solvesWonArr };
+}
+
+export { whoWonSolve, wonSet, getMatchScore };

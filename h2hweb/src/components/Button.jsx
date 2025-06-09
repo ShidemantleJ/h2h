@@ -5,7 +5,7 @@ function Button({ text, color = "green", onClick, type = "button" }) {
     <button
       className={`${color === "green" && "bg-emerald-700"} ${
         color === "red" && "bg-red-900"
-      } cursor-pointer mx-auto inline my-auto px-4 py-2 rounded-2xl font-semibold`}
+      } cursor-pointer mx-auto inline my-auto text-sm px-4 py-1 rounded-lg font-semibold`}
       onClick={onClick}
       type={type}
     >

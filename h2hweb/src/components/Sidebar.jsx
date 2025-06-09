@@ -63,7 +63,7 @@ const Sidebar = (props) => {
                   dropdownCollapsed={collapsed}
                   icon={<LogOut />}
                   name="Log Out"
-                  link={`/logout`}
+                  link={`${import.meta.env.VITE_BACKEND_URL}/auth/logout`}
                   variant="button"
                 />
               </>

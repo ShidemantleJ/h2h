@@ -38,10 +38,13 @@ function TopBar(props) {
   let message;
   switch (match.status) {
     case "P1_WON":
-      message = `${p1name} won`;
+      message = `${p1name} won.`;
       break;
     case "P2_WON":
-      message = `${p2name} won`;
+      message = `${p2name} won.`;
+      break;
+    case "both_left":
+      message = "Both players left early.";
       break;
     default:
       message = "";
@@ -50,8 +53,12 @@ function TopBar(props) {
 
   return (
     <div className="py-3 px-5">
-      {message && <p className="text-center text-xl">This match has concluded</p>}
-      {message && <p className="text-center text-md text-zinc-300 mb-3">{message}</p>}
+      {message && (
+        <p className="text-center text-xl">This match has concluded</p>
+      )}
+      {message && (
+        <p className="text-center text-md text-zinc-300 mb-3">{message}</p>
+      )}
       <div className="flex flex-col lg:flex-row lg:space-y-0 gap-y-2 items-center h-fit justify-between">
         <div className="flex items-center gap-x-5">
           {variant !== "CompleteMatch" && (
