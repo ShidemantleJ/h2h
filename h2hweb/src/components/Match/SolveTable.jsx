@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
-import { getNameFromId } from "../../utils/dbutils";
 import { toast } from "react-toastify";
 import { whoWonSolve, wonSet } from "../../helpers/matchHelpers";
 
@@ -45,25 +44,11 @@ function getTimes(
   return tableElements;
 }
 
-function SolveTable(props) {
-  const match = props.match;
-  const setCurrSet = props.setCurrSet;
-  const currSet = props.currSet;
-  const setCurrSolve = props.setCurrSolve;
-  const currSolve = props.currSolve;
-  const [p1name, setp1name] = useState("");
-  const [p2name, setp2name] = useState("");
+function SolveTable({ match, setCurrSet, currSet, setCurrSolve, currSolve }) {
+  const p1name = match?.player1?.name;
+  const p2name = match?.player2?.name;
 
-  useEffect(() => {
-    if (!match || !match.player_1_id || !match.player_2_id) return;
-    async function getNames() {
-      const player1name = await getNameFromId(match.player_1_id);
-      const player2name = await getNameFromId(match.player_2_id);
-      setp1name(player1name);
-      setp2name(player2name);
-    }
-    getNames();
-  }, [match.player_1_id, match.player_2_id]);
+  console.log(match);
 
   // Notify user when someone wins a set
   useEffect(() => {

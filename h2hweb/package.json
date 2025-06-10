@@ -26,6 +26,7 @@
     "react-router-dom": "^6.30.0",
     "react-toastify": "^11.0.5",
     "react-tooltip": "^5.28.1",
+    "recharts": "^2.15.3",
     "scramble-display": "^0.6.2",
     "tailwindcss": "^4.1.4",
     "vercel": "^42.3.0"

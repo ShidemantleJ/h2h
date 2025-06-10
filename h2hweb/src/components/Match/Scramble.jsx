@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { ScrambleDisplay } from "scramble-display";
 
 function Scramble({scrambleArray, event, currSet, currSolve}) {
@@ -27,4 +27,4 @@ function Scramble({scrambleArray, event, currSet, currSolve}) {
   );
 }
 
-export default Scramble;
+export default memo(Scramble);

@@ -2,7 +2,7 @@
     Display top bar without countdown timers, scrambles,
     and solve table that updates scramble when a row is clicked
 */
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import SolveTable from "./SolveTable";
 import TopBar from "./TopBar";
 import Scramble from "./Scramble";
@@ -41,4 +41,4 @@ function CompleteMatch({ match }) {
   );
 }
 
-export default CompleteMatch;
+export default memo(CompleteMatch);

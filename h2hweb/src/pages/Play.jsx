@@ -12,9 +12,8 @@ const Play = () => {
   const [showModal, setShowModal] = useState(false);
   const [challengedUser, setChallengedUser] = useState(0);
 
-  if (!user || !user?.friendInfo?.friends)
-    return <LoggedInMessage/>;
-  
+  if (!user || !user?.friendInfo?.friends) return <LoggedInMessage />;
+
   return (
     <>
       <Modal open={showModal} onClose={() => setShowModal(false)}>
@@ -24,14 +23,14 @@ const Play = () => {
         />
       </Modal>
       <div className="bg-zinc-900 w-full grid grid-cols-1 lg:grid-cols-2 gap-5 p-8 text-white font-semibold font-sans">
-        <div className="bg-zinc-800 p-5 rounded-2xl row-span-2">
+        <div className="bg-zinc-800 p-5 rounded-2xl row-span-2 h-full overflow-y-auto">
           <h1 className="text-2xl mb-2">Challenge a friend</h1>
           {/* TODO: get currently online friends and their status */}
-          {user?.friendInfo?.friends?.length === 0 && (
-            <p className="text-zinc-400">You have no friends yet.</p>
-          )}
-          {user?.friendInfo?.friends?.map((friendId) => {
-            return (
+          <div className="flex flex-col gap-2 max-h-[75vh] overflow-y-auto">
+            {user?.friendInfo?.friends?.length === 0 && (
+              <p className="text-zinc-400">You have no friends yet.</p>
+            )}
+            {user?.friendInfo?.friends?.map((friendId) => (
               <UserCard
                 variant="MatchInvite"
                 userId={friendId}
@@ -39,8 +38,8 @@ const Play = () => {
                 setShowChallengeModal={setShowModal}
                 setChallengedUser={setChallengedUser}
               />
-            );
-          })}
+            ))}
+          </div>
         </div>
         <div className="bg-zinc-800 p-5 rounded-2xl">
           <h1 className="text-2xl mb-2">Outgoing Challenges</h1>
@@ -50,11 +49,7 @@ const Play = () => {
           <div className="space-x-2 flex overflow-x-auto">
             {user?.matchInviteInfo?.outgoingReqs?.map((invite, i) => {
               return (
-                <MatchCard
-                  variant="outgoingReq"
-                  inviteData={invite}
-                  key={i}
-                />
+                <MatchCard variant="outgoingReq" inviteData={invite} key={i} />
               );
             })}
           </div>
@@ -67,11 +62,7 @@ const Play = () => {
           <div className="space-x-2 flex overflow-x-auto">
             {user?.matchInviteInfo?.incomingReqs?.map((invite, i) => {
               return (
-                <MatchCard
-                  variant="incomingReq"
-                  inviteData={invite}
-                  key={i}
-                />
+                <MatchCard variant="incomingReq" inviteData={invite} key={i} />
               );
             })}
           </div>

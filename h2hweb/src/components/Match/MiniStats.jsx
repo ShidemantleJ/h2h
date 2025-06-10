@@ -14,9 +14,8 @@ function sumColumn(arr, index) {
 function MiniStats({ match, playerNum, currSet }) {
   const p1timearr = match.player_1_times;
   const p2timearr = match.player_2_times;
-  const numSets = Math.max(p1timearr.length, p2timearr.length);
 
-  const {setsWonArr, solvesWonArr} = getMatchScore(numSets, match);
+  const {setsWonArr, solvesWonArr} = getMatchScore(match);
 
   const setsWon = setsWonArr[playerNum - 1];
   const totalSolvesWon = sumColumn(solvesWonArr, playerNum - 1);

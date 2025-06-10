@@ -29,7 +29,6 @@ const getMatchInviteInfo = async (user, setUser) => {
   }));
 };
 
-// TODO: optimize to only update for column updates involving the querying user
 const subscribeToMatchInviteChanges = (user, setUser) => {
   const channelA = supabase
     .channel(`match-invite-changes-${user.dbInfo.id}`)
@@ -46,8 +45,7 @@ const subscribeToMatchInviteChanges = (user, setUser) => {
           const name = await getNameFromId(payload.new.recipient_user_id);
           toast.success(
             <p>
-              {name} accepted your match invite! Join the match by
-              {" clicking "}
+              {name} accepted your match invite! Join the match by clicking
               <a
                 className="font-bold text-emerald-600 ml-2"
                 href={`/match/${payload.new.id}`}
@@ -57,7 +55,6 @@ const subscribeToMatchInviteChanges = (user, setUser) => {
             </p>,
             {
               autoClose: 60000,
-              pauseOnHover: false,
             }
           );
         }

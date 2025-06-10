@@ -5,12 +5,12 @@ import Button from "../Button";
 import CountdownTimer from "./CountdownTimer";
 import TopBar from "./TopBar";
 import Scramble from "./Scramble";
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, memo } from "react";
 import { UserContext } from "../../user/UserContext";
 import Modal from "./Modal";
 import axios from "axios";
 
-export default function InProgressMatch({ match, matchId, setMatch }) {
+function InProgressMatch({ match, matchId, setMatch }) {
   const { user } = useContext(UserContext);
   const [modalOpen, setModalOpen] = useState(true);
   const [timeIsUp, setTimeIsUp] = useState(false);
@@ -30,7 +30,11 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
           filter: `id=eq.${match.id}`,
         },
         (payload) => {
-          setMatch(payload.new);
+          setMatch((prev) => ({
+            player1: prev.player1,
+            player2: prev.player2,
+            ...payload.new,
+          }));
         }
       )
       .subscribe();
@@ -105,7 +109,7 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
           <div className="space-y-4 flex flex-col items-center">
             {timeIsUp ? (
               <>
-                <p>Your opponent did not join in time</p>
+                <p>All players did not join in time</p>
                 <Button
                   text="Return to homepage"
                   color="green"
@@ -159,3 +163,5 @@ export default function InProgressMatch({ match, matchId, setMatch }) {
     </div>
   );
 }
+
+export default memo(InProgressMatch);

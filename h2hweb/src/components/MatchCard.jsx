@@ -3,6 +3,7 @@ import { getUserInfo } from "../utils/dbutils";
 import Button from "./Button";
 import { getEventNameFromId } from "../lib/events";
 import axios from "axios";
+import { getMatchScore } from "../helpers/matchHelpers";
 
 function declineReq(inviteId) {
   axios
@@ -44,7 +45,11 @@ function MatchCard({ inviteData, variant }) {
   const [name, setName] = useState("");
 
   useEffect(() => {
-    if (!inviteData?.recipient_user_id && !inviteData?.player_1_id) return;
+    if (
+      (!inviteData?.recipient_user_id && !inviteData?.player_1_id) ||
+      variant === "normal"
+    )
+      return;
     variant === "outgoingReq" &&
       getUserInfo(inviteData.recipient_user_id).then((user) => {
         setName(user.name);
@@ -53,20 +58,33 @@ function MatchCard({ inviteData, variant }) {
       getUserInfo(inviteData.sender_user_id).then((user) => {
         setName(user.name);
       });
-    variant === "normal" &&
-      getUserInfo(inviteData.player_1_id).then((user1) => {
-        getUserInfo(inviteData.player_2_id).then((user2) => {
-          setName(user1.name + " vs. " + user2.name);
-        });
-      });
   }, [inviteData?.recipient_user_id]);
 
+  let nameAndScore;
+  if (variant === "normal") {
+    const { setsWonArr } = getMatchScore(inviteData);
+    console.log(inviteData);
+    nameAndScore =
+      inviteData.player1.name +
+      ` [${setsWonArr[0]}] vs. [${setsWonArr[1]}] ` +
+      inviteData.player2.name;
+  }
+
   return (
-    <div className="bg-zinc-900 p-2 rounded-lg space-y-1">
+    <div
+      onClick={() => {
+        variant === "normal" &&
+          (window.location.href = `/match/${inviteData.id}`);
+      }}
+      className={`${
+        variant === "normal" &&
+        "hover:scale-[1.03] transform-all duration-300 cursor-pointer"
+      } bg-zinc-900 p-2 rounded-lg space-y-1`}
+    >
       <p className="text-zinc-200">
         {variant === "outgoingReq" && "To: "}
         {variant === "incomingReq" && "From: "}
-        {name}
+        {variant === "normal" ? nameAndScore : name}
       </p>
       <p className="text-zinc-600">
         {getEventNameFromId(inviteData.event)}, bo
@@ -105,14 +123,6 @@ function MatchCard({ inviteData, variant }) {
             onClick={() => declineReq(inviteData.id)}
           />
         </div>
-      )}
-      {variant === "normal" && (
-        <Button
-          color="green"
-          text="View results"
-          onClick={() => (window.location.href = `/match/${inviteData.id}`)}
-          key={inviteData.id}
-        />
       )}
     </div>
   );

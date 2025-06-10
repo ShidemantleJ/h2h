@@ -55,7 +55,7 @@ const Friends = (props) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Search */}
         <div className="bg-zinc-800 rounded-2xl p-6">
-          <h1 className="text-3xl font-semibold mb-4">
+          <h1 className="text-2xl font-semibold mb-4">
             Search for New Friends
           </h1>
           <div className="relative" ref={dropdownRef}>
@@ -111,12 +111,14 @@ const Friends = (props) => {
             </h2>
             <div className="overflow-x-auto whitespace-nowrap flex gap-4">
               {user?.friendInfo?.outgoingReqs.map((userId, i) => (
-                <UserCard
-                  variant="OutgoingReq"
-                  layout="vertical"
-                  key={i}
-                  userId={userId}
-                />
+                <>
+                  <UserCard
+                    variant="OutgoingReq"
+                    layout="vertical"
+                    key={i}
+                    userId={userId}
+                  />
+                </>
               ))}
               {user?.friendInfo?.outgoingReqs.length === 0 && (
                 <p className="text-zinc-400">No outgoing requests.</p>
@@ -124,24 +126,26 @@ const Friends = (props) => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Friends List */}
-      <div className="mt-12 bg-zinc-800 rounded-2xl p-6">
-        <h2 className="text-3xl font-semibold mb-4">Your Friends</h2>
-        {user?.friendInfo?.friends.map((userId, i) => (
-          <UserCard
-            variant="FriendReq"
-            key={i}
-            userId={userId}
-            friendInfo={user.friendInfo}
-          />
-        ))}
-        {user?.friendInfo?.friends.length === 0 && (
-          <p className="col-span-full text-zinc-400">
-            You have no friends yet.
-          </p>
-        )}
+        {/* Friends List */}
+        <div className="bg-zinc-800 rounded-2xl p-6 lg:col-span-2">
+          <h2 className="text-2xl font-semibold mb-4">Your Friends</h2>
+          <div className="flex gap-4 whitespace-nowrap overflow-x-auto">
+            {user?.friendInfo?.friends.map((userId, i) => (
+              <UserCard
+                variant="FriendReq"
+                layout="vertical"
+                key={i}
+                userId={userId}
+                friendInfo={user.friendInfo}
+              />
+            ))}
+            {user?.friendInfo?.friends.length === 0 && (
+              <p className="col-span-full text-zinc-400">
+                You have no friends yet.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

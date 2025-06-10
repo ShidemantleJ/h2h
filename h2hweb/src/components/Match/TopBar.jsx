@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { UserContext } from "../../user/UserContext";
 import MiniStats from "./MiniStats";
 import axios from "axios";
-import { getNameFromId } from "../../utils/dbutils";
 
 function TopBar(props) {
   const match = props.match;
@@ -19,21 +18,8 @@ function TopBar(props) {
   const [p1countdownIsUp, setP1CountdownIsUp] = useState(false);
   const [p2countdownIsUp, setP2CountdownIsUp] = useState(false);
 
-  const [p1name, setp1name] = useState("");
-  const [p2name, setp2name] = useState("");
-
-  useEffect(() => {
-    if (!match?.player_1_id || !match?.player_2_id) return;
-
-    async function getNames() {
-      const player1name = await getNameFromId(match.player_1_id);
-      const player2name = await getNameFromId(match.player_2_id);
-      setp1name(player1name);
-      setp2name(player2name);
-    }
-
-    getNames();
-  }, [match?.player_1_id, match?.player_2_id]);
+  const p1name = match?.player1?.name;
+  const p2name = match?.player2?.name;
 
   let message;
   switch (match.status) {

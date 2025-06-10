@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 import { Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
 import axios from "axios";
@@ -27,8 +27,7 @@ function handleDnfInput(setDnfInputted, setTimeInputVal) {
   setTimeInputVal(-1);
 }
 
-function Timer(props) {
-  const matchId = props.matchId;
+function Timer({matchId}) {
 
   const [timerVal, setTimerVal] = useState(0);
   const [timerBold, setTimerBold] = useState(false);
@@ -171,4 +170,4 @@ function Timer(props) {
   );
 }
 
-export default Timer;
+export default memo(Timer);

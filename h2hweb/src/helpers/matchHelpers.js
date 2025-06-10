@@ -34,9 +34,10 @@ function wonSet(boSolve, p1setarr, p2setarr) {
   return { setResult, solvesWonArr };
 }
 
-function getMatchScore(numSets, match) {
+function getMatchScore(match) {
   const p1timearr = match.player_1_times;
   const p2timearr = match.player_2_times;
+  const numSets = Math.max(p1timearr.length, p2timearr.length);
 
   // Creates array with a row for each set. Each row contains solves won by p1 at index 0,
   // and solves won by p2 at index 1

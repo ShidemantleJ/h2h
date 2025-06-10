@@ -5,7 +5,7 @@ import UserCard from "../components/UserCard";
 import { UserContext } from "../user/UserContext";
 import { getUserInfo } from "../utils/dbutils";
 import EventSelector from "../components/EventSelector";
-import { getAvgLast5Matches, getLastXMatches } from "../utils/userStats";
+import { getStatsLast10Matches, getLastXMatches } from "../utils/userStats";
 import MatchCard from "../components/MatchCard";
 
 const UserView = () => {
@@ -14,7 +14,7 @@ const UserView = () => {
   const [user, setUser] = useState({});
   const [recentMatches, setRecentMatches] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState("333");
-  const [average, setAverage] = useState(0);
+  const [eventStats, setEventStats] = useState({});
 
   useEffect(() => {
     async function getInfo(userId) {
@@ -26,15 +26,23 @@ const UserView = () => {
 
   useEffect(() => {
     async function getAverage(userId, selectedEvent) {
-      const avg = await getAvgLast5Matches(selectedEvent, userId);
-      const recentMatches = await getLastXMatches("all", userId, 1, 5);
+      const { mean, stddev, record } = await getStatsLast10Matches(
+        selectedEvent,
+        userId
+      );
+      const recentMatches = await getLastXMatches("all", userId, 1, 10);
       setRecentMatches(recentMatches);
-      setAverage(avg);
+      setEventStats((prev) => ({
+        ...prev,
+        average: mean,
+        stddev: stddev,
+        record: record,
+      }));
     }
     getAverage(userId, selectedEvent);
   }, [userId, selectedEvent]);
 
-  if (!user) {
+  if (!user || !user.created_at) {
     console.log("No user info");
     return (
       <div className="bg-zinc-900 flex items-center justify-center w-full text-white text-lg">
@@ -44,14 +52,16 @@ const UserView = () => {
   }
 
   return (
-    <div className="bg-zinc-900 w-full text-white p-12 grid grid-cols-1 lg:grid-cols-2 gap-3 max-h-full">
+    <div className="bg-zinc-900 w-full text-white p-8 grid grid-cols-1 lg:grid-cols-2 gap-3">
       {/* User name, picture, date joined */}
       <div className="flex lg:col-span-2 gap-10 items-center mx-auto">
         <img src={user.profile_pic_url} className="h-20 w-20" />
         <div>
-          <h1 className="text-zinc-50 text-lg font-semibold whitespace-normal">{user.name}</h1>
+          <h1 className="text-zinc-50 text-lg font-semibold whitespace-normal">
+            {user.name}
+          </h1>
           <p
-            className="text-zinc-200 text-sm"
+            className="text-zinc-200 text-sm cursor-pointer"
             onClick={() =>
               (window.location.href = `https://worldcubeassociation.org/persons/${user.wcaid}`)
             }
@@ -69,24 +79,33 @@ const UserView = () => {
         <h1 className="font-semibold text-zinc-300 text-lg text-center">
           Statistics (Last 10 matches)
         </h1>
-        <div className="flex flex-col lg:flex-row">
+        <div className="flex flex-col space-y-2">
           <EventSelector
             setSelectedEvent={setSelectedEvent}
             selectedEvent={selectedEvent}
             bgcolor="bg-zinc-800"
           />
-          <p>Average: {average}</p>
+          <p>Average: {eventStats.average}</p>
+          <p>Standard Deviation: {eventStats.stddev}</p>
+          <p>Record (solves won-lost): {eventStats.record}</p>
         </div>
       </div>
       {/* Recent matches */}
-      <div className="space-y-1">
-        <h1 className="font-semibold text-zinc-300 text-lg text-center">
-          Recent Matches
-        </h1>
+      <div className="space-y-2">
+        <div>
+          <h1 className="font-semibold text-zinc-300 text-lg text-center">
+            Recent Matches
+          </h1>
+          <h1 className="text-zinc-400 text-sm text-center">
+            Click a match to view results
+          </h1>
+        </div>
         <div className="bg-zinc-800 space-y-2 max-h-[60vh] p-5 rounded-2xl overflow-y-auto">
           {recentMatches.map((match) => {
             return (
-              match.status !== "ongoing" && <MatchCard inviteData={match} variant="normal" key={match.id} />
+              match.status !== "ongoing" && (
+                <MatchCard inviteData={match} variant="normal" key={match.id} />
+              )
             );
           })}
         </div>

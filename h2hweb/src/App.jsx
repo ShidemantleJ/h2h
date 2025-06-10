@@ -28,7 +28,7 @@ function App() {
           `${import.meta.env.VITE_BACKEND_URL}/user/loggedInInfo`,
           { withCredentials: true }
         );
-        setUser(prevUser => ({
+        setUser((prevUser) => ({
           ...prevUser,
           sessionInfo: res.data.sessionInfo,
           dbInfo: res.data.dbInfo,
@@ -80,9 +80,9 @@ function App() {
         newestOnTop={false}
         closeOnClick={false}
         rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
         theme="dark"
       />
     </UserContext.Provider>
