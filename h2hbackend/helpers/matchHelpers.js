@@ -138,6 +138,85 @@ async function getNewScrambleArr(match, newP1TimeArr, newP2TimeArr) {
   return newScrambleArr;
 }
 
+// Gets a snapshot of all users present in the room by joining the room as 'monitor.' If only 'monitor' is present in the room, return 1 (empty), else return 0 (not empty)
+function getMatchRoomEmpty(match) {
+  return new Promise((resolve, reject) => {
+    const matchId = match.id;
+
+    const matchRoom = supabase.channel(`match_room_${matchId}`, {
+      config: { presence: { key: "monitor" } },
+    });
+
+    matchRoom
+      .on("presence", { event: "sync" }, () => {
+        const usersPresent = Object.values(matchRoom.presenceState())
+          .flat()
+          .map((user) => user.userId);
+
+        if (!usersPresent.includes("monitor")) return;
+
+        if (
+          usersPresent.length === 1 &&
+          usersPresent[0] === "monitor"
+        ) {
+          resolve(1);
+        } else if (usersPresent.length > 1) {
+          resolve(0);
+        }
+        matchRoom.unsubscribe();
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await matchRoom.track({ userId: "monitor" });
+        }
+      });
+  });
+}
+
+async function handleMatchCountdownComplete(match) {
+  const matchId = match.id;
+
+  const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
+    match,
+    -1,
+    match.player_turn === 1,
+    match.player_turn === 2
+  );
+
+  const newScrambleArr = await getNewScrambleArr(
+    match,
+    newP1TimeArr,
+    newP2TimeArr
+  );
+
+  const gameState = getGameState(
+    match.best_of_solve_format,
+    match.best_of_set_format,
+    newP1TimeArr,
+    newP2TimeArr
+  );
+
+  const matchRoomIsEmpty = await getMatchRoomEmpty(match);
+
+  const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
+  const { error } = await supabase
+    .from("matches")
+    .update({
+      player_1_times: newP1TimeArr,
+      player_2_times: newP2TimeArr,
+      player_turn: newTurn,
+      countdown_timestamp: matchRoomIsEmpty
+        ? match.countdown_timestamp
+        : new Date().toUTCString(),
+      scrambles: newScrambleArr,
+      max_solves: newMaxSolves,
+      status: matchRoomIsEmpty ? "both_left" : gameState,
+    })
+    .eq("id", matchId);
+
+  if (error) console.error(error);
+}
+
 export {
   getNewScrambleArr,
   getCurrSet,
@@ -148,4 +227,6 @@ export {
   getUpdatedTimeArr,
   whoWonSolve,
   wonSet,
+  getMatchRoomEmpty,
+  handleMatchCountdownComplete
 };

@@ -1,6 +1,4 @@
 import React, {memo} from "react";
-import { wonSet } from "../../helpers/matchHelpers";
-import { Crown } from "lucide-react";
 import {getMatchScore} from '../../helpers/matchHelpers';
 
 function sumColumn(arr, index) {
@@ -31,7 +29,7 @@ function MiniStats({ match, playerNum, currSet }) {
           <p className="text-xs font-semibold">set{setsWon !== 1 && "s"}</p>
         </div>
       </div>
-      <div className="text-white bg-zinc-900 py-1 px-2 text-center text-xs">
+      <div className="hidden lg:block text-white bg-zinc-900 py-1 px-2 text-center text-xs">
         <p className="text-xl font-bold">{totalSolvesWon}</p>
         <p className="text-xs font-semibold">
           total

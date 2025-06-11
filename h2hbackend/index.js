@@ -7,8 +7,6 @@ const { Pool } = pkg;
 import passport from "passport";
 import "./login/passportconfig.js";
 import cors from "cors";
-import "./MatchMonitor.js";
-import { supabase } from "./supabase.js";
 
 const pgSession = connectPgSimple(session);
 
@@ -42,7 +40,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 3, // Max cookie age of 3 days 
+      maxAge: 1000 * 60 * 60 * 24 * 3, // Max cookie age of 3 days
       // domain: "localhost",
       rolling: true,
     },

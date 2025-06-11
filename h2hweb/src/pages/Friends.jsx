@@ -16,7 +16,7 @@ const fetchPublicUserInfo = async (searchTerm, setUserResult, userId) => {
   else setUserResult(data.filter((user) => user.id !== userId) || []);
 };
 
-const Friends = (props) => {
+const Friends = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [userResult, setUserResult] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -51,7 +51,7 @@ const Friends = (props) => {
   if (!user || !user?.friendInfo) return <LoggedInMessage />;
 
   return (
-    <div className="bg-zinc-900 text-white min-h-screen p-8 font-sans w-full">
+    <div className="bg-zinc-900 text-white h-full min-h-dvh p-8 font-sans w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Search */}
         <div className="bg-zinc-800 rounded-2xl p-6">

@@ -13,7 +13,7 @@ function CompleteMatch({ match }) {
   const [currSolve, setCurrSolve] = useState(0);
 
   return (
-    <div className="bg-zinc-900 w-full flex flex-col gap-5 p-5 text-white auto-rows-min">
+    <div className="bg-zinc-900 w-full flex flex-col gap-5 p-5 text-white min-h-dvh auto-rows-min">
       <div className="bg-zinc-800 rounded-2xl lg:col-span-2 h-fit">
         <TopBar match={match} variant="CompleteMatch" currSet={currSet} />
       </div>

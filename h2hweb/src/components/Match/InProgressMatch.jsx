@@ -86,24 +86,28 @@ function InProgressMatch({ match, matchId, setMatch }) {
     return <div className="bg-zinc-900 w-full min-h-screen"></div>;
   let playerTimesArr = [];
 
-  if (!user || !user?.dbInfo?.id) {
-    // TODO: maybe prompt the user who they'd like to spectate maybe? or allow them to switch scrambles themselves?
-  } else if (user.dbInfo.id === match.player_1_id)
-    playerTimesArr = match.player_1_times;
-  else if (user.dbInfo.id === match.player_2_id)
-    playerTimesArr = match.player_2_times;
+  const userIsP1 = user?.dbInfo?.id === match.player_1_id;
+  const userIsP2 = user?.dbInfo?.id === match.player_2_id;
+  const userIsSpectator = !userIsP1 && !userIsP2;
+
+  if (userIsP1) playerTimesArr = match.player_1_times;
+  else if (userIsP2) playerTimesArr = match.player_2_times;
 
   const [currSet, setCurrSet] = useState(0);
   const [currSolve, setCurrSolve] = useState(0);
+  const [latestScrambleSet, setLatestScrambleSet] = useState(0);
+  const [latestScrambleSolve, setLatestScrambleSolve] = useState(0);
 
   useEffect(() => {
     setCurrSet(Math.max(playerTimesArr?.length - 1, 0));
     setCurrSolve(Math.max(playerTimesArr.at(-1)?.length, 0));
+    setLatestScrambleSet(Math.max(playerTimesArr?.length - 1, 0));
+    setLatestScrambleSolve(Math.max(playerTimesArr.at(-1)?.length, 0));
     console.log(currSet, currSolve);
   }, [playerTimesArr]);
 
   return (
-    <div className="bg-zinc-900 w-full min-h-screen grid grid-cols-1 lg:grid-cols-2 grid-rows-[auto_1fr] text-white gap-5 p-5">
+    <div className="bg-zinc-900 w-full min-h-dvh grid grid-cols-1 lg:grid-cols-2 grid-rows-[auto_1fr] text-white gap-5 p-5">
       {match.status === "notstarted" && (
         <Modal open={modalOpen}>
           <div className="space-y-4 flex flex-col items-center">
@@ -145,8 +149,8 @@ function InProgressMatch({ match, matchId, setMatch }) {
           <Scramble
             event={match.event}
             scrambleArray={match.scrambles}
-            currSet={currSet}
-            currSolve={currSolve}
+            currSet={userIsSpectator ? currSet : latestScrambleSet}
+            currSolve={userIsSpectator ? currSolve : latestScrambleSolve}
           />
         </div>
       </div>

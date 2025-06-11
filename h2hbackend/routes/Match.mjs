@@ -9,13 +9,14 @@ import {
   getMatch,
   getNewTurn,
   getUpdatedTimeArr,
+  handleMatchCountdownComplete,
 } from "../helpers/matchHelpers.js";
-
 
 router.post("/addTime", isLoggedIn, async (req, res) => {
   const { matchId, newTime } = req.body;
 
-  if (isNaN(newTime)) return res.status(400).send("Submitted time must be a number.");
+  if (isNaN(newTime))
+    return res.status(400).send("Submitted time must be a number.");
 
   // Get match data
   const { match, matchError } = await getMatch(matchId);
@@ -144,6 +145,48 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
   if (addScrambleErr) return res.status(500).send(addScrambleErr);
 
   return res.status(200);
+});
+
+router.post("/timeUpAddDNF", isLoggedIn, async (req, res) => {
+  const { matchId } = req.body;
+  const { match, matchError } = await getMatch(matchId);
+  if (matchError) return res.status(500);
+
+  // If the match is ongoing and countdown has passed, DNF opponent
+  if (
+    match.status === "ongoing" &&
+    match.countdown_secs -
+      Math.floor(
+        (new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
+          1000
+      ) <
+      0
+  ) {
+    handleMatchCountdownComplete(match);
+  }
+  return res.status(200);
+});
+
+// Called every 5 minutes by cron job
+router.post("/checkMatchesForDNF", isLoggedIn, async (req, res) => {
+  const { data: matches, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("status", "ongoing");
+
+  matches?.forEach((match) => {
+    if (
+      match.countdown_secs -
+        Math.floor(
+          (new Date().getTime() -
+            new Date(match.countdown_timestamp).getTime()) /
+            1000
+        ) <
+        0
+    ) {
+      handleMatchCountdownComplete(match);
+    }
+  });
 });
 
 export default router;

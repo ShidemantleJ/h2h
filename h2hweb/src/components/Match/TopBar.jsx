@@ -18,6 +18,18 @@ function TopBar(props) {
   const [p1countdownIsUp, setP1CountdownIsUp] = useState(false);
   const [p2countdownIsUp, setP2CountdownIsUp] = useState(false);
 
+  useEffect(() => {
+    if (p1countdownIsUp || p2countdownIsUp) {
+      axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/match/timeUpAddDNF`,
+        { matchId: match.id },
+        { withCredentials: true }
+      );
+      setP1CountdownIsUp(false);
+      setP2CountdownIsUp(false);
+    }
+  }, [p1countdownIsUp, p2countdownIsUp]);
+
   const p1name = match?.player1?.name;
   const p2name = match?.player2?.name;
 
@@ -46,7 +58,7 @@ function TopBar(props) {
         <p className="text-center text-md text-zinc-300 mb-3">{message}</p>
       )}
       <div className="flex flex-col lg:flex-row lg:space-y-0 gap-y-2 items-center h-fit justify-between">
-        <div className="flex items-center gap-x-5">
+        <div className="flex items-center justify-between md:gap-x-5">
           {variant !== "CompleteMatch" && (
             <CountdownTimer
               player={1}
@@ -64,7 +76,7 @@ function TopBar(props) {
           />
           <MiniStats match={match} playerNum={1} key={1} currSet={currSet} />
         </div>
-        <div className="flex items-center gap-x-5 flex-row-reverse lg:flex-row">
+        <div className="flex items-center md:gap-x-5 flex-row-reverse lg:flex-row">
           <MiniStats match={match} playerNum={2} key={2} currSet={currSet} />
           <UserCard
             key={match.player_2_id}

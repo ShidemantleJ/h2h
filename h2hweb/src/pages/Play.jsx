@@ -22,7 +22,7 @@ const Play = () => {
           recipientId={challengedUser}
         />
       </Modal>
-      <div className="bg-zinc-900 w-full grid grid-cols-1 lg:grid-cols-2 gap-5 p-8 text-white font-semibold font-sans">
+      <div className="bg-zinc-900 min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 gap-5 p-8 text-white font-semibold font-sans">
         <div className="bg-zinc-800 p-5 rounded-2xl row-span-2 h-full overflow-y-auto">
           <h1 className="text-2xl mb-2">Challenge a friend</h1>
           {/* TODO: get currently online friends and their status */}

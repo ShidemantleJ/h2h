@@ -4,7 +4,7 @@ import { LogIn } from "lucide-react";
 
 function LoggedInMessage(props) {
   return (
-    <div className="w-full flex items-center justify-center bg-zinc-900 text-white">
+    <div className="w-full flex items-center justify-center bg-zinc-900 min-h-dvh text-white">
       <div className="">
           <p className="text-xl">You must be logged in to view this page</p>
           <div className="w-fit mx-auto">

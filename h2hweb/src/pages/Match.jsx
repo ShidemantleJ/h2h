@@ -33,7 +33,7 @@ function Match(props) {
   }, [matchId]);
 
   if (!match || !match.player_1_id || !match.created_at)
-    return <div className="bg-zinc-900 w-full min-h-screen"></div>;
+    return <div className="bg-zinc-900 w-full min-h-dvh"></div>;
 
   if (match.status === "ongoing" || match.status === "notstarted")
     return (

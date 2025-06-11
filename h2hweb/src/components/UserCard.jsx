@@ -101,6 +101,18 @@ const RemoveFriendButton = (props) => {
   );
 };
 
+const ViewProfileButton = (props) => {
+  return (
+    <Button
+      onClick={() => {
+        window.location.href = `/users/${props.userId}`;
+      }}
+      color="green"
+      text="View Profile"
+    />
+  );
+};
+
 const SendReqButton = (props) => {
   return (
     <Button
@@ -148,7 +160,10 @@ const UserCard = ({
   switch (variant) {
     case "FriendReq":
       if (checkAlreadyFriends(userId, friendInfo))
-        buttons = <RemoveFriendButton key="1" userId={userId} />;
+        buttons = [
+          <RemoveFriendButton key="1" userId={userId} />,
+          <ViewProfileButton key="2" userId={userId} />,
+        ];
       else if (checkReceivedRequest(userId, friendInfo))
         buttons = <AcceptReqButton userId={userId} />;
       else if (checkSentRequest(userId, friendInfo))

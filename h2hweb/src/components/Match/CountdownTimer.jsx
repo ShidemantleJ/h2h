@@ -43,18 +43,13 @@ function CountdownTimer(props) {
 
   useEffect(() => {
     if (typeof setTimeIsUp === "function" && timeLeft.seconds < 0) {
-      // console.log(
-      //   "Time is up",
-      //   timeLeft.seconds,
-      //   countdownSecs - Math.floor((Date.now() - startTimestamp) / 1000)
-      // );
       setTimeIsUp(true);
     }
   }, [timeLeft, setTimeIsUp]);
 
   return (
     <div
-      className={`w-fit text-2xl text-black bg-zinc-200 p-2 rounded-xl h-fit`}
+      className={`w-fit lg:text-xl text-black bg-zinc-200 p-2 rounded-xl h-fit`}
     >
       <p
         className={`${

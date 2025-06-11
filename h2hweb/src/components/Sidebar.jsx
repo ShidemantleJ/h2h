@@ -6,6 +6,7 @@ import {
   CircleArrowLeft,
   LogOut,
   LogIn,
+  Menu,
 } from "lucide-react";
 import { useContext, useState } from "react";
 import { UserContext } from "../user/UserContext";
@@ -24,17 +25,22 @@ const Sidebar = (props) => {
 
   return (
     <>
-      {/* Arrow to collapse sidebar */}
+      {/* Menu Icon to collapse sidebar */}
       {/* Sidebar Parent Div */}
       <div
-        className={`sticky bg-zinc-900 transition-[width] duration-400 shrink-0 border-zinc-700 border-r-1 top-0 h-dvh ${
-          collapsed ? "w-20 p-5" : "w-58 p-5"
-        }`}
+        className={`
+    fixed lg:sticky
+    bg-zinc-900
+    transition-[width] duration-400
+    shrink-0
+    border-zinc-700 border-r-1
+    top-0 h-dvh
+    ${collapsed ? "z-50" : "z-20"}
+    ${collapsed ? "w-0 pt-5 pl-5 lg:w-20 lg:p-5" : "w-58 p-5"}
+  `}
       >
-        <CircleArrowLeft
-          className={`${
-            collapsed && "rotate-180"
-          } block transition-all duration-400 absolute z-10 -right-3 text-zinc-300 bg-zinc-900 cursor-pointer`}
+        <Menu
+          className="block transition-all duration-400 absolute z-50 -right-3 text-zinc-300 cursor-pointer"
           onClick={() => setCollapsed((prev) => !prev)}
         />
         {/* Sidebar Items */}

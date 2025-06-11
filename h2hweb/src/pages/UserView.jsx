@@ -52,7 +52,7 @@ const UserView = () => {
   }
 
   return (
-    <div className="bg-zinc-900 w-full text-white p-8 grid grid-cols-1 lg:grid-cols-2 gap-3">
+    <div className="bg-zinc-900 w-full min-h-dvh text-white p-8 grid grid-cols-1 lg:grid-cols-2 gap-3">
       {/* User name, picture, date joined */}
       <div className="flex lg:col-span-2 gap-10 items-center mx-auto">
         <img src={user.profile_pic_url} className="h-20 w-20" />

@@ -48,8 +48,6 @@ function SolveTable({ match, setCurrSet, currSet, setCurrSolve, currSolve }) {
   const p1name = match?.player1?.name;
   const p2name = match?.player2?.name;
 
-  console.log(match);
-
   // Notify user when someone wins a set
   useEffect(() => {
     if (
