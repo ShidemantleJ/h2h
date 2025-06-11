@@ -174,6 +174,11 @@ router.post("/checkMatchesForDNF", isLoggedIn, async (req, res) => {
     .select("*")
     .eq("status", "ongoing");
 
+  if (error)
+    return res
+      .status(500)
+      .status("Could not get ongoing matches from database");
+
   matches?.forEach((match) => {
     if (
       match.countdown_secs -
@@ -182,11 +187,13 @@ router.post("/checkMatchesForDNF", isLoggedIn, async (req, res) => {
             new Date(match.countdown_timestamp).getTime()) /
             1000
         ) <
-        0
+      0
     ) {
       handleMatchCountdownComplete(match);
     }
   });
+
+  return res.status(200);
 });
 
 export default router;

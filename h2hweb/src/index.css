@@ -29,7 +29,7 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: rgba(55, 65, 81, 0.5); /* Tailwind gray-700 @ 50% */
+    background-color: rgba(55, 65, 81, 0.5);
     border-radius: 4px;
   }
 
