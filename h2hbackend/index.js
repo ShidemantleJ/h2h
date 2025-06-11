@@ -60,4 +60,10 @@ app.use("/friend", friendRoute);
 app.use("/matchInvite", matchInviteRoute);
 app.use("/match", matchRoute);
 
-app.listen(5000, () => console.log("Listening on port 5000"));
+app.get("/", async (req, res) => {
+  return res.status(200).send("reached h2hbackend");
+});
+
+// app.listen(5000, () => console.log("Listening on port 5000"));
+
+export default app;
