@@ -7,8 +7,8 @@ const Home = (props) => {
   return (
     <div className="bg-zinc-900 h-screen w-full p-12 overflow-hidden inline font-sans space-y-8">
       <div className="text-4xl">
-        <h2 className="text-white font-bold">Compete Head-to-Head with Other Cubers</h2>
-        <h2 className="text-emerald-600 font-bold">on the #1 site!</h2>
+        <h2 className="text-white font-bold">H2HWeb</h2>
+        <h2 className="text-emerald-600 font-bold">Compete Head-to-Head with Other Cubers</h2>
       </div>
       <div
         onClick={() => (navigate('/play'))}
