@@ -18,7 +18,6 @@ function MiniStats({ match, playerNum, currSet }) {
   const setsWon = setsWonArr[playerNum - 1];
   const totalSolvesWon = sumColumn(solvesWonArr, playerNum - 1);
   const solvesWonThisSet = solvesWonArr?.[currSet]?.[playerNum - 1];
-  console.log(solvesWonArr, currSet);
 
   const playerWon = match.status === `P${playerNum}_WON`;
   return (
@@ -49,4 +48,4 @@ function MiniStats({ match, playerNum, currSet }) {
   );
 }
 
-export default memo(MiniStats);
+export default MiniStats;

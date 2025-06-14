@@ -23,8 +23,9 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(async function (sessionInfo, done) {
   try {
     const dbInfo = await findOrCreateUser(sessionInfo);
+    if (dbInfo === null) return null
     const result = {
-      dbInfo: dbInfo[0],
+      dbInfo: dbInfo,
       sessionInfo: sessionInfo,
     };
     done(null, result);

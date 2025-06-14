@@ -59,6 +59,12 @@ function SendChallengeModal({ recipientId, setShowModal }) {
   return (
     <div>
       <h1 className="mb-5 text-xl font-semibold">Send a Challenge</h1>
+      <p
+        className="absolute cursor-pointer top-2 right-3 text-sm"
+        onClick={() => setShowModal(false)}
+      >
+        X
+      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -131,7 +137,10 @@ function SendChallengeModal({ recipientId, setShowModal }) {
             </div>
           </div>
           <div className="space-y-2">
-            <EventSelector selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} />
+            <EventSelector
+              selectedEvent={selectedEvent}
+              setSelectedEvent={setSelectedEvent}
+            />
           </div>
         </div>
         <div className="mt-5">

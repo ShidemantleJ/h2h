@@ -49,8 +49,6 @@ function InProgressMatch({ match, matchId, setMatch }) {
     // Only subscribe to presence channel if logged in
     if (!user || !user?.dbInfo?.id || !match?.id) return;
 
-    // console.log(user);
-
     const matchRoom = supabase.channel(`match_room_${match.id}`, {
       config: { presence: { key: user.dbInfo.id } || {} },
     });
@@ -83,7 +81,7 @@ function InProgressMatch({ match, matchId, setMatch }) {
   }, [user?.dbInfo?.id, match?.id]);
 
   if (!match || !match.player_1_id || !match.created_at)
-    return <div className="bg-zinc-900 w-full min-h-screen"></div>;
+    return <div className="bg-zinc-900 w-full min-h-dvh"></div>;
   let playerTimesArr = [];
 
   const userIsP1 = user?.dbInfo?.id === match.player_1_id;
@@ -103,11 +101,10 @@ function InProgressMatch({ match, matchId, setMatch }) {
     setCurrSolve(Math.max(playerTimesArr.at(-1)?.length, 0));
     setLatestScrambleSet(Math.max(playerTimesArr?.length - 1, 0));
     setLatestScrambleSolve(Math.max(playerTimesArr.at(-1)?.length, 0));
-    console.log(currSet, currSolve);
   }, [playerTimesArr]);
 
   return (
-    <div className="bg-zinc-900 w-full min-h-dvh grid grid-cols-1 lg:grid-cols-2 grid-rows-[auto_1fr] text-white gap-5 p-5">
+    <div className="bg-zinc-900 w-full h-fit min-h-dvh grid grid-cols-1 lg:grid-cols-2 grid-rows-[auto_1fr] text-white gap-5 p-5">
       {match.status === "notstarted" && (
         <Modal open={modalOpen}>
           <div className="space-y-4 flex flex-col items-center">
@@ -124,11 +121,12 @@ function InProgressMatch({ match, matchId, setMatch }) {
               <>
                 <p>Waiting for all players to join...</p>
                 <CountdownTimer
-                  timestamp={new Date(match.created_at)}
+                  startTimestamp={new Date(match.created_at)}
                   countdownSecs={60}
+                  isRunning={true}
                   turn={1}
                   player={1}
-                  setTimeIsUp={setTimeIsUp}
+                  onTimeUp={() => setTimeIsUp(true)}
                 />
               </>
             )}
@@ -139,23 +137,12 @@ function InProgressMatch({ match, matchId, setMatch }) {
       <div className="bg-zinc-800 rounded-2xl lg:col-span-2 h-fit">
         <TopBar match={match} currSet={currSet} />
       </div>
-      <div className="space-y-5">
-        {/* Submit Times */}
-        <div className="bg-zinc-800 rounded-2xl p-5">
-          <Timer matchId={matchId} />
-        </div>
-        {/* Current Scramble */}
-        <div className="bg-zinc-800 rounded-2xl h-fit">
-          <Scramble
-            event={match.event}
-            scrambleArray={match.scrambles}
-            currSet={userIsSpectator ? currSet : latestScrambleSet}
-            currSolve={userIsSpectator ? currSolve : latestScrambleSolve}
-          />
-        </div>
+      {/* Submit Times */}
+      <div className="bg-zinc-800 rounded-2xl p-5">
+        <Timer matchId={matchId} />
       </div>
       {/* Table of solves */}
-      <div className="h-[70vh]">
+      <div className="bg-zinc-800 rounded-2xl p-5 row-span-2">
         <SolveTable
           match={match}
           currSet={currSet}
@@ -164,8 +151,17 @@ function InProgressMatch({ match, matchId, setMatch }) {
           setCurrSolve={setCurrSolve}
         />
       </div>
+      {/* Current Scramble */}
+      <div className="bg-zinc-800 rounded-2xl h-fit">
+        <Scramble
+          event={match.event}
+          scrambleArray={match.scrambles}
+          currSet={userIsSpectator ? currSet : latestScrambleSet}
+          currSolve={userIsSpectator ? currSolve : latestScrambleSolve}
+        />
+      </div>
     </div>
   );
 }
 
-export default memo(InProgressMatch);
+export default InProgressMatch;

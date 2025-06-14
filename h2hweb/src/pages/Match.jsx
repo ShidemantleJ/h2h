@@ -17,7 +17,6 @@ async function getMatch(matchId, setMatch) {
     )
     .eq("id", matchId)
     .single();
-  console.log(data);
   if (error) setMatch(null);
   else setMatch(data);
 }

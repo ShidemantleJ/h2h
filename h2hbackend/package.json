@@ -4,8 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "startDev": "nodemon index.js",
+    "start": "nodemon index.js",
     "build": "echo \"No build step Necessary\""
   },
   "author": "",
@@ -25,6 +24,7 @@
     "passport": "^0.7.0",
     "passport-wca": "^1.0.3",
     "pg": "^8.15.6",
+    "supabase": "^2.24.3",
     "vercel": "^42.3.0"
   }
 }

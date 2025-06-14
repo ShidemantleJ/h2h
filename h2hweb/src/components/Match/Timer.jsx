@@ -27,8 +27,7 @@ function handleDnfInput(setDnfInputted, setTimeInputVal) {
   setTimeInputVal(-1);
 }
 
-function Timer({matchId}) {
-
+function Timer({ matchId }) {
   const [timerVal, setTimerVal] = useState(0);
   const [timerBold, setTimerBold] = useState(false);
   const [timeInputVal, setTimeInputVal] = useState(0);
@@ -64,9 +63,9 @@ function Timer({matchId}) {
     }
   };
 
-  const handleSpaceKeyUp = (event) => {
-    if (event.key === " ") {
-      event.preventDefault();
+  const handleKeyOrTouchUp = (event) => {
+    if (event.key === " " || !event.key) {
+      if (event.key) event.preventDefault();
       if (justStoppedRef.current) {
         justStoppedRef.current = false;
       } else if (!runningRef.current && !justStoppedRef.current) {
@@ -76,9 +75,9 @@ function Timer({matchId}) {
     }
   };
 
-  const handleSpaceKeyDown = (event) => {
-    if (event.key === " ") {
-      event.preventDefault();
+  const handleKeyOrTouchDown = (event) => {
+    if (event.key === " " || !event.key) {
+      if (event.key) event.preventDefault();
       if (runningRef.current) {
         stopTimer();
         justStoppedRef.current = true;
@@ -89,18 +88,22 @@ function Timer({matchId}) {
   };
 
   useEffect(() => {
-    window.addEventListener("keyup", handleSpaceKeyUp);
-    window.addEventListener("keydown", handleSpaceKeyDown);
+    window.addEventListener("keyup", handleKeyOrTouchUp);
+    window.addEventListener("keydown", handleKeyOrTouchDown);
 
     return () => {
-      window.removeEventListener("keyup", handleSpaceKeyUp);
-      window.removeEventListener("keydown", handleSpaceKeyDown);
+      window.removeEventListener("keyup", handleKeyOrTouchUp);
+      window.removeEventListener("keydown", handleKeyOrTouchDown);
       stopTimer();
     };
   }, []);
 
   return (
-    <div className="space-y-3">
+    <div
+      className="space-y-3"
+      onTouchStart={handleKeyOrTouchDown}
+      onTouchEnd={handleKeyOrTouchUp}
+    >
       <div className="inline-flex items-center">
         <h2 className="text-2xl font-semibold">Timer</h2>
         <Tooltip anchorSelect=".timer-info" place="top">
@@ -132,7 +135,10 @@ function Timer({matchId}) {
             value={dnfInputted ? -1 : timeInputVal}
             onChange={(e) => setTimeInputVal(e.target.value)}
             onFocus={() => {
-              setDnfInputted(false), setTimeInputVal(0);
+              if (dnfInputted) {
+                setDnfInputted(false);
+                setTimeInputVal(0);
+              }
             }}
           />
           <p
@@ -170,4 +176,4 @@ function Timer({matchId}) {
   );
 }
 
-export default memo(Timer);
+export default Timer;

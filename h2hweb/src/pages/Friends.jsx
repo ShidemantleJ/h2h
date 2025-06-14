@@ -64,6 +64,7 @@ const Friends = () => {
                 setSearchTerm(e.target.value || "");
                 setOpenDropdown(true);
               }}
+              id="friendSearch"
               className={`w-full p-4 rounded-xl ${
                 openDropdown && userResult.length > 0 && "rounded-b-none "
               } bg-zinc-700 focus:outline-none`}

@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { supabase } from "../supabase.js";
+import { supabase } from "../db/supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
 async function removeFriend(userId, friendId) {
@@ -92,7 +92,6 @@ router.post("/removeFriend", isLoggedIn, async (req, res) => {
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
   let { friendId } = req.body;
   friendId = Number.parseInt(friendId, 10);
-  console.log(senderId, friendId);
   const error = await removeFriend(senderId, friendId);
 
   return error

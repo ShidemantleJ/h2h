@@ -146,7 +146,6 @@ const UserCard = ({
   wonMatch = false,
 }) => {
   const [user, setUser] = useState(null);
-  // console.log(props.userId);
   useEffect(() => {
     const fetchUser = async () => {
       const userData = await getUserInfo(userId);
@@ -199,9 +198,10 @@ const UserCard = ({
   if (variant === "MatchDisplay") {
     return (
       <div
-        className={`bg-zinc-700 ${
-          hover && "hover:bg-zinc-700"
-        } py-2 px-4 flex space-x-4 items-center w-fit rounded-2xl`}
+        className={`relative bg-zinc-800 shadow-lg rounded-2xl flex items-center gap-4 px-5 py-3 min-w-[220px] max-w-xs border border-zinc-700 ${
+          hover &&
+          "hover:shadow-xl hover:border-zinc-500 transition-all duration-200"
+        }`}
       >
         <div className="relative">
           {wonMatch && (
@@ -210,10 +210,14 @@ const UserCard = ({
               className="absolute text-white w-5 h-5 z-10 -top-2.5 -left-2.5 rotate-315"
             />
           )}
-          <img className="block w-9 h-9" src={user.profile_pic_url} />
+          <img
+            className="block w-12 h-12 rounded-full border-2 border-zinc-600 shadow-md object-cover bg-zinc-900"
+            src={user.profile_pic_url}
+            alt={user.name}
+          />
         </div>
-        <div className="overflow-hidden">
-          <h1 className="font-semibold overflow-hidden whitespace-nowrap text-ellipsis">
+        <div className="flex flex-col min-w-0">
+          <h1 className="font-semibold text-lg truncate text-white">
             {user.name}
           </h1>
         </div>
@@ -223,25 +227,45 @@ const UserCard = ({
 
   return (
     <div
-      className={`bg-zinc-700 ${hover && "hover:bg-zinc-700"} py-2 px-4 flex ${
-        layout === "vertical" ? "flex-col text-center space-y-2" : "space-x-4"
-      } items-center w-fit rounded-2xl`}
+      className={`relative bg-zinc-800 shadow-lg gap-3 rounded-2xl flex ${
+        layout === "vertical"
+          ? "flex-col items-center text-center gap-3 py-5 px-6"
+          : "flex-row items-center gap-5 py-3 px-5"
+      } w-fit min-w-[260px] max-w-lg border border-zinc-700 ${
+        hover
+          ? "hover:shadow-xl hover:border-zinc-500 transition-all duration-200"
+          : ""
+      }`}
     >
-      <img className="block w-15 h-15" src={user.profile_pic_url} />
-      <div>
-        <h1 className="font-semibold">{user.name}</h1>
+      <img
+        className={`${
+          layout === "horizontal" ? "hidden lg:block" : "block"
+        } w-16 h-16 rounded-full border-2 border-zinc-600 shadow-md object-cover bg-zinc-900`}
+        src={user.profile_pic_url}
+        alt={user.name}
+      />
+      <div className="flex flex-col min-w-0 flex-1">
+        <h1 className="font-semibold text-lg truncate text-white">
+          {user.name}
+        </h1>
         <a
-          className="text-sm"
+          className="text-sm text-zinc-300 hover:underline truncate"
           href={`http://worldcubeassociation.org/persons/${user.wcaid}`}
         >
           {user.wcaid}
         </a>
       </div>
-      <div className="flex gap-2">
-        {buttons?.length > 1
-          ? buttons?.map((button) => {
-              return button;
-            })
+      <div
+        className={`flex gap-2 ${
+          layout === "vertical" ? "justify-center mt-2" : "flex-col items-end"
+        }`}
+      >
+        {Array.isArray(buttons)
+          ? buttons.map((button, i) => (
+              <div key={i} className="w-full">
+                {button}
+              </div>
+            ))
           : buttons}
       </div>
     </div>

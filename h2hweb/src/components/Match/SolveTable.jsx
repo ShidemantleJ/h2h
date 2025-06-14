@@ -31,11 +31,11 @@ function getTimes(
           }
         }}
       >
-        <td className="px-6 py-4 text-center">{i + 1}</td>
-        <td className={`px-6 py-4 ${winner === 0 && "font-bold"}`}>
+        <td className="p-2 text-center">{i + 1}</td>
+        <td className={`p-2 ${winner === 0 && "font-bold"}`}>
           {isNaN(p1time) ? "-" : p1time == -1 ? "DNF" : p1time}
         </td>
-        <td className={`px-6 py-4 ${winner === 1 && "font-bold"}`}>
+        <td className={`p-2 ${winner === 1 && "font-bold"}`}>
           {isNaN(p2time) ? "-" : p2time == -1 ? "DNF" : p2time}
         </td>
       </tr>
@@ -79,14 +79,16 @@ function SolveTable({ match, setCurrSet, currSet, setCurrSolve, currSolve }) {
           " won this set! Moving on to set #" +
           (currSetIndex + 1)
         }`,
-        { autoClose: 5000 }
+        { autoClose: 5000, pauseOnFocusLoss: false }
       );
-      setCurrSet(currSetIndex);
+      setTimeout(() => {
+        setCurrSet(currSetIndex);
+      }, 1500);
     }
   }, [match?.player_1_times, match?.player_2_times]);
 
   return (
-    <div className="m-auto w-fit bg-zinc-800 rounded-2xl p-5 h-full min-h-0">
+    <div className="h-full">
       <div className="flex items-center justify-center space-x-5 mb-2">
         <ArrowLeftCircle
           className="cursor-pointer"
@@ -109,28 +111,26 @@ function SolveTable({ match, setCurrSet, currSet, setCurrSolve, currSolve }) {
           }}
         />
       </div>
-      <div className="inline-flex items-center min-h-0">
-        <div className="overflow-y-auto md:max-h-[50vh]">
-          <table className="transition-all duration-300 ease-in-out text-sm">
-            <thead>
-              <tr className="text-zinc-400 border-b-1 border-zinc-600">
-                <th className="px-6 py-4">Solve #</th>
-                <th className="px-6 py-4">{p1name}'s times</th>
-                <th className="px-6 py-4">{p2name}'s times</th>
-              </tr>
-            </thead>
-            <tbody className="">
-              {getTimes(
-                match?.player_1_times || [[]],
-                match?.player_2_times || [[]],
-                currSet,
-                match.max_solves[currSet],
-                setCurrSet,
-                setCurrSolve
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="max-h-[60vh] overflow-y-auto">
+        <table className="mx-auto transition-all duration-300 ease-in-out text-sm">
+          <thead>
+            <tr className="text-zinc-400 border-b-1 border-zinc-600">
+              <th className="px-3 py-4">Solve #</th>
+              <th className="px-3 py-4">{p1name}'s times</th>
+              <th className="px-3 py-4">{p2name}'s times</th>
+            </tr>
+          </thead>
+          <tbody className="">
+            {getTimes(
+              match?.player_1_times || [[]],
+              match?.player_2_times || [[]],
+              currSet,
+              match.max_solves[currSet],
+              setCurrSet,
+              setCurrSolve
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

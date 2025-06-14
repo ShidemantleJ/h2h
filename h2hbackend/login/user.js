@@ -1,4 +1,4 @@
-import {supabase} from '../supabase.js';
+import { supabase } from "../db/supabase.js";
 
 // If request has user, send to next point. If not, return 401 (unauthorized)
 function isLoggedIn(req, res, next) {
@@ -7,14 +7,16 @@ function isLoggedIn(req, res, next) {
 
 async function findOrCreateUser(user) {
   // console.log(user);
+  if (!user.wca.id) return null;
   const { data, error } = await supabase
     .from("users")
     .select()
-    .eq("wcaid", user.wca.id);
+    .eq("wcaid", user.wca.id)
+    .single();
 
   console.error(error);
 
-  if (data?.length === 0) {
+  if (!data) {
     // console.log("No user found");
     const { error } = await supabase.from("users").insert({
       name: user.displayName,

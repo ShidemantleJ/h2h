@@ -1,6 +1,7 @@
 import express from "express";
+import pgPool from "../db/pg.js";
 const router = express.Router();
-import { supabase } from "../supabase.js";
+import { supabase } from "../db/supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 import { randomScrambleForEvent } from "cubing/scramble";
 import {
@@ -149,22 +150,54 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
 
 router.post("/timeUpAddDNF", isLoggedIn, async (req, res) => {
   const { matchId } = req.body;
-  const { match, matchError } = await getMatch(matchId);
-  if (matchError) return res.status(500);
 
-  // If the match is ongoing and countdown has passed, DNF opponent
-  if (
-    match.status === "ongoing" &&
-    match.countdown_secs -
-      Math.floor(
-        (new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
-          1000
-      ) <
-      0
-  ) {
-    handleMatchCountdownComplete(match);
+  const client = await pgPool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // Try to acquire lock on match row.
+    // This prevents deadlock due to simultaneous calls to this endpoint
+
+    const lockResult = await client.query(
+      "SELECT pg_try_advisory_lock($1) AS acquired",
+      [matchId]
+    );
+
+    if (!lockResult.rows[0].acquired) {
+      await client.query("ROLLBACK");
+      return res.status(423).send("Another operation is already in progress.");
+    }
+
+    const { match, matchError } = await getMatch(matchId);
+    if (matchError) {
+      await client.query("ROLLBACK");
+      return res.status(500).send("Error getting match");
+    }
+
+    if (
+      match.status === "ongoing" &&
+      match.countdown_secs -
+        Math.floor(
+          (Date.now() - new Date(match.countdown_timestamp).getTime())
+        ) <
+        0
+    ) {
+      await handleMatchCountdownComplete(match, true);
+      console.log("countdown handled");
+    } else {
+      console.log("no need to DNF");
+    }
+
+    await client.query("COMMIT");
+    return res.status(200).send("OK");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error in timeUpAddDNF:", err);
+    return res.status(500).send("Internal server error");
+  } finally {
+    await client.query("SELECT pg_advisory_unlock($1)", [matchId]);
+    client.release();
   }
-  return res.status(200);
 });
 
 // Called every 5 minutes by cron job

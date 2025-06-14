@@ -7,9 +7,9 @@ function calculateTimeLeft(timestamp, countdownSecs) {
   const secsRemaining =
     countdownSecs - Math.floor((timestampNow - startTimestamp) / 1000);
 
+  console.log(secsRemaining);
   const secsToDisplay = Math.max(secsRemaining % 60, 0);
   const minsToDisplay = Math.max(Math.floor(secsRemaining / 60), 0);
-
   return {
     text: `${String(minsToDisplay).padStart(1, "0")}:${String(
       secsToDisplay
@@ -18,47 +18,49 @@ function calculateTimeLeft(timestamp, countdownSecs) {
   };
 }
 
-function CountdownTimer(props) {
-  const startTimestamp = props.timestamp;
-  const countdownSecs = props.countdownSecs;
-  const playerTurn = props.turn;
-  const player = props.player;
-  const setTimeIsUp = props.setTimeIsUp;
-
+function CountdownTimer({
+  startTimestamp,
+  countdownSecs,
+  isRunning,
+  onTimeUp,
+}) {
   const [timeLeft, setTimeLeft] = useState({ text: "0:00", seconds: 1 });
-  const timeLeftRef = useRef(calculateTimeLeft(startTimestamp, countdownSecs));
+  const onTimeUpCalled = useRef(false);
 
   useEffect(() => {
+    if (!startTimestamp || !countdownSecs) return;
     const intervalId = setInterval(() => {
       const calculatedTimeLeft = calculateTimeLeft(
         startTimestamp,
         countdownSecs
       );
       setTimeLeft(calculatedTimeLeft);
-      timeLeftRef.current = calculateTimeLeft(startTimestamp, countdownSecs);
+      if (calculatedTimeLeft.seconds > 0) onTimeUpCalled.current = false;
+      else if (
+        typeof onTimeUp === "function" &&
+        calculatedTimeLeft.seconds < 0
+      ) {
+        console.log("calling on time up function");
+        onTimeUpCalled.current = true;
+        onTimeUp();
+      }
     }, 1000);
 
     return () => clearInterval(intervalId);
   }, [startTimestamp, countdownSecs]);
 
-  useEffect(() => {
-    if (typeof setTimeIsUp === "function" && timeLeft.seconds < 0) {
-      setTimeIsUp(true);
-    }
-  }, [timeLeft, setTimeIsUp]);
-
   return (
     <div
-      className={`w-fit lg:text-xl text-black bg-zinc-200 p-2 rounded-xl h-fit`}
+      className={`w-fit lg:text-xl text-black bg-zinc-200 p-2 rounded-lg h-fit`}
     >
       <p
         className={`${
-          player === playerTurn && timeLeft.seconds < countdownSecs / 3
+          isRunning && timeLeft.seconds < countdownSecs / 3
             ? "text-red-600"
             : "text-black"
         }`}
       >
-        {player === playerTurn ? timeLeft.text : "0:00"}
+        {isRunning ? timeLeft.text : "0:00"}
       </p>
     </div>
   );

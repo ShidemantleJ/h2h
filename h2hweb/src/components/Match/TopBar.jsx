@@ -1,37 +1,31 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import UserCard from "../UserCard";
 import CountdownTimer from "./CountdownTimer";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { UserContext } from "../../user/UserContext";
 import MiniStats from "./MiniStats";
 import axios from "axios";
+import { UserContext } from "../../user/UserContext";
 
-function TopBar(props) {
-  const match = props.match;
-  const variant = props.variant;
-  const currSet = props.currSet;
-  const countdownTimestamp = match.countdown_timestamp;
-  const countdownSecs = match.countdown_secs;
-  const playerTurn = match.player_turn;
-  const { user } = useContext(UserContext);
-
-  const [p1countdownIsUp, setP1CountdownIsUp] = useState(false);
-  const [p2countdownIsUp, setP2CountdownIsUp] = useState(false);
-
-  useEffect(() => {
-    if (p1countdownIsUp || p2countdownIsUp) {
-      axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/match/timeUpAddDNF`,
-        { matchId: match.id },
-        { withCredentials: true }
+function handleTimeUp(match, callBackend = false) {
+  const secsSinceTimeUp = match.countdown_secs -
+      Math.floor(
+        (new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
+          1000
       );
-      setP1CountdownIsUp(false);
-      setP2CountdownIsUp(false);
-    }
-  }, [p1countdownIsUp, p2countdownIsUp]);
+  if (callBackend) {
+    console.log("calling backend");
+    axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/match/timeUpAddDNF`,
+      { matchId: match.id },
+      { withCredentials: true }
+    );
+  }
+}
 
+function TopBar({ match, variant, currSet }) {
   const p1name = match?.player1?.name;
   const p2name = match?.player2?.name;
+
+  const { user } = useContext(UserContext);
 
   let message;
   switch (match.status) {
@@ -49,6 +43,7 @@ function TopBar(props) {
       break;
   }
 
+  if (!user?.dbInfo?.id) return;
   return (
     <div className="py-3 px-5">
       {message && (
@@ -61,11 +56,10 @@ function TopBar(props) {
         <div className="flex items-center justify-between md:gap-x-5">
           {variant !== "CompleteMatch" && (
             <CountdownTimer
-              player={1}
-              turn={playerTurn}
-              countdownSecs={countdownSecs}
-              timestamp={countdownTimestamp}
-              setTimeIsUp={setP1CountdownIsUp}
+              isRunning={match.player_turn === 1}
+              countdownSecs={match.countdown_secs}
+              startTimestamp={match.countdown_timestamp}
+              onTimeUp={() => handleTimeUp(match, user?.dbInfo?.id === 6)}
             />
           )}
           <UserCard
@@ -86,11 +80,10 @@ function TopBar(props) {
           />
           {variant !== "CompleteMatch" && (
             <CountdownTimer
-              player={2}
-              turn={playerTurn}
-              countdownSecs={countdownSecs}
-              timestamp={countdownTimestamp}
-              setTimeIsUp={setP2CountdownIsUp}
+              isRunning={match.player_turn === 2}
+              countdownSecs={match.countdown_secs}
+              startTimestamp={match.countdown_timestamp}
+              onTimeUp={() => handleTimeUp(match, user?.dbInfo?.id === 6)}
             />
           )}
         </div>

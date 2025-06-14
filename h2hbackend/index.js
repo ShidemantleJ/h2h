@@ -2,22 +2,14 @@ import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import pkg from "pg";
-const { Pool } = pkg;
 import passport from "passport";
+import pgPool from "./db/pg.js";
 import "./login/passportconfig.js";
 import cors from "cors";
 
 const pgSession = connectPgSimple(session);
 
 const app = express();
-
-const pgPool = new Pool({
-  connectionString: process.env.PG_CONNECTION_STRING,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
 
 app.use(express.json());
 app.use(
@@ -65,6 +57,6 @@ app.get("/", async (req, res) => {
 });
 
 // Uncomment for development
-// app.listen(5000, () => console.log("Listening on port 5000"));
+app.listen(5000, () => console.log("Listening on port 5000"));
 
 export default app;

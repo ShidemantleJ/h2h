@@ -27,4 +27,4 @@ function Scramble({scrambleArray, event, currSet, currSolve}) {
   );
 }
 
-export default memo(Scramble);
+export default Scramble;

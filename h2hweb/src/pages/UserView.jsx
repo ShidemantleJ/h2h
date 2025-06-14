@@ -43,71 +43,94 @@ const UserView = () => {
   }, [userId, selectedEvent]);
 
   if (!user || !user.created_at) {
-    console.log("No user info");
     return (
-      <div className="bg-zinc-900 flex items-center justify-center w-full text-white text-lg">
+      <div className="bg-zinc-900 flex items-center justify-center w-full min-h-dvh text-white text-lg">
         User not found
       </div>
     );
   }
 
   return (
-    <div className="bg-zinc-900 w-full min-h-dvh text-white p-8 grid grid-cols-1 lg:grid-cols-2 gap-3">
-      {/* User name, picture, date joined */}
-      <div className="flex lg:col-span-2 gap-10 items-center mx-auto">
-        <img src={user.profile_pic_url} className="h-20 w-20" />
-        <div>
-          <h1 className="text-zinc-50 text-lg font-semibold whitespace-normal">
+    <div className="w-full bg-zinc-900 min-h-dvh text-white p-8 flex flex-col items-center">
+      {/* Profile Card */}
+      <div className="w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 bg-zinc-800/80 rounded-3xl shadow-xl p-8 mb-8 border border-zinc-700">
+        <img
+          src={user.profile_pic_url}
+          className="h-28 w-28 rounded-full border-4 border-emerald-700 shadow-lg object-cover"
+          alt="Profile"
+        />
+        <div className="flex-1 flex flex-col items-center md:items-start">
+          <h1 className="text-3xl font-bold text-emerald-400 mb-1">
             {user.name}
           </h1>
-          <p
-            className="text-zinc-200 text-sm cursor-pointer"
-            onClick={() =>
-              (window.location.href = `https://worldcubeassociation.org/persons/${user.wcaid}`)
-            }
+          <a
+            className="text-emerald-200 text-lg cursor-pointer hover:underline"
+            href={`https://worldcubeassociation.org/persons/${user.wcaid}`}
           >
             {user.wcaid}
-          </p>
-          <p className="text-zinc-200 text-sm">
-            Joined on {new Date(user.created_at).toLocaleDateString()}
+          </a>
+          <p className="text-zinc-300 text-md mt-2">
+            Joined on{" "}
+            <span className="font-semibold">
+              {new Date(user.created_at).toLocaleDateString()}
+            </span>
           </p>
         </div>
       </div>
-      <hr className="text-zinc-500 lg:col-span-2" />
-      {/* Statistics */}
-      <div className="">
-        <h1 className="font-semibold text-zinc-300 text-lg text-center">
-          Statistics (Last 10 matches)
-        </h1>
-        <div className="flex flex-col space-y-2">
+
+      {/* Stats and Matches */}
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Statistics Card */}
+        <div className="bg-zinc-800/80 rounded-2xl shadow-lg p-6 flex flex-col items-center border border-zinc-700">
+          <h1 className="font-semibold text-emerald-300 text-2xl mb-2">
+            Statistics (Last 10 Matches)
+          </h1>
           <EventSelector
             setSelectedEvent={setSelectedEvent}
             selectedEvent={selectedEvent}
-            bgcolor="bg-zinc-800"
+            bgcolor="bg-zinc-900"
           />
-          <p>Average: {eventStats.average}</p>
-          <p>Standard Deviation: {eventStats.stddev}</p>
-          <p>Record (solves won-lost): {eventStats.record}</p>
+          <div className="mt-4 w-full space-y-2">
+            <div className="flex justify-between text-lg">
+              <span className="text-zinc-300">Average:</span>
+              <span className="font-mono">{eventStats.average}</span>
+            </div>
+            <div className="flex justify-between text-lg">
+              <span className="text-zinc-300">Std Dev:</span>
+              <span className="font-mono">{eventStats.stddev}</span>
+            </div>
+            <div className="flex justify-between text-lg">
+              <span className="text-zinc-300">Record (W-L):</span>
+              <span className="font-mono">{eventStats.record}</span>
+            </div>
+          </div>
         </div>
-      </div>
-      {/* Recent matches */}
-      <div className="space-y-2">
-        <div>
-          <h1 className="font-semibold text-zinc-300 text-lg text-center">
-            Recent Matches
-          </h1>
-          <h1 className="text-zinc-400 text-sm text-center">
-            Click a match to view results
-          </h1>
-        </div>
-        <div className="bg-zinc-800 space-y-2 max-h-[60vh] p-5 rounded-2xl overflow-y-auto">
-          {recentMatches.map((match) => {
-            return (
-              match.status !== "ongoing" && (
+
+        {/* Recent Matches Card */}
+        <div className="bg-zinc-800/80 rounded-2xl shadow-lg p-6 flex flex-col border border-zinc-700 max-h-[60vh]">
+          <div className="mb-2">
+            <h1 className="font-semibold text-emerald-300 text-2xl text-center">
+              Recent Matches
+            </h1>
+            <h2 className="text-zinc-400 text-sm text-center">
+              Click a match to view results
+            </h2>
+          </div>
+          <div className="z-10 flex-1 overflow-y-auto space-y-2 mt-2">
+            {recentMatches.filter(
+              (match) =>
+                match.status !== "ongoing" && match.status !== "notstarted"
+            ).length === 0 && (
+              <div className="text-zinc-400 text-center mt-8">
+                No recent matches found.
+              </div>
+            )}
+            {recentMatches.map((match) =>
+              match.status !== "ongoing" && match.status !== "notstarted" ? (
                 <MatchCard inviteData={match} variant="normal" key={match.id} />
-              )
-            );
-          })}
+              ) : null
+            )}
+          </div>
         </div>
       </div>
     </div>

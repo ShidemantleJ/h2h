@@ -34,7 +34,7 @@ function App() {
           dbInfo: res.data.dbInfo,
         }));
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 

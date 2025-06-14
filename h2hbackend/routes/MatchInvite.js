@@ -1,9 +1,15 @@
 import express from "express";
 const router = express.Router();
-import { supabase } from "../supabase.js";
+import { supabase } from "../db/supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
-function validateInvite(setFormat, solveFormat, selectedEvent, minutes, seconds) {
+function validateInvite(
+  setFormat,
+  solveFormat,
+  selectedEvent,
+  minutes,
+  seconds
+) {
   let error = "";
   // console.log(setFormat, solveFormat, selectedEvent, minutes, seconds);
   if (isNaN(Number(setFormat)) || Number(setFormat) < 1)
@@ -53,8 +59,8 @@ router.post("/send", isLoggedIn, async (req, res) => {
   let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } =
     req.body;
   const senderId = Number.parseInt(req.user.dbInfo.id, 10);
-  if (!validateInvite(boSetFormat, boSolveFormat, event, 0, countdown_secs)) return res.status(400).send("Invite invalid.");
-  console.log(recipientId, boSetFormat, boSolveFormat, event, countdown_secs);
+  if (!validateInvite(boSetFormat, boSolveFormat, event, 0, countdown_secs))
+    return res.status(400).send("Invite invalid.");
   const { data, error } = await supabase
     .from("matchinvites")
     .insert({

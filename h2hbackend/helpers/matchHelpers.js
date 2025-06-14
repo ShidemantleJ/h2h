@@ -1,5 +1,5 @@
 import { randomScrambleForEvent } from "cubing/scramble";
-import { supabase } from "../supabase.js";
+import { supabase } from "../db/supabase.js";
 
 // Returns 0 if first time won, 1 if second time won, -1 if invalid, -2 if same time
 function whoWonSolve(solve1, solve2) {
@@ -13,7 +13,6 @@ function whoWonSolve(solve1, solve2) {
 
 function wonSet(boSolve, p1setarr, p2setarr) {
   const solvesToWin = Math.ceil(boSolve / 2);
-  console.log(boSolve, p1setarr, p2setarr);
   if (
     !p1setarr ||
     !p1setarr ||
@@ -42,7 +41,6 @@ function getGameState(boSolve, boSet, p1timearr, p2timearr) {
   const setsWon = [0, 0];
   for (let i = 0; i < totalSets; i++) {
     const whoWonSet = wonSet(boSolve, p1timearr[i], p2timearr[i]);
-    console.log(whoWonSet);
     if (whoWonSet === "P1_WON") setsWon[0]++;
     else if (whoWonSet === "P2_WON") setsWon[1]++;
   }
@@ -155,10 +153,7 @@ function getMatchRoomEmpty(match) {
 
         if (!usersPresent.includes("monitor")) return;
 
-        if (
-          usersPresent.length === 1 &&
-          usersPresent[0] === "monitor"
-        ) {
+        if (usersPresent.every((u) => u === "monitor")) {
           resolve(1);
         } else if (usersPresent.length > 1) {
           resolve(0);
@@ -173,7 +168,7 @@ function getMatchRoomEmpty(match) {
   });
 }
 
-async function handleMatchCountdownComplete(match) {
+async function handleMatchCountdownComplete(match, skipEmptyRoomCheck = false) {
   const matchId = match.id;
 
   const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
@@ -196,9 +191,13 @@ async function handleMatchCountdownComplete(match) {
     newP2TimeArr
   );
 
-  const matchRoomIsEmpty = await getMatchRoomEmpty(match);
+  let matchRoomIsEmpty;
+  if (skipEmptyRoomCheck) {
+    matchRoomIsEmpty = await getMatchRoomEmpty(match);
+  } else matchRoomIsEmpty = true;
 
   const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
+
   const { error } = await supabase
     .from("matches")
     .update({
@@ -214,7 +213,7 @@ async function handleMatchCountdownComplete(match) {
     })
     .eq("id", matchId);
 
-  if (error) console.error(error);
+  if (error) throw new Error(error);
 }
 
 export {
@@ -228,5 +227,5 @@ export {
   whoWonSolve,
   wonSet,
   getMatchRoomEmpty,
-  handleMatchCountdownComplete
+  handleMatchCountdownComplete,
 };

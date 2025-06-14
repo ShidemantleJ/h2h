@@ -21,7 +21,7 @@ const topSidebarElements = [
 
 const Sidebar = (props) => {
   const { user } = useContext(UserContext);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <>
