@@ -158,7 +158,10 @@ router.post("/timeUpAddDNF", isLoggedIn, async (req, res) => {
     if (matchError) return res.status(500).send("Could not get match from db");
 
     const matchIsValid = Object.entries(match).every(([key, value]) => {
-      return matchFromUser.hasOwnProperty(key) && JSON.stringify(matchFromUser[key]) === JSON.stringify(value);
+      return (
+        matchFromUser.hasOwnProperty(key) &&
+        JSON.stringify(matchFromUser[key]) === JSON.stringify(value)
+      );
     });
 
     if (!matchIsValid) {
@@ -204,7 +207,7 @@ router.post("/checkMatchesForDNF", async (req, res) => {
       .status(500)
       .status("Could not get ongoing matches from database");
 
-  matches?.forEach((match) => {
+  matches?.forEach(async (match) => {
     if (
       match.countdown_secs -
         Math.floor(
@@ -214,7 +217,7 @@ router.post("/checkMatchesForDNF", async (req, res) => {
         ) <
       0
     ) {
-      handleMatchCountdownComplete(match);
+      await handleMatchCountdownComplete(match);
     }
   });
 
