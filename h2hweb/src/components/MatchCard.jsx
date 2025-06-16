@@ -4,6 +4,7 @@ import Button from "./Button";
 import { getEventNameFromId } from "../lib/events";
 import axios from "axios";
 import { getMatchScore } from "../helpers/matchHelpers";
+import { toast } from "react-toastify";
 
 function declineReq(inviteId) {
   axios
@@ -29,16 +30,30 @@ function cancelReq(inviteId) {
     });
 }
 
-function acceptReq(inviteId) {
-  axios
-    .post(
+async function acceptReq(inviteId) {
+  try {
+    const res = await axios.post(
       `${import.meta.env.VITE_BACKEND_URL}/matchInvite/accept`,
       { inviteId: inviteId },
       { withCredentials: true }
-    )
-    .then((res) => {
-      return res.data;
-    });
+    );
+    return res.data;
+  } catch (error) {
+    if (error.status === 418 && error.response) {
+      toast.error(
+        <p>
+          You are already participating in a match. Click{" "}
+          <a
+            className="font-bold text-emerald-600"
+            href={`/match/${error.response.data}`}
+          >
+            here
+          </a>{" "}
+          to join
+        </p>
+      );
+    }
+  }
 }
 
 function MatchCard({ inviteData, variant }) {

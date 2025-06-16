@@ -51,7 +51,7 @@ const Friends = () => {
   if (!user || !user?.friendInfo) return <LoggedInMessage />;
 
   return (
-    <div className="bg-zinc-900 text-white h-full min-h-dvh p-8 font-sans w-full">
+    <div className="text-white h-full min-h-dvh p-8 font-sans w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Search */}
         <div className="bg-zinc-800 rounded-2xl p-6">
@@ -72,7 +72,7 @@ const Friends = () => {
               onFocus={() => setOpenDropdown(true)}
             />
             {openDropdown && userResult.length > 0 && (
-              <div className="absolute top-full w-full z-50 bg-zinc-700 border border-zinc-700 rounded-b-xl max-h-60 overflow-y-auto shadow-xl p-2 space-y-2">
+              <div className="absolute top-full w-full z-20 bg-zinc-700 border border-zinc-700 rounded-b-xl max-h-60 overflow-y-auto shadow-xl p-2 space-y-2">
                 {userResult.map((searchUser, i) => (
                   <UserCard
                     hover={false}

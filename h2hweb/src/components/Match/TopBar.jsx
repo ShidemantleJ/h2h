@@ -1,24 +1,16 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import UserCard from "../UserCard";
 import CountdownTimer from "./CountdownTimer";
 import MiniStats from "./MiniStats";
 import axios from "axios";
 import { UserContext } from "../../user/UserContext";
 
-function handleTimeUp(match, callBackend = false) {
-  const secsSinceTimeUp = match.countdown_secs -
-      Math.floor(
-        (new Date().getTime() - new Date(match.countdown_timestamp).getTime()) /
-          1000
-      );
-  if (callBackend) {
-    console.log("calling backend");
+function handleTimeUp(match) {
     axios.post(
       `${import.meta.env.VITE_BACKEND_URL}/match/timeUpAddDNF`,
-      { matchId: match.id },
+      { match: match },
       { withCredentials: true }
     );
-  }
 }
 
 function TopBar({ match, variant, currSet }) {
@@ -26,6 +18,10 @@ function TopBar({ match, variant, currSet }) {
   const p2name = match?.player2?.name;
 
   const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    console.log(match.player_turn, match.countdown_secs, match.countdown_timestamp);
+  }, [match.player_turn])
 
   let message;
   switch (match.status) {
@@ -59,7 +55,7 @@ function TopBar({ match, variant, currSet }) {
               isRunning={match.player_turn === 1}
               countdownSecs={match.countdown_secs}
               startTimestamp={match.countdown_timestamp}
-              onTimeUp={() => handleTimeUp(match, user?.dbInfo?.id === 6)}
+              onTimeUp={() => handleTimeUp(match)}
             />
           )}
           <UserCard
@@ -83,7 +79,7 @@ function TopBar({ match, variant, currSet }) {
               isRunning={match.player_turn === 2}
               countdownSecs={match.countdown_secs}
               startTimestamp={match.countdown_timestamp}
-              onTimeUp={() => handleTimeUp(match, user?.dbInfo?.id === 6)}
+              onTimeUp={() => handleTimeUp(match)}
             />
           )}
         </div>

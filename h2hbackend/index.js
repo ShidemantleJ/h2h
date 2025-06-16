@@ -56,7 +56,7 @@ app.get("/", async (req, res) => {
   return res.status(200).send("reached h2hbackend");
 });
 
-// Uncomment for development
-app.listen(5000, () => console.log("Listening on port 5000"));
+if (process.env.DEVELOPMENT !== "true")
+  app.listen(5000, () => console.log("Listening on port 5000"));
 
 export default app;

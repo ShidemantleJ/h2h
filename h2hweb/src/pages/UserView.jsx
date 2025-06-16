@@ -38,6 +38,7 @@ const UserView = () => {
         stddev: stddev,
         record: record,
       }));
+      console.log(recentMatches);
     }
     getAverage(userId, selectedEvent);
   }, [userId, selectedEvent]);
@@ -51,7 +52,7 @@ const UserView = () => {
   }
 
   return (
-    <div className="w-full bg-zinc-900 min-h-dvh text-white p-8 flex flex-col items-center">
+    <div className="w-full min-h-dvh text-white p-8 flex flex-col items-center">
       {/* Profile Card */}
       <div className="w-full max-w-4xl flex flex-col md:flex-row items-center gap-8 bg-zinc-800/80 rounded-3xl shadow-xl p-8 mb-8 border border-zinc-700">
         <img
@@ -117,18 +118,14 @@ const UserView = () => {
             </h2>
           </div>
           <div className="z-10 flex-1 overflow-y-auto space-y-2 mt-2">
-            {recentMatches.filter(
-              (match) =>
-                match.status !== "ongoing" && match.status !== "notstarted"
-            ).length === 0 && (
+            {recentMatches.length === 0 && (
               <div className="text-zinc-400 text-center mt-8">
                 No recent matches found.
               </div>
             )}
-            {recentMatches.map((match) =>
-              match.status !== "ongoing" && match.status !== "notstarted" ? (
+            {recentMatches.map((match) => (
                 <MatchCard inviteData={match} variant="normal" key={match.id} />
-              ) : null
+              )
             )}
           </div>
         </div>

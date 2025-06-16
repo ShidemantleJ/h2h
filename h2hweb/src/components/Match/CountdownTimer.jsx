@@ -7,7 +7,6 @@ function calculateTimeLeft(timestamp, countdownSecs) {
   const secsRemaining =
     countdownSecs - Math.floor((timestampNow - startTimestamp) / 1000);
 
-  console.log(secsRemaining);
   const secsToDisplay = Math.max(secsRemaining % 60, 0);
   const minsToDisplay = Math.max(Math.floor(secsRemaining / 60), 0);
   return {
@@ -24,7 +23,9 @@ function CountdownTimer({
   isRunning,
   onTimeUp,
 }) {
-  const [timeLeft, setTimeLeft] = useState({ text: "0:00", seconds: 1 });
+  const [timeLeft, setTimeLeft] = useState(
+    calculateTimeLeft(startTimestamp, countdownSecs)
+  );
   const onTimeUpCalled = useRef(false);
 
   useEffect(() => {
@@ -38,11 +39,11 @@ function CountdownTimer({
       if (calculatedTimeLeft.seconds > 0) onTimeUpCalled.current = false;
       else if (
         typeof onTimeUp === "function" &&
-        calculatedTimeLeft.seconds < 0
+        calculatedTimeLeft.seconds < 0 &&
+        onTimeUpCalled.current === false
       ) {
-        console.log("calling on time up function");
         onTimeUpCalled.current = true;
-        onTimeUp();
+        if (isRunning) onTimeUp();
       }
     }, 1000);
 

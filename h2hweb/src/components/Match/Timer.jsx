@@ -99,11 +99,7 @@ function Timer({ matchId }) {
   }, []);
 
   return (
-    <div
-      className="space-y-3"
-      onTouchStart={handleKeyOrTouchDown}
-      onTouchEnd={handleKeyOrTouchUp}
-    >
+    <div className="space-y-3">
       <div className="inline-flex items-center">
         <h2 className="text-2xl font-semibold">Timer</h2>
         <Tooltip anchorSelect=".timer-info" place="top">
@@ -120,6 +116,8 @@ function Timer({ matchId }) {
           className={`${
             timerBold ? "text-green-800 font-bold" : ""
           } text-2xl font-semibold`}
+          onTouchStart={handleKeyOrTouchDown}
+          onTouchEnd={handleKeyOrTouchUp}
         >
           {timerVal.toFixed(2)}
         </p>

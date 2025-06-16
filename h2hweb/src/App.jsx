@@ -7,9 +7,7 @@ import Sidebar from "./components/Sidebar";
 import Friends from "./pages/Friends";
 import Play from "./pages/Play";
 import Match from "./pages/Match";
-import supabase from "./supabase";
 import { UserContext } from "./user/UserContext";
-import { User } from "lucide-react";
 import { subscribeToFriendChanges, getFriendInfo } from "./user/friendinfo";
 import {
   subscribeToMatchInviteChanges,
@@ -19,7 +17,6 @@ import { ToastContainer } from "react-toastify";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     const fetchAndSubscribe = async () => {
@@ -61,16 +58,18 @@ function App() {
   return (
     <UserContext.Provider value={{ user, setUser }}>
       <Router>
-        <div className="flex">
+        <div className="bg-zinc-900">
           <Sidebar />
           {/* Main Page Content */}
-          <Routes>
-            <Route path="/" element={<Home onlineUsers={onlineUsers} />} />
-            <Route path="/users/:userId" element={<UserView />} />
-            <Route path="/friends" element={<Friends />} />
-            <Route path="/play" element={<Play />} />
-            <Route path="/match/:matchId" element={<Match />} />
-          </Routes>
+          <main className="lg:ml-20">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/users/:userId" element={<UserView />} />
+              <Route path="/friends" element={<Friends />} />
+              <Route path="/play" element={<Play />} />
+              <Route path="/match/:matchId" element={<Match />} />
+            </Routes>
+          </main>
         </div>
       </Router>
       <ToastContainer

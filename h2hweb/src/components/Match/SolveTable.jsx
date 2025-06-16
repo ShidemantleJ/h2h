@@ -88,7 +88,7 @@ function SolveTable({ match, setCurrSet, currSet, setCurrSolve, currSolve }) {
   }, [match?.player_1_times, match?.player_2_times]);
 
   return (
-    <div className="h-full">
+    <div className="h-full w-full mx-auto">
       <div className="flex items-center justify-center space-x-5 mb-2">
         <ArrowLeftCircle
           className="cursor-pointer"
@@ -111,7 +111,7 @@ function SolveTable({ match, setCurrSet, currSet, setCurrSolve, currSolve }) {
           }}
         />
       </div>
-      <div className="max-h-[60vh] overflow-y-auto">
+      <div className="mx-auto max-h-[60vh] overflow-y-auto">
         <table className="mx-auto transition-all duration-300 ease-in-out text-sm">
           <thead>
             <tr className="text-zinc-400 border-b-1 border-zinc-600">

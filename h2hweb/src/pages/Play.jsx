@@ -23,7 +23,7 @@ const Play = () => {
           recipientId={challengedUser}
         />
       </Modal>
-      <div className="bg-zinc-900 min-h-screen w-full grid grid-cols-1 lg:grid-cols-4 gap-8 p-8 text-white font-sans">
+      <div className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-4 gap-8 p-8 text-white font-sans">
         {/* Challenge a Friend */}
         <div className="bg-zinc-800 p-6 rounded-2xl row-span-1 max-h-[70vh] lg:col-span-2 overflow-y-auto shadow-lg flex flex-col">
           <div className="flex items-center gap-2 mb-4">

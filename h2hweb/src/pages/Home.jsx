@@ -2,10 +2,9 @@ import { Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = (props) => {
-  const numUsers = props.onlineUsers.length;
   const navigate = useNavigate();
   return (
-    <div className="bg-zinc-900 h-screen w-full p-12 overflow-hidden inline font-sans space-y-8">
+    <div className="h-screen w-full p-12 overflow-hidden font-sans space-y-8">
       <div className="text-4xl">
         <h2 className="text-white font-bold">H2HWeb</h2>
         <h2 className="text-emerald-600 font-bold">Compete Head-to-Head with Other Cubers</h2>

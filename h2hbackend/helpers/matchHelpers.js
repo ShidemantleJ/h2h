@@ -169,8 +169,6 @@ function getMatchRoomEmpty(match) {
 }
 
 async function handleMatchCountdownComplete(match, skipEmptyRoomCheck = false) {
-  const matchId = match.id;
-
   const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
     match,
     -1,
@@ -193,27 +191,27 @@ async function handleMatchCountdownComplete(match, skipEmptyRoomCheck = false) {
 
   let matchRoomIsEmpty;
   if (skipEmptyRoomCheck) {
-    matchRoomIsEmpty = await getMatchRoomEmpty(match);
-  } else matchRoomIsEmpty = true;
+    matchRoomIsEmpty = false;
+  } else matchRoomIsEmpty = await getMatchRoomEmpty(match);
 
   const newTurn = getNewTurn(newP1TimeArr, newP2TimeArr);
 
+  // Use match-eq to ensure we only update if countdown_timestamp hasn't changed
   const { error } = await supabase
     .from("matches")
     .update({
       player_1_times: newP1TimeArr,
       player_2_times: newP2TimeArr,
       player_turn: newTurn,
-      countdown_timestamp: matchRoomIsEmpty
-        ? match.countdown_timestamp
-        : new Date().toUTCString(),
+      countdown_timestamp: new Date().toUTCString(),
       scrambles: newScrambleArr,
       max_solves: newMaxSolves,
       status: matchRoomIsEmpty ? "both_left" : gameState,
     })
-    .eq("id", matchId);
-
-  if (error) throw new Error(error);
+    .eq("id", match.id)
+    .eq("player_turn", match.player_turn)
+    .eq("countdown_timestamp", match.countdown_timestamp);
+  if (error) throw new Error(error.toString());
 }
 
 export {

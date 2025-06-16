@@ -14,7 +14,7 @@ import {
 } from "../helpers/matchHelpers.js";
 
 router.post("/addTime", isLoggedIn, async (req, res) => {
-  const { matchId, newTime } = req.body;
+  const { newTime, matchId } = req.body;
 
   if (isNaN(newTime))
     return res.status(400).send("Submitted time must be a number.");
@@ -149,59 +149,51 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
 });
 
 router.post("/timeUpAddDNF", isLoggedIn, async (req, res) => {
-  const { matchId } = req.body;
+  const { match: matchFromUser } = req.body;
+  const matchId = matchFromUser.id;
 
-  const client = await pgPool.connect();
   try {
-    await client.query("BEGIN");
-
-    // Try to acquire lock on match row.
-    // This prevents deadlock due to simultaneous calls to this endpoint
-
-    const lockResult = await client.query(
-      "SELECT pg_try_advisory_lock($1) AS acquired",
-      [matchId]
-    );
-
-    if (!lockResult.rows[0].acquired) {
-      await client.query("ROLLBACK");
-      return res.status(423).send("Another operation is already in progress.");
-    }
-
     const { match, matchError } = await getMatch(matchId);
-    if (matchError) {
-      await client.query("ROLLBACK");
-      return res.status(500).send("Error getting match");
+
+    if (matchError) return res.status(500).send("Could not get match from db");
+
+    const matchIsValid = Object.entries(match).every(([key, value]) => {
+      return matchFromUser.hasOwnProperty(key) && JSON.stringify(matchFromUser[key]) === JSON.stringify(value);
+    });
+
+    if (!matchIsValid) {
+      return res
+        .status(400)
+        .send("Stale request, dnf has already been handled");
     }
 
+    // Check if timer has actually expired and match is still ongoing
     if (
       match.status === "ongoing" &&
       match.countdown_secs -
-        Math.floor(
-          (Date.now() - new Date(match.countdown_timestamp).getTime())
-        ) <
+        Math.floor(Date.now() - new Date(match.countdown_timestamp).getTime()) <
         0
     ) {
-      await handleMatchCountdownComplete(match, true);
-      console.log("countdown handled");
+      try {
+        await handleMatchCountdownComplete(match, true);
+        console.log("countdown handled for user ", match.player_turn);
+        return res.status(200).send("DNF added successfully");
+      } catch (err) {
+        console.log("DNF already handled by another request. Error: ", err);
+        return res.status(200).send("DNF already handled");
+      }
     } else {
       console.log("no need to DNF");
+      return res.status(200).send("No DNF needed");
     }
-
-    await client.query("COMMIT");
-    return res.status(200).send("OK");
   } catch (err) {
-    await client.query("ROLLBACK");
     console.error("Error in timeUpAddDNF:", err);
     return res.status(500).send("Internal server error");
-  } finally {
-    await client.query("SELECT pg_advisory_unlock($1)", [matchId]);
-    client.release();
   }
 });
 
 // Called every 5 minutes by cron job
-router.post("/checkMatchesForDNF", isLoggedIn, async (req, res) => {
+router.post("/checkMatchesForDNF", async (req, res) => {
   const { data: matches, error } = await supabase
     .from("matches")
     .select("*")

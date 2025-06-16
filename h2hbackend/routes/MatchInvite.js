@@ -83,6 +83,20 @@ router.post("/send", isLoggedIn, async (req, res) => {
 
 router.post("/accept", isLoggedIn, async (req, res) => {
   const { inviteId } = req.body;
+
+  const { data: inProgressMatchData, error: matchDataErr } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("status", "ongoing")
+    .or(
+      `player_1_id.eq.${req.user.dbInfo.id},player_2_id.eq.${req.user.dbInfo.id}`
+    );
+
+  if (inProgressMatchData) {
+    console.log(inProgressMatchData);
+    return res.status(418).send(inProgressMatchData[0].id);
+  }
+
   const { data, error } = await supabase
     .from("matchinvites")
     .update({ status: "accepted" })

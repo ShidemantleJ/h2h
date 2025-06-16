@@ -57,8 +57,6 @@ function InProgressMatch({ match, matchId, setMatch }) {
       const usersPresent = Object.values(matchRoom.presenceState())
         .flat()
         .map((user) => user.userId);
-      // console.log(matchRoom.presenceState());
-      // console.log(usersPresent);
 
       const competitors = [match.player_1_id, match.player_2_id];
       if (
@@ -138,7 +136,7 @@ function InProgressMatch({ match, matchId, setMatch }) {
         <TopBar match={match} currSet={currSet} />
       </div>
       {/* Submit Times */}
-      <div className="bg-zinc-800 rounded-2xl p-5">
+      <div className="bg-zinc-800 rounded-2xl p-5 h-fit w-fit">
         <Timer matchId={matchId} />
       </div>
       {/* Table of solves */}

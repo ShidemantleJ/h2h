@@ -28,16 +28,25 @@ const Sidebar = (props) => {
       {/* Menu Icon to collapse sidebar */}
       {/* Sidebar Parent Div */}
       <div
+        onMouseEnter={() => {
+          setCollapsed(false);
+        }}
+        onMouseLeave={() => {
+          setCollapsed(true);
+        }}
         className={`
-    fixed lg:sticky
-    bg-zinc-900
-    transition-[width] duration-400
-    shrink-0
-    border-zinc-700 border-r-1
-    top-0 h-dvh
-    ${collapsed ? "z-50" : "z-20"}
-    ${collapsed ? "w-0 pt-5 pl-5 lg:w-20 lg:p-5" : "w-58 p-5"}
-  `}
+          fixed
+          bg-zinc-900
+          transition-[width] duration-300 ease-in-out
+          border-r border-zinc-700
+          top-0 h-dvh
+          z-50
+          ${
+            collapsed
+              ? "w-0 lg:w-20 p-5"
+              : "w-64 p-5 shadow-[5px_0_25px_0_rgba(0,0,0,0.25)]"
+          }
+        `}
       >
         <Menu
           className="block transition-all duration-400 absolute z-50 -right-3 text-zinc-300 cursor-pointer"
