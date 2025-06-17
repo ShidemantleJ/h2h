@@ -20,7 +20,9 @@ import { subscribeToOnlineUsers } from "./user/onlineUsersChannel";
 function App() {
   const [user, setUser] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  // Fetch user info
   useEffect(() => {
     const fetchAndSubscribe = async () => {
       try {
@@ -40,10 +42,19 @@ function App() {
     fetchAndSubscribe();
   }, []);
 
+  // Initialize data and set up subscriptions
   useEffect(() => {
-    if (user?.dbInfo?.id) {
-      getFriendInfo(user, setUser);
-      getMatchInviteInfo(user, setUser);
+    if (user?.dbInfo?.id && !isInitialized) {
+      const initializeData = async () => {
+        await Promise.all([
+          getFriendInfo(user, setUser),
+          getMatchInviteInfo(user, setUser),
+        ]);
+        setIsInitialized(true);
+      };
+
+      initializeData();
+
       const friendUnsubscribe = subscribeToFriendChanges(user, setUser);
       const matchInviteUnsubscribe = subscribeToMatchInviteChanges(
         user,
@@ -60,7 +71,7 @@ function App() {
         onlineUsersUnsubscribe();
       };
     }
-  }, [user?.dbInfo?.id]);
+  }, [user?.dbInfo?.id, isInitialized]);
   // console.log(user);
 
   return (
