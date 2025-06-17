@@ -217,7 +217,7 @@ router.post("/checkMatchesForDNF", async (req, res) => {
         ) <
       0
     ) {
-      await handleMatchCountdownComplete(match);
+      handleMatchCountdownComplete(match);
     }
   });
 

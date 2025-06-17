@@ -28,11 +28,12 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    secure: true,
     cookie: {
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 3, // Max cookie age of 3 days
-      // domain: "localhost",
+      domain: process.env.COOKIE_DOMAIN,
+      secure: process.env.NODE_ENV === "production",
       rolling: true,
     },
   })
