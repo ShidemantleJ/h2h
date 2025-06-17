@@ -30,10 +30,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 3, // Max cookie age of 3 days
-      domain: process.env.COOKIE_DOMAIN,
-      secure: process.env.NODE_ENV === "production",
       rolling: true,
     },
   })
