@@ -7,18 +7,9 @@ import passport from "passport";
 router.get("/wca", passport.authenticate("wca"));
 
 router.get(
-  "/wca/callback",
-  (req, res, next) => {
-    console.log("Callback received");
-    next();
-  },
-  passport.authenticate("wca", {
-    successRedirect: process.env.ORIGIN,
-    failureRedirect: "/auth/failure",
-    failureMessage: true,
-  }),
-  (req, res) => {
-    console.log("Authentication successful");
+  "/auth/wca/callback",
+  passport.authenticate("wca", { failureRedirect: "/failure" }),
+  function (req, res) {
     res.redirect(process.env.ORIGIN);
   }
 );
