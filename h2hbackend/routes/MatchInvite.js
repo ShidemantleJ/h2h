@@ -92,9 +92,9 @@ router.post("/accept", isLoggedIn, async (req, res) => {
       `player_1_id.eq.${req.user.dbInfo.id},player_2_id.eq.${req.user.dbInfo.id}`
     );
 
-  if (inProgressMatchData) {
+  if (inProgressMatchData[0]?.id) {
     console.log(inProgressMatchData);
-    return res.status(418).send(inProgressMatchData[0].id);
+    return res.status(418).send(inProgressMatchData[0]?.id);
   }
 
   const { data, error } = await supabase

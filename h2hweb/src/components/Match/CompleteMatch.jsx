@@ -18,7 +18,7 @@ function CompleteMatch({ match }) {
         <TopBar match={match} variant="CompleteMatch" currSet={currSet} />
       </div>
       <div className="flex flex-col lg:flex-row gap-5 w-full">
-        <div className="bg-zinc-800 rounded-2xl w-full">
+        <div className="bg-zinc-800 rounded-2xl p-5 w-full mr-auto">
           <SolveTable
             currSet={currSet}
             setCurrSet={setCurrSet}

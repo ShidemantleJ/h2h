@@ -28,7 +28,7 @@ async function getNameFromId(userId) {
 const getUserInfo = async (userId) => {
   const { data, error } = await supabase
     .from("users")
-    .select("name, wcaid, created_at, profile_pic_url")
+    .select("id, name, wcaid, created_at, profile_pic_url")
     .eq("id", userId)
     .maybeSingle();
   if (error) console.error(error);

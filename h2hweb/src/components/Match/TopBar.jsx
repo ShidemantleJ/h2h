@@ -19,10 +19,6 @@ function TopBar({ match, variant, currSet }) {
 
   const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    console.log(match.player_turn, match.countdown_secs, match.countdown_timestamp);
-  }, [match.player_turn])
-
   let message;
   switch (match.status) {
     case "P1_WON":
@@ -39,7 +35,6 @@ function TopBar({ match, variant, currSet }) {
       break;
   }
 
-  if (!user?.dbInfo?.id) return;
   return (
     <div className="py-3 px-5">
       {message && (

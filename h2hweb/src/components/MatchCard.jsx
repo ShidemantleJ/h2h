@@ -30,6 +30,18 @@ function cancelReq(inviteId) {
     });
 }
 
+function resignFromMatch(matchId) {
+  axios
+    .post(
+      `${import.meta.env.VITE_BACKEND_URL}/match/resign`,
+      { matchId: matchId },
+      { withCredentials: true }
+    )
+    .then((res) => {
+      return res.data;
+    });
+}
+
 async function acceptReq(inviteId) {
   try {
     const res = await axios.post(
@@ -49,7 +61,16 @@ async function acceptReq(inviteId) {
           >
             here
           </a>{" "}
-          to join
+          to join, or{" "}
+          <a
+            className="font-bold text-red-500"
+            onClick={() => {
+              resignFromMatch(error.response.data);
+            }}
+          >
+            here
+          </a>{" "}
+          to resign
         </p>
       );
     }
@@ -78,7 +99,6 @@ function MatchCard({ inviteData, variant }) {
   let nameAndScore;
   if (variant === "normal") {
     const { setsWonArr } = getMatchScore(inviteData);
-    console.log(inviteData);
     nameAndScore =
       inviteData.player1.name +
       ` [${setsWonArr[0]}] vs. [${setsWonArr[1]}] ` +
@@ -92,11 +112,9 @@ function MatchCard({ inviteData, variant }) {
           (window.location.href = `/match/${inviteData.id}`);
       }}
       className={`relative bg-zinc-800 rounded-2xl shadow-lg p-4 flex flex-col gap-2 transition-all duration-200 border border-zinc-700 
-        ${
-          variant === "normal"
-            ? "cursor-pointer hover:border-emerald-400"
-            : "hover:border-amber-400"
-        }
+        ${variant === "normal" && "cursor-pointer hover:border-emerald-400"}
+        ${variant === "incomingReq" && "w-fit lg:w-full hover:border-emerald-400"}
+        ${variant === "outgoingReq" && "w-fit lg:w-full hover:border-amber-400"}
       `}
     >
       <div className="flex items-center gap-2">
@@ -110,7 +128,7 @@ function MatchCard({ inviteData, variant }) {
             From
           </span>
         )}
-        <span className="font-semibold text-lg text-white truncate">
+        <span className="font-semibold text-lg text-white lg:truncate">
           {variant === "normal" ? nameAndScore : name}
         </span>
       </div>

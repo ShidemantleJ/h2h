@@ -148,7 +148,7 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
   return res.status(200);
 });
 
-router.post("/timeUpAddDNF", isLoggedIn, async (req, res) => {
+router.post("/timeUpAddDNF", async (req, res) => {
   const { match: matchFromUser } = req.body;
   const matchId = matchFromUser.id;
 
@@ -179,14 +179,14 @@ router.post("/timeUpAddDNF", isLoggedIn, async (req, res) => {
     ) {
       try {
         await handleMatchCountdownComplete(match, true);
-        console.log("countdown handled for user ", match.player_turn);
+        // console.log("countdown handled for user ", match.player_turn);
         return res.status(200).send("DNF added successfully");
       } catch (err) {
         console.log("DNF already handled by another request. Error: ", err);
         return res.status(200).send("DNF already handled");
       }
     } else {
-      console.log("no need to DNF");
+      // console.log("no need to DNF");
       return res.status(200).send("No DNF needed");
     }
   } catch (err) {
@@ -222,6 +222,41 @@ router.post("/checkMatchesForDNF", async (req, res) => {
   });
 
   return res.status(200);
+});
+
+router.post("/resign", isLoggedIn, async (req, res) => {
+  const { matchId } = req.body;
+
+  const { data: match, error } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .eq("status", "ongoing")
+    .single();
+
+  if (error) return res.status(500).send(error);
+
+  const playerIsP1 = req.user.dbInfo.id === match.player_1_id;
+  const playerIsP2 = req.user.dbInfo.id === match.player_2_id;
+
+  if (!playerIsP1 && !playerIsP2) {
+    return res
+      .status(400)
+      .send("Cannot resign from a match you aren't participating in.");
+  }
+
+  let newStatus;
+  if (playerIsP1) newStatus = "P2_WON";
+  else if (playerIsP2) newStatus = "P1_WON";
+
+  const { error: updateError } = await supabase
+    .from("matches")
+    .update("status", newStatus)
+    .eq("id", matchId);
+
+  if (updateError) return res.status(500).send(error);
+
+  res.status(200);
 });
 
 export default router;

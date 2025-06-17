@@ -26,7 +26,6 @@ function CountdownTimer({
   const [timeLeft, setTimeLeft] = useState(
     calculateTimeLeft(startTimestamp, countdownSecs)
   );
-  const onTimeUpCalled = useRef(false);
 
   useEffect(() => {
     if (!startTimestamp || !countdownSecs) return;
@@ -36,13 +35,10 @@ function CountdownTimer({
         countdownSecs
       );
       setTimeLeft(calculatedTimeLeft);
-      if (calculatedTimeLeft.seconds > 0) onTimeUpCalled.current = false;
-      else if (
+      if (
         typeof onTimeUp === "function" &&
-        calculatedTimeLeft.seconds < 0 &&
-        onTimeUpCalled.current === false
+        calculatedTimeLeft.seconds < 0
       ) {
-        onTimeUpCalled.current = true;
         if (isRunning) onTimeUp();
       }
     }, 1000);

@@ -37,19 +37,19 @@ const Sidebar = (props) => {
         className={`
           fixed
           bg-zinc-900
-          transition-[width] duration-300 ease-in-out
+          transition-all duration-300 ease-in-out
           border-r border-zinc-700
           top-0 h-dvh
           z-50
           ${
             collapsed
-              ? "w-0 lg:w-20 p-5"
+              ? "w-0 lg:w-20 p-0 pr-3 pt-5 lg:p-5"
               : "w-64 p-5 shadow-[5px_0_25px_0_rgba(0,0,0,0.25)]"
           }
         `}
       >
         <Menu
-          className="block transition-all duration-400 absolute z-50 -right-3 text-zinc-300 cursor-pointer"
+          className="block lg:hidden transition-all duration-400 absolute z-50 -right-3 text-zinc-300 cursor-pointer"
           onClick={() => setCollapsed((prev) => !prev)}
         />
         {/* Sidebar Items */}

@@ -38,7 +38,6 @@ const UserView = () => {
         stddev: stddev,
         record: record,
       }));
-      console.log(recentMatches);
     }
     getAverage(userId, selectedEvent);
   }, [userId, selectedEvent]);
@@ -124,9 +123,8 @@ const UserView = () => {
               </div>
             )}
             {recentMatches.map((match) => (
-                <MatchCard inviteData={match} variant="normal" key={match.id} />
-              )
-            )}
+              <MatchCard inviteData={match} variant="normal" key={match.id} />
+            ))}
           </div>
         </div>
       </div>

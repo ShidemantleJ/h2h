@@ -88,6 +88,14 @@ function InProgressMatch({ match, matchId, setMatch }) {
 
   if (userIsP1) playerTimesArr = match.player_1_times;
   else if (userIsP2) playerTimesArr = match.player_2_times;
+  else if (userIsSpectator)
+    playerTimesArr =
+      Math.max(
+        match.player_1_times.at(-1).length,
+        match.player_2_times.at(-1).length
+      ) === match.player_1_times.at(-1).length
+        ? match.player_1_times
+        : match.player_2_times;
 
   const [currSet, setCurrSet] = useState(0);
   const [currSolve, setCurrSolve] = useState(0);
@@ -136,11 +144,11 @@ function InProgressMatch({ match, matchId, setMatch }) {
         <TopBar match={match} currSet={currSet} />
       </div>
       {/* Submit Times */}
-      <div className="bg-zinc-800 rounded-2xl p-5 h-fit w-fit">
+      {!userIsSpectator && <div className="bg-zinc-800 rounded-2xl p-5 h-fit w-fit">
         <Timer matchId={matchId} />
-      </div>
+      </div>}
       {/* Table of solves */}
-      <div className="bg-zinc-800 rounded-2xl p-5 row-span-2">
+      <div className={`bg-zinc-800 rounded-2xl p-5 w-fit ${!userIsSpectator && "lg:ml-auto"} row-span-2`}>
         <SolveTable
           match={match}
           currSet={currSet}
