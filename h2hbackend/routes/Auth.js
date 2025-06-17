@@ -7,7 +7,7 @@ import passport from "passport";
 router.get("/wca", passport.authenticate("wca"));
 
 router.get(
-  "/auth/wca/callback",
+  "/wca/callback",
   passport.authenticate("wca", { failureRedirect: "/failure" }),
   function (req, res) {
     res.redirect(process.env.ORIGIN);
