@@ -1,0 +1,31 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "h2hbackend/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/key.pem
+          chmod 600 ~/.ssh/key.pem
+
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USERNAME: ec2-user
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/key.pem $EC2_USERNAME@$EC2_HOST '
+            cd ~/h2h/h2hbackend &&
+            git pull &&
+            npm install &&
+            pm2 restart h2hbackend
+          '
