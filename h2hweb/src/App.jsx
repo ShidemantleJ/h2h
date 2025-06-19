@@ -1,12 +1,15 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import axios from "axios";
-import Home from "./pages/Home";
-import UserView from "./pages/UserView";
+
+// Lazy load pages
+const Home = lazy(() => import("./pages/Home"));
+const UserView = lazy(() => import("./pages/UserView"));
+const Friends = lazy(() => import("./pages/Friends"));
+const Play = lazy(() => import("./pages/Play"));
+const Match = lazy(() => import("./pages/Match"));
+
 import Sidebar from "./components/Sidebar";
-import Friends from "./pages/Friends";
-import Play from "./pages/Play";
-import Match from "./pages/Match";
 import { UserContext } from "./user/UserContext";
 import { OnlineUsersContext } from "./user/OnlineUsersContext";
 import { subscribeToFriendChanges, getFriendInfo } from "./user/friendinfo";
@@ -69,13 +72,19 @@ function App() {
             <Sidebar />
             {/* Main Page Content */}
             <main className="lg:ml-20">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/users/:userId" element={<UserView />} />
-                <Route path="/friends" element={<Friends />} />
-                <Route path="/play" element={<Play />} />
-                <Route path="/match/:matchId" element={<Match />} />
-              </Routes>
+              <Suspense
+                fallback={
+                  <div className="bg-zinc-900 min-h-dvh w-full"/>
+                }
+              >
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/users/:userId" element={<UserView />} />
+                  <Route path="/friends" element={<Friends />} />
+                  <Route path="/play" element={<Play />} />
+                  <Route path="/match/:matchId" element={<Match />} />
+                </Routes>
+              </Suspense>
             </main>
           </div>
         </Router>

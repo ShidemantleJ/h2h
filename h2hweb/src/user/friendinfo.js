@@ -52,9 +52,6 @@ const getFriendInfo = async (user, setUser) => {
   }));
 };
 
-// TODO: change channel name to something user-specific and optimize to only query for rows specific
-//       to the current user.
-
 const subscribeToFriendChanges = (user, setUser) => {
   console.log("subscribed to friend changes");
   const channelA = supabase

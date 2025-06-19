@@ -32,7 +32,7 @@ function Match(props) {
   }, [matchId]);
 
   if (!match || !match.player_1_id || !match.created_at)
-    return <div className="bg-zinc-900 w-full min-h-dvh"></div>;
+    return <div className="bg-zinc-900 w-full min-h-dvh flex items-center justify-center font-bold text-white text-2xl">Error: Match not found</div>;
 
   if (match.status === "ongoing" || match.status === "notstarted")
     return (

@@ -19,22 +19,4 @@ router.get("/userPublic", async (req, res) => {
   // console.error(error);
 });
 
-// Todo: remove endpoint and test (handled in client)
-router.get("/userSearch", async (req, res) => {
-  try {
-    // console.log(req.query.term);
-    if (req.query.term === "") return;
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .or(`wcaid.ilike.%${req.query.term}%, name.ilike.%${req.query.term}%`)
-      .limit(5);
-    // console.log(data, req.query.term);
-    // console.log(error);
-    res.send(data);
-  } catch (e) {
-    console.error(e);
-  }
-});
-
 export default router;

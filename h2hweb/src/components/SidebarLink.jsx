@@ -38,7 +38,7 @@ function SidebarLink(props) {
               )}
               {icon}
             </div>
-            <a className={`ml-2 font-sans text-zinc-300 whitespace-nowrap`}>
+            <a className={`ml-2 font-sans text-zinc-300 whitespace-nowrap`} href={link}>
               {name}
             </a>
           </li>
