@@ -71,6 +71,7 @@ const Sidebar = (props) => {
                   dropdownCollapsed={collapsed}
                   icon={<User />}
                   name="My Profile"
+                  key="My Profile"
                   link={`/users/${user?.dbInfo?.id}`}
                   variant="normal"
                 />
@@ -78,6 +79,7 @@ const Sidebar = (props) => {
                   dropdownCollapsed={collapsed}
                   icon={<LogOut />}
                   name="Log Out"
+                  key="Log Out"
                   link={`${import.meta.env.VITE_BACKEND_URL}/auth/logout`}
                   variant="button"
                 />
