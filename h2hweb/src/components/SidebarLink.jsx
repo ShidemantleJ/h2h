@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { UserContext } from "../user/UserContext";
 
 function NotifCircle({ numNotifs }) {
@@ -18,7 +18,6 @@ function SidebarLink(props) {
   const name = props.name;
   const dropdownCollapsed = props.dropdownCollapsed;
   const variant = props.variant;
-  const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const numMatchNotifs = user?.matchInviteInfo?.incomingReqs?.length || 0;
   const numFriendNotifs = user?.friendInfo?.incomingReqs?.length || 0;
@@ -26,35 +25,46 @@ function SidebarLink(props) {
   switch (variant) {
     case "normal":
       return (
-        <div>
-          <li
-            onClick={() => navigate(link)}
-            className="flex items-center cursor-pointer rounded-md hover:bg-zinc-800 transition-all duration-400 p-2"
+        <li className="flex items-center rounded-md hover:bg-zinc-800 transition-all duration-400 p-2">
+          <Link
+            to={link}
+            className="flex items-center w-full h-full cursor-pointer"
+            aria-label={name}
+            tabIndex={0}
+            role="menuitem"
           >
-            <div className="font-sans justify-center text-zinc-300 inline-block relative">
+            <span className="font-sans justify-center text-zinc-300 inline-block relative">
               {link === "/play" && <NotifCircle numNotifs={numMatchNotifs} />}
               {link === "/friends" && (
                 <NotifCircle numNotifs={numFriendNotifs} />
               )}
               {icon}
-            </div>
-            <a className={`ml-2 font-sans text-zinc-300 whitespace-nowrap`} href={link}>
+            </span>
+            <span className={`ml-2 font-sans text-zinc-300 whitespace-nowrap`}>
               {name}
-            </a>
-          </li>
-        </div>
+            </span>
+          </Link>
+        </li>
       );
       break;
     case "button":
       return (
         <li
           className="flex items-center cursor-pointer mt-3 p-2 rounded-[6px] bg-emerald-700 hover:bg-emerald-800 transition-all duration-400 text-center text-zinc-200 font-sans font-semibold"
-          onClick={() => (window.location.href = link)}
+          role="none"
         >
-          <div className="font-sans justify-center text-zinc-300 inline-block">
-            {icon}
-          </div>
-          <p className={`ml-2 whitespace-nowrap`}>{name}</p>
+          <Link
+            to={link}
+            className="flex items-center w-full h-full cursor-pointer"
+            aria-label={name}
+            tabIndex={0}
+            role="menuitem"
+          >
+            <span className="font-sans justify-center text-zinc-300 inline-block">
+              {icon}
+            </span>
+            <span className={`ml-2 whitespace-nowrap`}>{name}</span>
+          </Link>
         </li>
       );
       break;

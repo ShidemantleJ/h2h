@@ -54,17 +54,17 @@ function TopBar({ match, variant, currSet }) {
             />
           )}
           <UserCard
-            key={match.player_1_id}
+            key={"user_card_" + match.player_1_id}
             userId={match.player_1_id}
             variant="MatchDisplay"
             wonMatch={match.status === "P1_WON"}
           />
-          <MiniStats match={match} playerNum={1} key={1} currSet={currSet} />
+          <MiniStats match={match} playerNum={1} key="mini_stats_1" currSet={currSet} />
         </div>
         <div className="flex items-center md:gap-x-5 flex-row-reverse lg:flex-row">
-          <MiniStats match={match} playerNum={2} key={2} currSet={currSet} />
+          <MiniStats match={match} playerNum={2} key="mini_stats_2" currSet={currSet} />
           <UserCard
-            key={match.player_2_id}
+            key={"user_card_" + match.player_2_id}
             userId={match.player_2_id}
             variant="MatchDisplay"
             wonMatch={match.status === "P2_WON"}
