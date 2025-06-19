@@ -6,7 +6,7 @@ const Home = (props) => {
   return (
     <div className="h-screen w-full p-12 overflow-hidden font-sans space-y-8">
       <div className="text-center">
-        <h2 className="text-white font-bold text-6xl">H2HWeb</h2>
+        <h2 className="text-white font-bold text-6xl">H2HCube</h2>
         <h2 className="text-emerald-600 mt-2 text-3xl">Compete Head-to-Head with Other Cubers</h2>
       </div>
       <div
