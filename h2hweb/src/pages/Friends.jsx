@@ -54,7 +54,7 @@ const Friends = () => {
     <div className="text-white h-full min-h-dvh p-8 font-sans w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Search */}
-        <div className="bg-zinc-800 rounded-2xl p-6">
+        <div className="bg-zinc-800 rounded-2xl p-6 shadow-lg">
           <h1 className="text-2xl font-semibold mb-4">
             Search for New Friends
           </h1>
@@ -78,7 +78,7 @@ const Friends = () => {
                     hover={false}
                     friendInfo={user.friendInfo}
                     variant="FriendReq"
-                    key={i}
+                    key={"friend_search_" + searchUser}
                     userId={searchUser.id}
                   />
                 ))}
@@ -88,7 +88,7 @@ const Friends = () => {
         </div>
         {/* Requests */}
         <div className="space-y-8 max-h-fit">
-          <div className="bg-zinc-800 rounded-2xl p-6">
+          <div className="bg-zinc-800 rounded-2xl p-6 shadow-lg">
             <h2 className="text-2xl font-semibold mb-4">
               Incoming Friend Requests
             </h2>
@@ -97,7 +97,7 @@ const Friends = () => {
                 <UserCard
                   variant="IncomingReq"
                   layout="vertical"
-                  key={i}
+                  key={"incoming_req_" + userId}
                   userId={userId}
                 />
               ))}
@@ -106,7 +106,7 @@ const Friends = () => {
               )}
             </div>
           </div>
-          <div className="bg-zinc-800 rounded-2xl p-6">
+          <div className="bg-zinc-800 rounded-2xl p-6 shadow-lg">
             <h2 className="text-2xl font-semibold mb-4">
               Outgoing Friend Requests
             </h2>
@@ -116,7 +116,7 @@ const Friends = () => {
                   <UserCard
                     variant="OutgoingReq"
                     layout="vertical"
-                    key={i}
+                    key={"outgoing_req_" + userId}
                     userId={userId}
                   />
                 </>
@@ -128,14 +128,14 @@ const Friends = () => {
           </div>
         </div>
         {/* Friends List */}
-        <div className="bg-zinc-800 rounded-2xl p-6 lg:col-span-2">
+        <div className="bg-zinc-800 rounded-2xl p-6 lg:col-span-2 shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">Your Friends</h2>
           <div className="flex gap-4 whitespace-nowrap overflow-x-auto">
             {user?.friendInfo?.friends.map((userId, i) => (
               <UserCard
                 variant="FriendReq"
                 layout="vertical"
-                key={i}
+                key={"friend_" + userId}
                 userId={userId}
                 friendInfo={user.friendInfo}
               />

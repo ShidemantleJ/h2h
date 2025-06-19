@@ -46,7 +46,7 @@ const getFriendInfo = async (user, setUser) => {
     outgoingReqs: outReqsData.map((u) => u.recipient_user_id) || [],
     friends: friendsData || [],
   };
-  setUser(prevUser => ({
+  setUser((prevUser) => ({
     ...prevUser,
     friendInfo: friendInfo,
   }));
@@ -56,6 +56,7 @@ const getFriendInfo = async (user, setUser) => {
 //       to the current user.
 
 const subscribeToFriendChanges = (user, setUser) => {
+  console.log("subscribed to friend changes");
   const channelA = supabase
     .channel(`friend-req-changes-${user.dbInfo.id}`)
     .on(
@@ -64,6 +65,19 @@ const subscribeToFriendChanges = (user, setUser) => {
         event: "*",
         schema: "public",
         table: "friends",
+        filter: `user1_id=eq.${user.dbInfo.id}`,
+      },
+      async (payload) => {
+        await getFriendInfo(user, setUser);
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "friends",
+        filter: `user2_id=eq.${user.dbInfo.id}`,
       },
       async (payload) => {
         await getFriendInfo(user, setUser);
@@ -75,6 +89,19 @@ const subscribeToFriendChanges = (user, setUser) => {
         event: "*",
         schema: "public",
         table: "friendreqs",
+        filter: `sender_user_id=eq.${user.dbInfo.id}`,
+      },
+      async (payload) => {
+        await getFriendInfo(user, setUser);
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "friendreqs",
+        filter: `recipient_user_id=eq.${user.dbInfo.id}`,
       },
       async (payload) => {
         await getFriendInfo(user, setUser);
@@ -82,7 +109,7 @@ const subscribeToFriendChanges = (user, setUser) => {
     )
     .subscribe();
 
-  return () => supabase.removeChannel(channelA);
+  return () => channelA.unsubscribe();
 };
 
 export { subscribeToFriendChanges, getFriendInfo };

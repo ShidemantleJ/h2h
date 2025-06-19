@@ -55,24 +55,11 @@ function App() {
 
       initializeData();
 
-      const friendUnsubscribe = subscribeToFriendChanges(user, setUser);
-      const matchInviteUnsubscribe = subscribeToMatchInviteChanges(
-        user,
-        setUser
-      );
-      const onlineUsersUnsubscribe = subscribeToOnlineUsers(
-        user.dbInfo.id,
-        setOnlineUsers
-      );
-
-      return () => {
-        friendUnsubscribe();
-        matchInviteUnsubscribe();
-        onlineUsersUnsubscribe();
-      };
+      subscribeToFriendChanges(user, setUser);
+      subscribeToMatchInviteChanges(user, setUser);
+      subscribeToOnlineUsers(user.dbInfo.id, setOnlineUsers);
     }
   }, [user?.dbInfo?.id, isInitialized]);
-  // console.log(user);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
