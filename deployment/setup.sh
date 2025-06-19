@@ -9,29 +9,37 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 nvm install 18
 nvm use 18
 
-# Install Nginx
-sudo yum install nginx -y
-
-# Create Nginx configuration
-cp deployment/h2h.conf /etc/nginx/conf.d/h2h.conf
-
 # Install PM2
 npm install -g pm2
 
 # Install Git
-sudo yum install git -y
+sudo yum install -y git
+
+# Install Nginx and copy config
+sudo yum install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo cp h2h/deployment/nginx.conf /etc/nginx/nginx.conf
+sudo nginx -t
+sudo systemctl restart nginx
+
+# Install and set up certbot
+sudo yum install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d h2hcube.com -d www.h2hcube.com -d api.h2hcube.com
+sudo certbot renew --dry-run
+sudo systemctl start certbot-renew.timer
 
 # Clone your repository
-git clone https://ShidemantleJ:{REPLACE_WITH_GITHUB_PAT}@github.com/ShidemantleJ/h2h.git
+git clone https://github.com/ShidemantleJ/h2h.git
 cd h2h
 
 # Setup backend
-cd h2hbackend
+cd ~/h2h/h2hbackend
 npm install
 pm2 start index.js --name h2hbackend
 
 # Setup frontend
-cd ../h2hweb
+cd ~/h2h/h2hweb
 npm install
 npm run build
 pm2 serve dist 3000 --name h2hweb

@@ -43,7 +43,7 @@ const Sidebar = (props) => {
           z-50
           ${
             collapsed
-              ? "w-0 lg:w-20 p-0 pr-3 pt-5 lg:p-5"
+              ? "w-0 lg:w-20 p-0 pr-3 py-5 lg:p-5"
               : "w-64 p-5 shadow-[5px_0_25px_0_rgba(0,0,0,0.25)]"
           }
         `}
