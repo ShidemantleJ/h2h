@@ -14,7 +14,7 @@ async function getLastXMatches(event, userId, lowerLimit, upperLimit) {
           )
           .or(`player_1_id.eq.${userId},player_2_id.eq.${userId}`)
           .neq("status", "both_left")
-          .order("created_at", { ascending: false })
+          .order("created_at", { ascending: true })
           .range(lowerLimit, upperLimit)
       : await supabase
           .from("matches")
@@ -25,7 +25,7 @@ async function getLastXMatches(event, userId, lowerLimit, upperLimit) {
           )
           .or(`player_1_id.eq.${userId},player_2_id.eq.${userId}`)
           .eq("event", event)
-          .order("created_at", { ascending: false })
+          .order("created_at", { ascending: true })
           .range(lowerLimit, upperLimit);
   if (error) console.log(error);
   else return data;
