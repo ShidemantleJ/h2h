@@ -1,6 +1,7 @@
 import { TimerOff } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 
+// Returns time between now and timestamp + countdownSecs
 function calculateTimeLeft(timestamp, countdownSecs) {
   const timestampNow = new Date().getTime();
   const startTimestamp = new Date(timestamp).getTime();

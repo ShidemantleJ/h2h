@@ -30,8 +30,11 @@ const getUserInfo = async (userId) => {
     .from("users")
     .select("id, name, wcaid, profile_id, created_at, profile_pic_url")
     .eq("id", userId)
-    .maybeSingle();
-  if (error) console.error(error);
+    .single();
+  if (error || !data) {
+    console.error(error);
+    return { empty: true };
+  }
   return data;
 };
 

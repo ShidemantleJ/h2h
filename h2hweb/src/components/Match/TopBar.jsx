@@ -5,15 +5,15 @@ import MiniStats from "./MiniStats";
 import axios from "axios";
 import { UserContext } from "../../user/UserContext";
 
-function handleTimeUp(match) {
-    axios.post(
+function handleTimeUp(match, userIsSpectator) {
+    if (!userIsSpectator) axios.post(
       `${import.meta.env.VITE_BACKEND_URL}/match/timeUpAddDNF`,
       { match: match },
       { withCredentials: true }
     );
 }
 
-function TopBar({ match, variant, currSet }) {
+function TopBar({ match, variant, currSet, userIsSpectator }) {
   const p1name = match?.player1?.name;
   const p2name = match?.player2?.name;
 
@@ -50,7 +50,7 @@ function TopBar({ match, variant, currSet }) {
               isRunning={match.player_turn === 1}
               countdownSecs={match.countdown_secs}
               startTimestamp={match.countdown_timestamp}
-              onTimeUp={() => handleTimeUp(match)}
+              onTimeUp={() => handleTimeUp(match, userIsSpectator)}
             />
           )}
           <UserCard

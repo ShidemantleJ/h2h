@@ -10,23 +10,22 @@ router.get(
   "/wca/callback",
   passport.authenticate("wca", { failureRedirect: "/failure" }),
   function (req, res) {
-    res.redirect(process.env.ORIGIN);
+    return res.redirect(process.env.ORIGIN);
   }
 );
 
 router.get("/failure", (req, res) => {
   console.error("Authentication failed:", req.session.messages);
-  res.send("You did not log in successfully. Please try again");
+  return res.send("You did not log in successfully. Please try again");
 });
 
 router.get("/logout", isLoggedIn, (req, res) => {
   req.logout(function (err) {
     if (err) {
-      console.error(err);
       return res.status(500).send("Logout failed");
     }
     req.session.destroy();
-    res.redirect(process.env.ORIGIN);
+    return res.redirect(process.env.ORIGIN);
   });
 });
 

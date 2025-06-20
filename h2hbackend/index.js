@@ -37,7 +37,7 @@ app.use(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 3, // Max cookie age of 3 days
+      maxAge: 1000 * 60 * 60 * 24 * 7, // Max cookie age of 7 days
     },
   })
 );
@@ -56,10 +56,9 @@ app.use("/matchInvite", matchInviteRoute);
 app.use("/match", matchRoute);
 
 app.get("/", async (req, res) => {
-  return res.status(200).send("reached h2hbackend");
+  return res.status(200).send("Backend of h2hweb");
 });
 
-if (process.env.DEVELOPMENT !== "true")
-  app.listen(5000, () => console.log("Listening on port 5000"));
+app.listen(5000, () => console.log("Listening on port 5000"));
 
 export default app;

@@ -32,7 +32,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   const userIsP2 = req.user.dbInfo.id === match.player_2_id;
   if (!userIsP1 && !userIsP2) {
     return res
-      .status(401)
+      .status(400)
       .send("Cannot add times to games you aren't participating in");
   }
 
@@ -55,7 +55,7 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   )
     return res.status(400).send("Cannot add a time out of turn!");
 
-  // Get previous time array (2D) and update
+  // Get previous time array and update
   const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
     match,
     parseFloat(newTime).toFixed(2),
@@ -99,6 +99,8 @@ router.post("/addTime", isLoggedIn, async (req, res) => {
   return res.status(200).send("OK");
 });
 
+// not 100% sure I want to allow and finish implementing this
+/*
 router.post("/modifyTime", isLoggedIn, async (req, res) => {
   const { setNum, solveNum, matchId } = req.body;
   const { data, error } = await supabase
@@ -116,7 +118,9 @@ router.post("/modifyTime", isLoggedIn, async (req, res) => {
 
   return res.status(200).send("OK");
 });
+*/
 
+// Changes status, updates countdown_timestamp and pushes first scramble
 router.post("/startMatch", isLoggedIn, async (req, res) => {
   const { matchId } = req.body;
 
@@ -148,6 +152,8 @@ router.post("/startMatch", isLoggedIn, async (req, res) => {
   return res.status(200);
 });
 
+// Had a problem where dnfs would be added in bursts of 5 when they weren't supposed to,
+// to fix I just kept adding checks until it worked. too scared to modify now, so a bit of a mess sry
 router.post("/timeUpAddDNF", async (req, res) => {
   const { match: matchFromUser } = req.body;
   const matchId = matchFromUser.id;
@@ -158,9 +164,14 @@ router.post("/timeUpAddDNF", async (req, res) => {
     if (matchError) return res.status(500).send("Could not get match from db");
 
     const matchIsValid = Object.entries(match).every(([key, value]) => {
+      // if (!matchFromUser.hasOwnProperty(key) ||
+      //   JSON.stringify(matchFromUser[key]) !== JSON.stringify(value) ||
+      //   key === "scrambles") {
+      //     console.log(key, matchFromUser[key], value)
+      //   }
       return (
-        matchFromUser.hasOwnProperty(key) &&
-        JSON.stringify(matchFromUser[key]) === JSON.stringify(value)
+        key === "scrambles" || (matchFromUser.hasOwnProperty(key) &&
+        JSON.stringify(matchFromUser[key]) === JSON.stringify(value))
       );
     });
 
@@ -179,14 +190,12 @@ router.post("/timeUpAddDNF", async (req, res) => {
     ) {
       try {
         await handleMatchCountdownComplete(match, true);
-        // console.log("countdown handled for user ", match.player_turn);
         return res.status(200).send("DNF added successfully");
       } catch (err) {
         console.log("DNF already handled by another request. Error: ", err);
         return res.status(200).send("DNF already handled");
       }
     } else {
-      // console.log("no need to DNF");
       return res.status(200).send("No DNF needed");
     }
   } catch (err) {
@@ -195,7 +204,7 @@ router.post("/timeUpAddDNF", async (req, res) => {
   }
 });
 
-// Called every 5 minutes by cron job
+// Called every 30 minutes by cron job, sets matches where both players left to both_left
 router.post("/checkMatchesForDNF", async (req, res) => {
   const { data: matches, error } = await supabase
     .from("matches")
@@ -251,12 +260,12 @@ router.post("/resign", isLoggedIn, async (req, res) => {
 
   const { error: updateError } = await supabase
     .from("matches")
-    .update("status", newStatus)
+    .update({ status: newStatus })
     .eq("id", matchId);
 
   if (updateError) return res.status(500).send(error);
 
-  res.status(200);
+  return res.status(200).send("resigned from match");
 });
 
 export default router;

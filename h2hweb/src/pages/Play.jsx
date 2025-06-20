@@ -7,6 +7,7 @@ import SendChallengeModal from "../components/SendChallengeModal";
 import MatchCard from "../components/MatchCard";
 import LoggedInMessage from "../components/LoggedInMessage";
 import { Users, Send, ArrowRight, Info } from "lucide-react";
+import UserCardList from "../components/UserCardList";
 
 const Play = () => {
   const { user } = useContext(UserContext);
@@ -34,15 +35,13 @@ const Play = () => {
             {user?.friendInfo?.friends?.length === 0 && (
               <p className="text-zinc-400">You have no friends yet.</p>
             )}
-            {user?.friendInfo?.friends?.map((friendId) => (
-                <UserCard
-                  variant="MatchInvite"
-                  userId={friendId}
-                  key={friendId}
-                  setShowChallengeModal={setShowModal}
-                  setChallengedUser={setChallengedUser}
-                />
-            ))}
+            <UserCardList
+              variant="MatchInvite"
+              usersArray={user?.friendInfo?.friends}
+              setShowChallengeModal={setShowModal}
+              setChallengedUser={setChallengedUser}
+              keyPrefix="friend_to_challenge_"
+            />
           </div>
         </div>
         {/* Outgoing Challenges */}
@@ -56,7 +55,7 @@ const Play = () => {
           )}
           <div className="space-x-2 flex flex-col gap-2 overflow-y-auto py-2">
             {user?.matchInviteInfo?.outgoingReqs?.map((invite, i) => (
-                <MatchCard variant="outgoingReq" inviteData={invite} key={i} />
+              <MatchCard variant="outgoingReq" inviteData={invite} key={i} />
             ))}
           </div>
         </div>

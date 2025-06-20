@@ -30,14 +30,15 @@ function cancelReq(inviteId) {
     });
 }
 
-function resignFromMatch(matchId) {
-  axios
+async function resignFromMatch(matchId) {
+  await axios
     .post(
       `${import.meta.env.VITE_BACKEND_URL}/match/resign`,
       { matchId: matchId },
       { withCredentials: true }
     )
     .then((res) => {
+      // console.log(res);
       return res.data;
     });
 }
@@ -61,16 +62,18 @@ async function acceptReq(inviteId) {
           >
             here
           </a>{" "}
-          to join, or{" "}
-          <a
-            className="font-bold text-red-500"
+          to join that match, or{" "}
+          <button
+            className="font-bold text-red-500 cursor-pointer"
             onClick={() => {
-              resignFromMatch(error.response.data);
+              resignFromMatch(error.response.data).then(() =>
+                acceptReq(inviteId)
+              );
             }}
           >
             here
-          </a>{" "}
-          to resign
+          </button>{" "}
+          to resign and join this match
         </p>
       );
     }
@@ -113,7 +116,10 @@ function MatchCard({ inviteData, variant }) {
       }}
       className={`relative bg-zinc-800 rounded-2xl shadow-lg p-4 flex flex-col gap-2 transition-all duration-200 border border-zinc-700 
         ${variant === "normal" && "cursor-pointer hover:border-emerald-400"}
-        ${variant === "incomingReq" && "w-fit lg:w-full hover:border-emerald-400"}
+        ${
+          variant === "incomingReq" &&
+          "w-fit lg:w-full hover:border-emerald-400"
+        }
         ${variant === "outgoingReq" && "w-fit lg:w-full hover:border-amber-400"}
       `}
     >

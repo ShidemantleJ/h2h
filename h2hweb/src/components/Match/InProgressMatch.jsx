@@ -141,7 +141,7 @@ function InProgressMatch({ match, matchId, setMatch }) {
       )}
       {/* Profile picture and username of opponents and timer */}
       <div className="bg-zinc-800 rounded-2xl lg:col-span-2 h-fit">
-        <TopBar match={match} currSet={currSet} />
+        <TopBar match={match} currSet={currSet} userIsSpectator={userIsSpectator} />
       </div>
       {/* Submit Times */}
       {!userIsSpectator && <div className="bg-zinc-800 rounded-2xl p-5 h-fit w-fit">

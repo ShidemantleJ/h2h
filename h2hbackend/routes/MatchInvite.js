@@ -3,6 +3,7 @@ const router = express.Router();
 import { supabase } from "../db/supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
+// Re-checks all invite metadata
 function validateInvite(
   setFormat,
   solveFormat,
@@ -28,6 +29,7 @@ function validateInvite(
   } else return true;
 }
 
+// Creates skeleton for match until it's started
 async function createMatch(match) {
   const senderGoesFirst = Math.round(Math.random());
 
@@ -43,6 +45,8 @@ async function createMatch(match) {
         : match.sender_user_id,
       best_of_set_format: match.best_of_set_format,
       best_of_solve_format: match.best_of_solve_format,
+      // Creates array of best_of_set size, each element is best_of_solve_format.
+      // This allows the max_solves to be increased if two players get same result.
       max_solves: Array(Number(match.best_of_set_format)).fill(
         Number(match.best_of_solve_format)
       ),
@@ -51,16 +55,17 @@ async function createMatch(match) {
       status: "notstarted",
     })
     .select();
-  // console.log(error);
   return { data, error };
 }
 
+// Sends match invite with metadata from requestor
 router.post("/send", isLoggedIn, async (req, res) => {
   let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } =
     req.body;
-  const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  const senderId = req.user.dbInfo.id;
   if (!validateInvite(boSetFormat, boSolveFormat, event, 0, countdown_secs))
     return res.status(400).send("Invite invalid.");
+
   const { data, error } = await supabase
     .from("matchinvites")
     .insert({
@@ -73,17 +78,15 @@ router.post("/send", isLoggedIn, async (req, res) => {
     })
     .select("*");
 
-  if (error) {
-    res.status(500).json({ msg: "Could not send invite", error: error });
-    return;
-  }
-
-  res.status(201).json(data);
+  return error
+    ? res.status(500).json({ msg: "Could not send invite", error: error })
+    : res.status(201).json(data);
 });
 
 router.post("/accept", isLoggedIn, async (req, res) => {
   const { inviteId } = req.body;
 
+  // First checks if user is already in an ongoing match (in this case, not allowed to join a new one)
   const { data: inProgressMatchData, error: matchDataErr } = await supabase
     .from("matches")
     .select("*")
@@ -93,14 +96,15 @@ router.post("/accept", isLoggedIn, async (req, res) => {
     );
 
   if (inProgressMatchData[0]?.id) {
-    console.log(inProgressMatchData);
+    // Sends id, allowing frontend to prompt the user to rejoin or resign existing match
     return res.status(418).send(inProgressMatchData[0]?.id);
   }
 
+  // If user not already in match, accept the invite
   const { data, error } = await supabase
     .from("matchinvites")
     .update({ status: "accepted" })
-    .eq("id", Number.parseInt(inviteId, 10))
+    .eq("id", inviteId)
     .eq("recipient_user_id", req.user.dbInfo.id)
     .select()
     .single();
@@ -111,8 +115,9 @@ router.post("/accept", isLoggedIn, async (req, res) => {
       .send("Could not find this invite, may have been canceled or deleted");
 
   const { data: createMatchData, error: createMatchError } = createMatch(data);
-  if (createMatchError) return res.status(500).send(createMatchError);
-  return res.status(200).send(createMatchData);
+  return createMatchError
+    ? res.status(500).send(createMatchError)
+    : res.status(200);
 });
 
 router.post("/decline", isLoggedIn, async (req, res) => {
@@ -125,8 +130,7 @@ router.post("/decline", isLoggedIn, async (req, res) => {
       `sender_user_id.eq.${req.user.dbInfo.id},recipient_user_id.eq.${req.user.dbInfo.id}`
     );
 
-  if (!error) return res.status(200);
-  return res.status(500).send(error);
+  return error ? res.status(500).send(error) : res.status(200);
 });
 
 router.post("/cancel", isLoggedIn, async (req, res) => {
@@ -139,8 +143,7 @@ router.post("/cancel", isLoggedIn, async (req, res) => {
       `sender_user_id.eq.${req.user.dbInfo.id},recipient_user_id.eq.${req.user.dbInfo.id}`
     );
 
-  if (!error) return res.status(200);
-  return res.status(500).send(error);
+  return error ? res.status(500).send(error) : res.status(200);
 });
 
 export default router;

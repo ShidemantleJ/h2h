@@ -5,8 +5,9 @@ function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
 }
 
+// If wcaid exists, add profile id. If profile id exists, add WCAid. Otherwise, the new user
+// will be inserted into the users table.
 async function findOrCreateUser(user) {
-  // console.log("No user found");
   const { data, error } = await supabase
     .from("users")
     .upsert(

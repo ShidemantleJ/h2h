@@ -4,14 +4,16 @@ import { supabase } from "../db/supabase.js";
 // Returns 0 if first time won, 1 if second time won, -1 if invalid, -2 if same time
 function whoWonSolve(solve1, solve2) {
   if (isNaN(solve1) || isNaN(solve2)) return -1;
-  else if (solve2 === solve1) return -2;
+  else if (solve2 == solve1) return -2;
   else if (solve2 == -1) return 0;
   else if (solve1 == -1) return 1;
   else if (solve1 < solve2) return 0;
   else if (solve2 < solve1) return 1;
 }
 
+// Returns who won a set
 function wonSet(boSolve, p1setarr, p2setarr) {
+  // Returns early if set cannot possibly be over
   const solvesToWin = Math.ceil(boSolve / 2);
   if (
     !p1setarr ||
@@ -20,18 +22,20 @@ function wonSet(boSolve, p1setarr, p2setarr) {
     p1setarr?.length < solvesToWin
   )
     return "SET_NOT_OVER";
+
+  // Keeps track of # solves won for [p1, p2]
   let solvesWonArr = [0, 0];
   for (let i = 0; i < p1setarr.length; i++) {
     const winningPlayer = whoWonSolve(p1setarr[i], p2setarr[i]);
     if (winningPlayer < 0) continue;
     solvesWonArr[winningPlayer]++;
-    console.assert(winningPlayer === 0 || winningPlayer === 1);
   }
   if (solvesWonArr[0] >= solvesToWin) return "P1_WON";
   else if (solvesWonArr[1] >= solvesToWin) return "P2_WON";
   return "SET_NOT_OVER";
 }
 
+// Returns state of match
 function getGameState(boSolve, boSet, p1timearr, p2timearr) {
   const totalSets = Math.max(p1timearr.length, p2timearr.length);
   const setsToWin = Math.ceil(boSet / 2);
@@ -59,9 +63,10 @@ const getMatch = async (matchId) => {
   return { match, matchError };
 };
 
+// Updates time array
 function getUpdatedTimeArr(match, newTime, addForP1, addForP2) {
-  let newP1TimeArr = structuredClone(match.player_1_times);
-  let newP2TimeArr = structuredClone(match.player_2_times);
+  let newP1TimeArr = match.player_1_times;
+  let newP2TimeArr = match.player_2_times;
   if (addForP1) {
     if (newP1TimeArr.length === 0) newP1TimeArr.push([newTime]);
     else newP1TimeArr.at(-1).push(newTime);
@@ -71,7 +76,7 @@ function getUpdatedTimeArr(match, newTime, addForP1, addForP2) {
   }
 
   // If neither competitor won a solve, add another solve to the set
-  let newMaxSolves = structuredClone(match.max_solves);
+  let newMaxSolves = match.max_solves;
   if (
     newP1TimeArr.at(-1).length === newP2TimeArr.at(-1).length &&
     newP1TimeArr.length === newP2TimeArr.length &&
@@ -96,11 +101,12 @@ function getUpdatedTimeArr(match, newTime, addForP1, addForP2) {
 
   return { newP1TimeArr, newP2TimeArr, newMaxSolves };
 }
-
+// Returns latest set (1-based)
 function getCurrSet(p1timearr, p2timearr) {
   return Math.max(p1timearr.length, p2timearr.length);
 }
 
+// Returns the latest solve (1-based)
 function getCurrSolve(p1timearr, p2timearr) {
   return Math.max(
     p1timearr[p1timearr.length - 1].length,
@@ -108,6 +114,7 @@ function getCurrSolve(p1timearr, p2timearr) {
   );
 }
 
+// Returns new player turn (alternating solves, alternating sets)
 function getNewTurn(p1timearr, p2timearr) {
   const currSet = getCurrSet(p1timearr, p2timearr);
   const currSolve = getCurrSolve(p1timearr, p2timearr);
@@ -119,8 +126,8 @@ async function getNewScrambleArr(match, newP1TimeArr, newP2TimeArr) {
   // Get previous scramble array
   const currSet = getCurrSet(newP1TimeArr, newP2TimeArr);
   const currSolve = getCurrSolve(newP1TimeArr, newP2TimeArr);
-  const prevScrambleArr = structuredClone(match.scrambles) || [[]];
-  let newScrambleArr = structuredClone(prevScrambleArr);
+  const prevScrambleArr = match.scrambles || [[]];
+  let newScrambleArr = prevScrambleArr;
 
   // If scramble array doesn't contain a subarray for the current set, create subarray
   // and add scramble to the subarray
@@ -136,7 +143,8 @@ async function getNewScrambleArr(match, newP1TimeArr, newP2TimeArr) {
   return newScrambleArr;
 }
 
-// Gets a snapshot of all users present in the room by joining the room as 'monitor.' If only 'monitor' is present in the room, return 1 (empty), else return 0 (not empty)
+// Gets a snapshot of all users present in the room by joining the room as 'monitor.'
+// If only 'monitor' is present in the room, return 1 (empty), else return 0 (not empty)
 function getMatchRoomEmpty(match) {
   return new Promise((resolve, reject) => {
     const matchId = match.id;
@@ -168,6 +176,7 @@ function getMatchRoomEmpty(match) {
   });
 }
 
+// If the match countdown is over, a DNF is added
 async function handleMatchCountdownComplete(match, skipEmptyRoomCheck = false) {
   const { newP1TimeArr, newP2TimeArr, newMaxSolves } = getUpdatedTimeArr(
     match,

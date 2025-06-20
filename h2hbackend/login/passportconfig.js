@@ -2,6 +2,7 @@ import passport from "passport";
 import { findOrCreateUser } from "./user.js";
 import WCAStrategy from "passport-wca";
 
+// https://github.com/thewca/wca-oauth/tree/master/node/passport-wca
 passport.use(
   new WCAStrategy(
     {

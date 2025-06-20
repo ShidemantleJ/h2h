@@ -4,9 +4,10 @@ import { supabase } from "../db/supabase.js";
 import { isLoggedIn, findOrCreateUser } from "../login/user.js";
 
 async function removeFriend(userId, friendId) {
-  if (!userId || !friendId || isNaN(userId) || isNaN(friendId)) {
+  if (!userId || !friendId) {
     console.error("userid or friendid are undefined");
   }
+  // Removes row where user1_id and user2_id are some combination of userId (requestor) and friendId (friend to be removed)
   const { error } = await supabase
     .from("friends")
     .delete()
@@ -19,10 +20,9 @@ async function removeFriend(userId, friendId) {
 
 router.post("/sendReq", isLoggedIn, async (req, res) => {
   let { recipientId } = req.body;
-  recipientId = Number.parseInt(recipientId, 10);
-  const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  const senderId = req.user.dbInfo.id;
 
-  if (!recipientId || !senderId || isNaN(recipientId) || isNaN(senderId)) {
+  if (!recipientId || !senderId) {
     return res.status(400).send("Improper recipient/sender id");
   }
 
@@ -38,8 +38,7 @@ router.post("/sendReq", isLoggedIn, async (req, res) => {
 
 router.post("/acceptReq", isLoggedIn, async (req, res) => {
   let { senderId } = req.body;
-  senderId = Number.parseInt(senderId, 10);
-  const recipientId = Number.parseInt(req.user.dbInfo.id);
+  const recipientId = req.user.dbInfo.id;
 
   const { error } = await supabase
     .from("friendreqs")
@@ -48,14 +47,14 @@ router.post("/acceptReq", isLoggedIn, async (req, res) => {
     .eq("recipient_user_id", recipientId)
     .eq("status", "pending");
 
-  if (error) return res.status(500).send("Could not find friend request");
-  return res.status(200).send("You are now friends");
+  return error
+    ? res.status(500).send("Error accepting friend request")
+    : res.status(200).send("Friend request accepted");
 });
 
 router.post("/declineReq", isLoggedIn, async (req, res) => {
   let { senderId } = req.body;
-  senderId = Number.parseInt(senderId, 10);
-  const recipientId = Number.parseInt(req.user.dbInfo.id);
+  const recipientId = req.user.dbInfo.id;
 
   const { error } = await supabase
     .from("friendreqs")
@@ -64,17 +63,14 @@ router.post("/declineReq", isLoggedIn, async (req, res) => {
     .eq("recipient_user_id", recipientId)
     .eq("status", "pending");
 
-  if (error) {
-    console.error(error);
-    return res.status(500).send("Could not find friend request");
-  }
-  return res.status(200).send("Friend request declined");
+  return error
+    ? res.status(500).send("Error declining friend request")
+    : res.status(200).send("Friend request declined");
 });
 
 router.post("/cancelReq", isLoggedIn, async (req, res) => {
   let { recipientId } = req.body;
-  recipientId = Number.parseInt(recipientId, 10);
-  const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  const senderId = req.user.dbInfo.id;
 
   const { error } = await supabase
     .from("friendreqs")
@@ -89,9 +85,8 @@ router.post("/cancelReq", isLoggedIn, async (req, res) => {
 });
 
 router.post("/removeFriend", isLoggedIn, async (req, res) => {
-  const senderId = Number.parseInt(req.user.dbInfo.id, 10);
+  const senderId = req.user.dbInfo.id;
   let { friendId } = req.body;
-  friendId = Number.parseInt(friendId, 10);
   const error = await removeFriend(senderId, friendId);
 
   return error

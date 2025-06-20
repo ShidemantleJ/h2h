@@ -5,6 +5,7 @@ import supabase from "../supabase";
 import { UserContext } from "../user/UserContext";
 import LoggedInMessage from "../components/LoggedInMessage";
 import debounce from "lodash.debounce";
+import UserCardList from "../components/UserCardList";
 
 const fetchPublicUserInfo = async (searchTerm, setUserResult, userId) => {
   const { data, error } = await supabase
@@ -65,6 +66,7 @@ const Friends = () => {
                 setOpenDropdown(true);
               }}
               id="friendSearch"
+              autoComplete="off"
               className={`w-full p-4 rounded-xl ${
                 openDropdown && userResult.length > 0 && "rounded-b-none "
               } bg-zinc-700 focus:outline-none`}
@@ -93,16 +95,16 @@ const Friends = () => {
               Incoming Friend Requests
             </h2>
             <div className="overflow-x-auto whitespace-nowrap flex gap-4">
-              {user?.friendInfo?.incomingReqs.map((userId, i) => (
-                <UserCard
-                  variant="IncomingReq"
-                  layout="vertical"
-                  key={"incoming_req_" + userId}
-                  userId={userId}
-                />
-              ))}
-              {user?.friendInfo?.incomingReqs.length === 0 && (
+              {user?.friendInfo?.incomingReqs.length === 0 ? (
                 <p className="text-zinc-400">No incoming requests.</p>
+              ) : (
+                <UserCardList
+                  variant={"IncomingReq"}
+                  layout={"vertical"}
+                  keyPrefix={"incoming_req_"}
+                  usersArray={user?.friendInfo?.incomingReqs}
+                  friendInfo={user.friendInfo}
+                />
               )}
             </div>
           </div>
@@ -111,18 +113,15 @@ const Friends = () => {
               Outgoing Friend Requests
             </h2>
             <div className="overflow-x-auto whitespace-nowrap flex gap-4">
-              {user?.friendInfo?.outgoingReqs.map((userId, i) => (
-                <>
-                  <UserCard
-                    variant="OutgoingReq"
-                    layout="vertical"
-                    key={"outgoing_req_" + userId}
-                    userId={userId}
-                  />
-                </>
-              ))}
-              {user?.friendInfo?.outgoingReqs.length === 0 && (
+              {user?.friendInfo?.outgoingReqs.length === 0 ? (
                 <p className="text-zinc-400">No outgoing requests.</p>
+              ) : (
+                <UserCardList
+                  keyPrefix={"outgoing_req_"}
+                  layout="vertical"
+                  usersArray={user?.friendInfo?.outgoingReqs}
+                  variant={"OutgoingReq"}
+                />
               )}
             </div>
           </div>
@@ -131,19 +130,18 @@ const Friends = () => {
         <div className="bg-zinc-800 rounded-2xl p-6 lg:col-span-2 shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">Your Friends</h2>
           <div className="flex gap-4 whitespace-nowrap overflow-x-auto">
-            {user?.friendInfo?.friends.map((userId, i) => (
-              <UserCard
-                variant="FriendReq"
-                layout="vertical"
-                key={"friend_" + userId}
-                userId={userId}
-                friendInfo={user.friendInfo}
-              />
-            ))}
-            {user?.friendInfo?.friends.length === 0 && (
+            {user?.friendInfo?.friends.length === 0 ? (
               <p className="col-span-full text-zinc-400">
                 You have no friends yet.
               </p>
+            ) : (
+              <UserCardList
+                keyPrefix={"friend_"}
+                layout={"vertical"}
+                usersArray={user?.friendInfo?.friends}
+                variant={"FriendReq"}
+                friendInfo={user.friendInfo}
+              />
             )}
           </div>
         </div>

@@ -256,10 +256,9 @@ const UserCard = ({
       }`}
     >
       <div className="relative">
-        {isOnline && <>
-          <div className={`lg:absolute -top-1 -left-1 w-5 h-5 rounded-4xl border-2 border-emerald-500`} />
-          <div className={`hidden lg:block lg:absolute top-0 left-0 w-3 h-3 rounded-4xl border-[1.75px] border-emerald-500`} />
-        </>}
+        {isOnline && 
+          <div className={`absolute -top-1 -left-1 w-4 h-4 rounded-4xl border-3 border-emerald-500`} />
+        }
         <img
           className={`${
             layout === "horizontal" ? "hidden lg:block" : "block"

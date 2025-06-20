@@ -11,7 +11,7 @@ import MatchCard from "../components/MatchCard";
 const UserView = () => {
   const { userId } = useParams();
   const { user: loggedInUser } = useContext(UserContext);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({loading: true});
   const [recentMatches, setRecentMatches] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState("333");
   const [eventStats, setEventStats] = useState({});
@@ -42,12 +42,16 @@ const UserView = () => {
     getAverage(userId, selectedEvent);
   }, [userId, selectedEvent]);
 
-  if (!user || !user.created_at) {
+  if (user?.empty === true) {
     return (
       <div className="bg-zinc-900 flex items-center justify-center w-full min-h-dvh text-white text-lg">
         User not found
       </div>
     );
+  }
+
+  if (user?.loading === true) {
+    return <div className="bg-zinc-900 min-h-dvh w-full"/>
   }
 
   return (
