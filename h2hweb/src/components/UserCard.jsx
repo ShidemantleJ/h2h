@@ -274,9 +274,9 @@ const UserCard = ({
         </h1>
         <a
           className="text-sm text-zinc-300 hover:underline truncate"
-          href={`http://worldcubeassociation.org/persons/${user.wcaid}`}
+          href={`http://worldcubeassociation.org/persons/${user?.wcaid}`}
         >
-          {user.wcaid}
+          {user?.wcaid}
         </a>
       </div>
       <div

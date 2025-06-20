@@ -78,7 +78,7 @@ const Friends = () => {
                     hover={false}
                     friendInfo={user.friendInfo}
                     variant="FriendReq"
-                    key={"friend_search_" + searchUser}
+                    key={"friend_search_" + searchUser.id}
                     userId={searchUser.id}
                   />
                 ))}

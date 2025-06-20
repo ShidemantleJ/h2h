@@ -65,9 +65,9 @@ const UserView = () => {
           </h1>
           <a
             className="text-emerald-200 text-lg cursor-pointer hover:underline"
-            href={`https://worldcubeassociation.org/persons/${user.wcaid}`}
+            href={`https://worldcubeassociation.org/persons/${user?.wcaid}`}
           >
-            {user.wcaid}
+            {user?.wcaid}
           </a>
           <p className="text-zinc-300 text-md mt-2">
             Joined on{" "}

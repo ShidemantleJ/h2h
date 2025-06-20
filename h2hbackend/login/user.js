@@ -6,12 +6,12 @@ function isLoggedIn(req, res, next) {
 }
 
 async function findOrCreateUser(user) {
-  // console.log(user);
+  // console.log(user.id);
   if (!user.wca.id) return null;
   const { data, error } = await supabase
     .from("users")
     .select()
-    .eq("wcaid", user.wca.id)
+    .eq("profile_id", user.id)
     .single();
 
   console.error(error);
@@ -20,7 +20,8 @@ async function findOrCreateUser(user) {
     // console.log("No user found");
     const { error } = await supabase.from("users").insert({
       name: user.displayName,
-      wcaid: user.wca.id,
+      profile_id: user.id,
+      wcaid: user?.wca.id,
       profile_pic_url: user.photos[0].value,
     });
 
