@@ -18,12 +18,15 @@ async function findOrCreateUser(user) {
 
   if (!data) {
     // console.log("No user found");
-    const { error } = await supabase.from("users").insert({
-      name: user.displayName,
-      profile_id: user.id,
-      wcaid: user?.wca.id,
-      profile_pic_url: user.photos[0].value,
-    });
+    const { error } = await supabase.from("users").upsert(
+      {
+        name: user.displayName,
+        profile_id: user.id,
+        wcaid: user?.wca.id,
+        profile_pic_url: user.photos[0].value,
+      },
+      { onConflict: ["wcaid"] }
+    );
 
     console.error(error);
   }
