@@ -8,17 +8,11 @@ function isLoggedIn(req, res, next) {
 async function findOrCreateUser(user) {
   // console.log(user.id);
   if (!user.wca.id) return null;
+
+  // console.log("No user found");
   const { data, error } = await supabase
     .from("users")
-    .select()
-    .eq("profile_id", user.id)
-    .single();
-
-  console.error(error);
-
-  if (!data) {
-    // console.log("No user found");
-    const { error } = await supabase.from("users").upsert(
+    .upsert(
       {
         name: user.displayName,
         profile_id: user.id,
@@ -26,11 +20,23 @@ async function findOrCreateUser(user) {
         profile_pic_url: user.photos[0].value,
       },
       { onConflict: ["wcaid"] }
-    );
+    )
+    .select();
+  const { data: data2, error: error2 } = await supabase
+    .from("users")
+    .upsert(
+      {
+        name: user.displayName,
+        profile_id: user.id,
+        wcaid: user?.wca.id,
+        profile_pic_url: user.photos[0].value,
+      },
+      { onConflict: ["profile_id"] }
+    )
+    .select();
 
-    console.error(error);
-  }
-  return data;
+  console.error(error, error2);
+  return data || data2;
 }
 
 export { findOrCreateUser, isLoggedIn };
