@@ -6,9 +6,6 @@ function isLoggedIn(req, res, next) {
 }
 
 async function findOrCreateUser(user) {
-  // console.log(user.id);
-  if (!user.wca.id) return null;
-
   // console.log("No user found");
   const { data, error } = await supabase
     .from("users")
