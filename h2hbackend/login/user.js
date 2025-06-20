@@ -21,7 +21,8 @@ async function findOrCreateUser(user) {
       },
       { onConflict: ["wcaid"] }
     )
-    .select();
+    .select()
+    .single();
   const { data: data2, error: error2 } = await supabase
     .from("users")
     .upsert(
@@ -33,7 +34,8 @@ async function findOrCreateUser(user) {
       },
       { onConflict: ["profile_id"] }
     )
-    .select();
+    .select()
+    .single();
 
   console.error(error, error2);
   return data || data2;
