@@ -13,7 +13,7 @@ async function getLastXMatches(event, userId, lowerLimit, upperLimit) {
     player2:users!matches_player_2_id_fkey(id, name)`
           )
           .or(`player_1_id.eq.${userId},player_2_id.eq.${userId}`)
-          .or("status.eq.ongoing,status.eq.both_left")
+          .neq("status", "both_left")
           .order("created_at", { ascending: false })
           .range(lowerLimit, upperLimit)
       : await supabase
@@ -27,7 +27,6 @@ async function getLastXMatches(event, userId, lowerLimit, upperLimit) {
           .eq("event", event)
           .order("created_at", { ascending: false })
           .range(lowerLimit, upperLimit);
-
   if (error) console.log(error);
   else return data;
 }
@@ -60,7 +59,7 @@ async function getStatsLast10Matches(event, userId) {
     );
   });
 
-  solves = solves.filter((solveTime) => solveTime !== -1);
+  solves = solves.filter((solveTime) => solveTime != -1);
 
   let sum = 0;
   solves.forEach((solve) => (sum += parseFloat(solve)));

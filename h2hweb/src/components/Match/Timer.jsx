@@ -102,7 +102,7 @@ function Timer({ matchId }) {
     <div className="space-y-3">
       <div className="inline-flex items-center">
         <h2 className="text-2xl font-semibold">Timer</h2>
-        <Tooltip anchorSelect=".timer-info" place="top">
+        <Tooltip anchorSelect=".timer-info" place="top" className="z-50">
           You can use an external timer, or the built in
           <br />
           timer controlled with the spacebar. Once you've

@@ -30,7 +30,7 @@ const UserView = () => {
         selectedEvent,
         userId
       );
-      const recentMatches = await getLastXMatches("all", userId, 1, 10);
+      const recentMatches = await getLastXMatches("all", userId, 0, 10);
       setRecentMatches(recentMatches);
       setEventStats((prev) => ({
         ...prev,
