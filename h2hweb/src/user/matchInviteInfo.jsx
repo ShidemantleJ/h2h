@@ -15,13 +15,21 @@ const getMatchInviteInfo = async (user, setUser) => {
     .eq("sender_user_id", user.dbInfo.id)
     .eq("status", "pending");
 
-  if (incInviteError || outInviteError) {
-    console.error(incInviteError, outInviteError);
+  const { data: randomInviteData, error: randomInviteError } = await supabase
+    .from("matchinvites")
+    .select("*")
+    .eq("to_random_users", true)
+    .eq("status", "pending")
+    .neq("sender_user_id", user.dbInfo.id);
+
+  if (incInviteError || outInviteError || randomInviteError) {
+    console.error(incInviteError, outInviteError, randomInviteError);
     return;
   }
   const matchInviteInfo = {
     incomingReqs: incInviteData || [],
     outgoingReqs: outInviteData || [],
+    randomIncomingReqs: randomInviteData || [],
   };
   setUser((prevUser) => ({
     ...prevUser,
@@ -76,9 +84,21 @@ const subscribeToMatchInviteChanges = (user, setUser) => {
         await getMatchInviteInfo(user, setUser);
       }
     )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "matchinvites",
+        filter: `recipient_user_id=eq.-1`,
+      },
+      async (payload) => {
+        await getMatchInviteInfo(user, setUser);
+      }
+    )
     .subscribe();
 
-  return () => supabase.removeChannel(channelA);
+  return () => channelA.unsubscribe();
 };
 
 export { subscribeToMatchInviteChanges, getMatchInviteInfo };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-function EventSelector({selectedEvent, setSelectedEvent, bgcolor = "bg-zinc-900"}) {
+function EventSelector({selectedEvent, showAllOption = false, setSelectedEvent, bgcolor = "bg-zinc-900"}) {
     return (
         <div>
             <p>Choose an event:</p>
@@ -11,6 +11,7 @@ function EventSelector({selectedEvent, setSelectedEvent, bgcolor = "bg-zinc-900"
               value={selectedEvent}
               onChange={(e) => setSelectedEvent(e.target.value)}
             >
+              {showAllOption && <option value="All">All</option>}
               <option value="333">3x3</option>
               <option value="222">2x2</option>
               <option value="444">4x4</option>

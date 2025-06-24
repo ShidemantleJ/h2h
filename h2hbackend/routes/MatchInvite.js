@@ -60,12 +60,36 @@ async function createMatch(match) {
 
 // Sends match invite with metadata from requestor
 router.post("/send", isLoggedIn, async (req, res) => {
-  let { recipientId, boSetFormat, boSolveFormat, event, countdown_secs } =
-    req.body;
+  let {
+    recipientId,
+    boSetFormat,
+    boSolveFormat,
+    event,
+    countdown_secs,
+    toRandomUsers,
+  } = req.body;
   const senderId = req.user.dbInfo.id;
   if (!validateInvite(boSetFormat, boSolveFormat, event, 0, countdown_secs))
     return res.status(400).send("Invite invalid.");
 
+  // Only allow user to send one invite to everyone at a time
+  if (recipientId == -1) {
+    let { data: existingInviteData, error: existingInviteError } =
+      await supabase
+        .from("matchinvites")
+        .select("*")
+        .eq("sender_user_id", req.user.dbInfo.id)
+        .eq("recipient_user_id", -1)
+        .eq("status", "pending");
+
+    if (existingInviteData?.length >= 3)
+      return res
+        .status(400)
+        .send("You can only send a maximum of 3 invites to all random users");
+  }
+
+  // If to_random_users is false, it's a normal invite between friends. Otherwise,
+  // it's an invite for a random opponent
   const { data, error } = await supabase
     .from("matchinvites")
     .insert({
@@ -73,6 +97,7 @@ router.post("/send", isLoggedIn, async (req, res) => {
       recipient_user_id: recipientId,
       best_of_set_format: Number(boSetFormat),
       best_of_solve_format: boSolveFormat,
+      to_random_users: toRandomUsers,
       event: event,
       countdown_secs: Number(countdown_secs),
     })
@@ -103,9 +128,8 @@ router.post("/accept", isLoggedIn, async (req, res) => {
   // If user not already in match, accept the invite
   const { data, error } = await supabase
     .from("matchinvites")
-    .update({ status: "accepted" })
+    .update({ status: "accepted", recipient_user_id: req.user.dbInfo.id })
     .eq("id", inviteId)
-    .eq("recipient_user_id", req.user.dbInfo.id)
     .select()
     .single();
 

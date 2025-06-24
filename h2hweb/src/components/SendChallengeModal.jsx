@@ -3,8 +3,9 @@ import { toast } from "react-toastify";
 import Button from "./Button";
 import axios from "axios";
 import EventSelector from "./EventSelector";
+import { ReceiptEuroIcon } from "lucide-react";
 
-function handleSubmit(
+async function handleSubmit(
   recipientId,
   setFormat,
   solveFormat,
@@ -13,18 +14,24 @@ function handleSubmit(
   seconds,
   setShowModal
 ) {
-  toast("Challenge sent!");
-  axios.post(
-    `${import.meta.env.VITE_BACKEND_URL}/matchInvite/send`,
-    {
-      recipientId: recipientId,
-      boSetFormat: setFormat,
-      boSolveFormat: solveFormat,
-      event: selectedEvent,
-      countdown_secs: Number(minutes) * 60 + Number(seconds),
-    },
-    { withCredentials: true }
-  );
+  try {
+    const res = await axios
+      .post(
+        `${import.meta.env.VITE_BACKEND_URL}/matchInvite/send`,
+        {
+          recipientId: recipientId,
+          boSetFormat: setFormat,
+          boSolveFormat: solveFormat,
+          toRandomUsers: recipientId === -1,
+          event: selectedEvent,
+          countdown_secs: Number(minutes) * 60 + Number(seconds),
+        },
+        { withCredentials: true }
+      );
+  } catch (err) {
+    // console.log(err);
+    toast.error(err.response.data);
+  }
   setShowModal(false);
 }
 

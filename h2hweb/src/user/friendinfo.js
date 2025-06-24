@@ -53,7 +53,7 @@ const getFriendInfo = async (user, setUser) => {
 };
 
 const subscribeToFriendChanges = (user, setUser) => {
-  console.log("subscribed to friend changes");
+  // console.log("subscribed to friend changes");
   const channelA = supabase
     .channel(`friend-req-changes-${user.dbInfo.id}`)
     .on(

@@ -1,10 +1,12 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, useContext, memo } from "react";
 import { getUserInfo } from "../utils/dbutils";
 import Button from "./Button";
 import { getEventNameFromId } from "../lib/events";
 import axios from "axios";
 import { getMatchScore } from "../helpers/matchHelpers";
 import { toast } from "react-toastify";
+import { getStatsLast10Matches } from "../utils/userStats";
+import { OnlineUsersContext } from "../user/OnlineUsersContext";
 
 function declineReq(inviteId) {
   axios
@@ -80,8 +82,10 @@ async function acceptReq(inviteId) {
   }
 }
 
-function MatchCard({ inviteData, variant }) {
+function MatchCard({ inviteData, variant, showDecline = true }) {
   const [name, setName] = useState("");
+  const [avg, setAvg] = useState(0.0);
+  const {onlineUsers} = useContext(OnlineUsersContext);
 
   useEffect(() => {
     if (
@@ -89,14 +93,29 @@ function MatchCard({ inviteData, variant }) {
       variant === "normal"
     )
       return;
-    variant === "outgoingReq" &&
-      getUserInfo(inviteData.recipient_user_id).then((user) => {
-        setName(user.name);
-      });
-    variant === "incomingReq" &&
+    async function getAvg() {
+      const { mean } = await getStatsLast10Matches(
+        inviteData.event,
+        inviteData.sender_user_id
+      );
+      setAvg(mean);
+    }
+
+    if (variant === "outgoingReq") {
+      if (inviteData.recipient_user_id === -1) {
+        setName("Anyone");
+      } else {
+        getUserInfo(inviteData.recipient_user_id).then((user) => {
+          setName(user.name);
+        });
+      }
+    }
+    if (variant === "incomingReq") {
       getUserInfo(inviteData.sender_user_id).then((user) => {
         setName(user.name);
       });
+      getAvg();
+    }
   }, [inviteData?.recipient_user_id]);
 
   let nameAndScore;
@@ -107,6 +126,8 @@ function MatchCard({ inviteData, variant }) {
       ` [${setsWonArr[0]}] vs. [${setsWonArr[1]}] ` +
       inviteData.player2.name;
   }
+
+  if (variant === "incomingReq" && !onlineUsers.includes(inviteData.sender_user_id)) return null;
 
   return (
     <div
@@ -150,6 +171,11 @@ function MatchCard({ inviteData, variant }) {
           {new Date(inviteData.created_at).toLocaleDateString()}
         </p>
       )}
+      {variant === "incomingReq" && (
+        <p className="text-zinc-300 text-sm mt-1">
+          {avg === "N/A" ? "Hasn't competed yet" : "Avg: " + avg}
+        </p>
+      )}
       {variant !== "normal" && (
         <p className="text-zinc-500 text-xs mt-1">
           {Math.floor(inviteData.countdown_secs / 60)}:
@@ -168,19 +194,19 @@ function MatchCard({ inviteData, variant }) {
         </div>
       )}
       {variant === "incomingReq" && (
-        <div className="flex flex-col gap-2 justify-end mt-2">
+        <div className="flex flex-row gap-2 justify-end mt-2">
           <Button
             color="green"
             text="Accept"
             onClick={() => acceptReq(inviteData.id)}
             className="w-24"
           />
-          <Button
+          {showDecline && <Button
             color="red"
             text="Decline"
             onClick={() => declineReq(inviteData.id)}
             className="w-24"
-          />
+          />}
         </div>
       )}
     </div>
