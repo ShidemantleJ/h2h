@@ -29,6 +29,10 @@ function CountdownTimer({
   );
 
   useEffect(() => {
+    setTimeLeft(calculateTimeLeft(startTimestamp, countdownSecs));
+  }, [isRunning]);
+
+  useEffect(() => {
     if (!startTimestamp || !countdownSecs) return;
     const intervalId = setInterval(() => {
       const calculatedTimeLeft = calculateTimeLeft(
@@ -36,10 +40,7 @@ function CountdownTimer({
         countdownSecs
       );
       setTimeLeft(calculatedTimeLeft);
-      if (
-        typeof onTimeUp === "function" &&
-        calculatedTimeLeft.seconds < 0
-      ) {
+      if (typeof onTimeUp === "function" && calculatedTimeLeft.seconds < 0) {
         if (isRunning) onTimeUp();
       }
     }, 1000);
@@ -58,7 +59,7 @@ function CountdownTimer({
             : "text-black"
         }`}
       >
-        {isRunning ? timeLeft.text : "0:00"}
+        {isRunning ? timeLeft.text : "00:00"}
       </p>
     </div>
   );
