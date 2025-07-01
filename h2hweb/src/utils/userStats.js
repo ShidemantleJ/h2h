@@ -2,31 +2,28 @@ import { getMatchScore } from "../helpers/matchHelpers";
 import supabase from "../supabase";
 
 async function getLastXMatches(event, userId, lowerLimit, upperLimit) {
-  // Fetch last x matches for the specified event, but don't filter by event if "all" passed as event
-  const { data, error } =
-    event === "all"
-      ? await supabase
-          .from("matches")
-          .select(
-            `*,
+  let query = supabase
+    .from("matches")
+    .select(
+      `*,
     player1:users!matches_player_1_id_fkey(id, name),
     player2:users!matches_player_2_id_fkey(id, name)`
-          )
-          .or(`player_1_id.eq.${userId},player_2_id.eq.${userId}`)
-          .neq("status", "both_left")
-          .order("created_at", { ascending: true })
-          .range(lowerLimit, upperLimit)
-      : await supabase
-          .from("matches")
-          .select(
-            `*,
-    player1:users!matches_player_1_id_fkey(id, name),
-    player2:users!matches_player_2_id_fkey(id, name)`
-          )
-          .or(`player_1_id.eq.${userId},player_2_id.eq.${userId}`)
-          .eq("event", event)
-          .order("created_at", { ascending: true })
-          .range(lowerLimit, upperLimit);
+    )
+    .neq("status", "both_left");
+
+  if (userId !== null) {
+    query = query.or(`player_1_id.eq.${userId},player_2_id.eq.${userId}`);
+  }
+
+  if (event !== "all") {
+    query = query.eq("event", event);
+  }
+
+  query = query
+    .order("created_at", { ascending: true })
+    .range(lowerLimit, upperLimit);
+
+  const { data, error } = await query;
   if (error) console.log(error);
   else return data;
 }
