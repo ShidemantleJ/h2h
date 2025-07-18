@@ -20,7 +20,7 @@ async function getLastXMatches(event, userId, lowerLimit, upperLimit) {
   }
 
   query = query
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: false })
     .range(lowerLimit, upperLimit);
 
   const { data, error } = await query;

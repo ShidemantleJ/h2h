@@ -4,11 +4,15 @@ import { supabase } from "../db/supabase.js";
 // Returns 0 if first time won, 1 if second time won, -1 if invalid, -2 if same time
 function whoWonSolve(solve1, solve2) {
   if (isNaN(solve1) || isNaN(solve2)) return -1;
-  else if (solve2 == solve1) return -2;
-  else if (solve2 == -1) return 0;
-  else if (solve1 == -1) return 1;
-  else if (solve1 < solve2) return 0;
-  else if (solve2 < solve1) return 1;
+  else {
+    solve1 = Number.parseFloat(solve1, 10);
+    solve2 = Number.parseFloat(solve2, 10);
+    if (solve2 == solve1) return -2;
+    else if (solve2 == -1) return 0;
+    else if (solve1 == -1) return 1;
+    else if (solve1 < solve2) return 0;
+    else if (solve2 < solve1) return 1;
+  }
 }
 
 // Returns who won a set
